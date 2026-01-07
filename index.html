@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Matt Lubin</title>
+  <meta name="description" content="Biologist • Science Writer • Rabbi & Jewish Ethicist • AI Safety Researcher">
+  <style>
+    /* Root variables for theming */
+    :root {
+      --bg-light: #faf8f5;
+      --bg-dark: #1a1614;
+      --text-light: #2d2a26;
+      --text-dark: #e8e4df;
+      --text-muted-light: #6b6762;
+      --text-muted-dark: #9a9288;
+
+      /* Main domain colors */
+      --biology: #2d7a5e;
+      --biology-light: #3d9a78;
+      --ai-safety: #8b5a3c;
+      --ai-safety-light: #a86f4d;
+      --judaism: #4a5f8d;
+      --judaism-light: #5d76ab;
+
+      /* Crossover colors (blended) */
+      --bio-ai: #4d6a4e;
+      --bio-judaism: #3d6b76;
+      --ai-judaism: #6d5965;
+    }
+
+    /* Default to light mode */
+    :root {
+      --bg: var(--bg-light);
+      --text: var(--text-light);
+      --text-muted: var(--text-muted-light);
+    }
+
+    /* Dark mode when class is applied */
+    :root.dark {
+      --bg: var(--bg-dark);
+      --text: var(--text-dark);
+      --text-muted: var(--text-muted-dark);
+    }
+
+    /* Respect system preference if no manual selection */
+    @media (prefers-color-scheme: dark) {
+      :root:not(.light) {
+        --bg: var(--bg-dark);
+        --text: var(--text-dark);
+        --text-muted: var(--text-muted-dark);
+      }
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Iowan Old Style', 'Palatino Linotype', 'URW Palladio L', P052, serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      transition: background-color 0.3s ease, color 0.3s ease;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Hero section */
+    .hero {
+      text-align: center;
+      padding: 1rem 2rem 1rem;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .hero-title {
+      font-size: 2.5rem;
+      font-weight: 400;
+      margin-bottom: 0.75rem;
+      letter-spacing: 0.01em;
+    }
+
+    .hero-subtitle {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      font-weight: 300;
+      line-height: 1.8;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    .words {
+      text-align: center;
+      padding: 1rem 2rem 1rem;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    /* Flower container */
+    .flower-container {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      min-height: 650px;
+    }
+
+    .flower {
+      position: relative;
+      width: 650px;
+      height: 650px;
+      max-width: 95vw;
+      max-height: 95vw;
+    }
+
+    /* Center button - personal */
+    .flower-center {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 120px;
+      height: 120px;
+      background: linear-gradient(135deg, #6b6762 0%, #8a827a 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      text-decoration: none;
+      font-size: 0.95rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      box-shadow: 0 3px 15px rgba(0, 0, 0, 0.15);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 3;
+      cursor: pointer;
+    }
+
+    .flower-center:hover {
+      transform: translate(-50%, -50%) scale(1.08);
+      box-shadow: 0 6px 25px rgba(0, 0, 0, 0.25);
+    }
+
+    /* Base petal styling */
+    .petal {
+      position: absolute;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      color: #ffffff;
+      text-align: center;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 2;
+      cursor: pointer;
+      padding: 1.5rem;
+    }
+
+    /* Main petals - larger, more prominent */
+    .petal-main {
+      width: 200px;
+      height: 200px;
+      border-radius: 45% 55% 50% 50% / 55% 50% 50% 45%;
+      font-size: 1.25rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+    }
+
+    /* Crossover petals - smaller, diamond-like */
+    .petal-cross {
+      width: 140px;
+      height: 140px;
+      border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+      font-size: 0.8rem;
+      font-weight: 400;
+      letter-spacing: 0.06em;
+      line-height: 1.4;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+      opacity: 0.95;
+    }
+
+    .petal:hover {
+      transform: scale(1.05);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+      z-index: 10;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .petal {
+        transition: none;
+      }
+    }
+
+    /* Individual petal colors and positions */
+
+    /* BIOLOGY - top */
+    .petal-biology {
+      background: linear-gradient(135deg, var(--biology) 0%, var(--biology-light) 100%);
+      top: 5%;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+    .petal-biology:hover {
+      transform: translateX(-50%) scale(1.05);
+    }
+
+    /* AI SAFETY - bottom right */
+    .petal-ai {
+      background: linear-gradient(135deg, var(--ai-safety) 0%, var(--ai-safety-light) 100%);
+      bottom: 18%;
+      right: 12%;
+    }
+
+    /* JUDAISM - bottom left */
+    .petal-judaism {
+      background: linear-gradient(135deg, var(--judaism) 0%, var(--judaism-light) 100%);
+      bottom: 18%;
+      left: 12%;
+    }
+
+    /* BIO × AI SAFETY - between biology and AI */
+    .petal-bio-ai {
+      background: linear-gradient(135deg, var(--bio-ai) 0%, #5d7d5e 100%);
+      top: 28%;
+      right: 16%;
+      transform: rotate(15deg);
+    }
+    .petal-bio-ai:hover {
+      transform: rotate(15deg) scale(1.05);
+    }
+
+    /* BIO × JUDAISM - between biology and judaism */
+    .petal-bio-judaism {
+      background: linear-gradient(135deg, var(--bio-judaism) 0%, #4d7d8a 100%);
+      top: 28%;
+      left: 16%;
+      transform: rotate(-15deg);
+    }
+    .petal-bio-judaism:hover {
+      transform: rotate(-15deg) scale(1.05);
+    }
+
+    /* AI × JUDAISM - between AI and judaism */
+    .petal-ai-judaism {
+      background: linear-gradient(135deg, var(--ai-judaism) 0%, #806775 100%);
+      bottom: 5%;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+    .petal-ai-judaism:hover {
+      transform: translateX(-50%) scale(1.05);
+    }
+
+    .petal-text {
+      display: block;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Header */
+    .site-header {
+      padding: 1.5rem 2rem;
+      text-align: center;
+    }
+
+    .header-nav {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    .header-nav a {
+      color: var(--text-muted);
+      text-decoration: none;
+      margin: 0 0.4rem;
+      transition: color 0.2s ease;
+    }
+
+    .header-nav a:hover {
+      color: var(--text);
+    }
+
+    /* Theme toggle button */
+    .theme-toggle {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      padding: 0;
+      margin: 0 0.4rem;
+      transition: color 0.2s ease;
+    }
+
+    .theme-toggle:hover {
+      color: var(--text);
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .hero-title {
+        font-size: 2rem;
+      }
+
+      .hero-subtitle {
+        font-size: 0.85rem;
+      }
+
+      .flower {
+        width: 550px;
+        height: 550px;
+      }
+
+      .petal-main {
+        width: 170px;
+        height: 170px;
+        font-size: 1.05rem;
+        padding: 1.2rem;
+      }
+
+      .petal-cross {
+        width: 120px;
+        height: 120px;
+        font-size: 0.7rem;
+        padding: 1rem;
+      }
+
+      .flower-center {
+        width: 100px;
+        height: 100px;
+        font-size: 0.8rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .hero {
+        padding: 2rem 1rem 0.5rem;
+      }
+
+      .hero-title {
+        font-size: 1.6rem;
+      }
+
+      .hero-subtitle {
+        font-size: 0.8rem;
+      }
+
+      .flower {
+        width: 420px;
+        height: 420px;
+      }
+
+      .petal-main {
+        width: 130px;
+        height: 130px;
+        font-size: 0.9rem;
+        padding: 1rem;
+      }
+
+      .petal-cross {
+        width: 95px;
+        height: 95px;
+        font-size: 0.6rem;
+        padding: 0.75rem;
+      }
+
+      .flower-center {
+        width: 80px;
+        height: 80px;
+        font-size: 0.7rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <nav class="header-nav">
+      <a href="/about">about</a> ·
+      <a href="/writing">writing</a> ·
+      <a href="/contact">contact</a> ·
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <span id="themeIcon">☾</span>
+      </button>
+    </nav>
+  </header>
+
+  <main>
+    <div class="hero">
+      <h1 class="hero-title">Matt Lubin</h1>
+      <p class="hero-subtitle">Biologist • Writer • Rabbi • AI Safety Advocate</p>
+    </div>
+
+    <div class="words">
+        <p> None of these links or buttons are currently working. 
+        But I hope that someday they will do something cool, because I will have done something cool.</p>
+    </div>
+
+
+    <div class="flower-container">
+      <div class="flower">
+        <!-- Main petals: larger, distinct -->
+        <a href="/biology" class="petal petal-main petal-biology">
+          <span class="petal-text">BIOLOGY</span>
+        </a>
+
+        <a href="/ai-safety" class="petal petal-main petal-ai">
+          <span class="petal-text">AI SAFETY</span>
+        </a>
+
+        <a href="/judaism" class="petal petal-main petal-judaism">
+          <span class="petal-text">JUDAISM</span>
+        </a>
+
+        <!-- Crossover petals: smaller, between main domains -->
+        <a href="/bio-ai" class="petal petal-cross petal-bio-ai">
+          <span class="petal-text">BIO ×<br>AI SAFETY</span>
+        </a>
+
+        <a href="/bio-judaism" class="petal petal-cross petal-bio-judaism">
+          <span class="petal-text">BIO ×<br>JUDAISM</span>
+        </a>
+
+        <a href="/ai-judaism" class="petal petal-cross petal-ai-judaism">
+          <span class="petal-text">AI SAFETY ×<br>JUDAISM</span>
+        </a>
+
+        <!-- Center button -->
+        <a href="/personal" class="flower-center">
+          <span class="petal-text">PERSONAL</span>
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // Theme toggle functionality
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = document.getElementById('themeIcon');
+    const html = document.documentElement;
+
+    // Check for saved theme preference or default to system preference
+    const savedTheme = localStorage.getItem('theme');
+    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+    // Initialize theme
+    if (savedTheme === 'dark') {
+      html.classList.add('dark');
+      themeIcon.textContent = '☀';
+    } else if (savedTheme === 'light') {
+      html.classList.add('light');
+      themeIcon.textContent = '☾';
+    } else if (systemPrefersDark) {
+      themeIcon.textContent = '☀';
+    }
+
+    // Toggle theme on button click
+    themeToggle.addEventListener('click', () => {
+      if (html.classList.contains('dark')) {
+        html.classList.remove('dark');
+        html.classList.add('light');
+        localStorage.setItem('theme', 'light');
+        themeIcon.textContent = '☾';
+      } else {
+        html.classList.remove('light');
+        html.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+        themeIcon.textContent = '☀';
+      }
+    });
+  </script>
+</body>
+</html>
