@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Biology - Matt Lubin</title>
+  <meta name="description" content="Research, writing, and thoughts on biology and the life sciences">
+  <style>
+    /* Root variables for theming */
+    :root {
+      --bg-light: #faf8f5;
+      --bg-dark: #1a1614;
+      --text-light: #2d2a26;
+      --text-dark: #e8e4df;
+      --text-muted-light: #6b6762;
+      --text-muted-dark: #9a9288;
+      --biology: #2d7a5e;
+      --biology-light: #3d9a78;
+    }
+
+    :root {
+      --bg: var(--bg-light);
+      --text: var(--text-light);
+      --text-muted: var(--text-muted-light);
+    }
+
+    :root.dark {
+      --bg: var(--bg-dark);
+      --text: var(--text-dark);
+      --text-muted: var(--text-muted-dark);
+    }
+
+    /* Light mode is the default - dark mode only activates via toggle */
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Iowan Old Style', 'Palatino Linotype', 'URW Palladio L', P052, serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      transition: background-color 0.3s ease, color 0.3s ease;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .site-header {
+      padding: 1.5rem 2rem;
+      text-align: center;
+    }
+
+    .header-nav {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    .header-nav a {
+      color: var(--text-muted);
+      text-decoration: none;
+      margin: 0 0.4rem;
+      transition: color 0.2s ease;
+    }
+
+    .header-nav a:hover {
+      color: var(--text);
+    }
+
+    .theme-toggle {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      padding: 0;
+      margin: 0 0.4rem;
+      transition: color 0.2s ease;
+    }
+
+    .theme-toggle:hover {
+      color: var(--text);
+    }
+
+    .page-hero {
+      text-align: center;
+      padding: 3rem 2rem 2rem;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .page-title {
+      font-size: 3rem;
+      font-weight: 400;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, var(--biology) 0%, var(--biology-light) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .page-subtitle {
+      font-size: 1.1rem;
+      color: var(--text-muted);
+      font-weight: 300;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .content {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 0 2rem 4rem;
+    }
+
+    .content p {
+      margin-bottom: 1.5rem;
+      font-size: 1.05rem;
+    }
+
+    .intro {
+      font-size: 1.1rem;
+      line-height: 1.8;
+      margin-bottom: 3rem;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid var(--text-muted);
+      opacity: 0.9;
+    }
+
+    .intro em {
+      font-style: italic;
+    }
+
+    /* Section styling */
+    .section {
+      margin-bottom: 4rem;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .section-icon {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, var(--biology) 0%, var(--biology-light) 100%);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+
+    .section-title {
+      font-size: 1.6rem;
+      font-weight: 400;
+      color: var(--biology);
+    }
+
+    :root.dark .section-title {
+      color: var(--biology-light);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root:not(.light) .section-title {
+        color: var(--biology-light);
+      }
+    }
+
+    .section-intro {
+      font-size: 1rem;
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+      line-height: 1.7;
+      font-style: italic;
+    }
+
+    /* Link cards */
+    .link-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .link-card {
+      display: block;
+      padding: 1.25rem 1.5rem;
+      background: var(--bg);
+      border: 1px solid var(--text-muted);
+      border-left: 4px solid var(--biology);
+      border-radius: 0 8px 8px 0;
+      text-decoration: none;
+      color: var(--text);
+      transition: all 0.2s ease;
+    }
+
+    .link-card:hover {
+      border-left-color: var(--biology-light);
+      background: linear-gradient(90deg, rgba(45, 122, 94, 0.08) 0%, transparent 100%);
+      transform: translateX(4px);
+    }
+
+    :root.dark .link-card:hover {
+      background: linear-gradient(90deg, rgba(61, 154, 120, 0.12) 0%, transparent 100%);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root:not(.light) .link-card:hover {
+        background: linear-gradient(90deg, rgba(61, 154, 120, 0.12) 0%, transparent 100%);
+      }
+    }
+
+    .link-card-title {
+      font-size: 1.1rem;
+      font-weight: 500;
+      margin-bottom: 0.3rem;
+      color: var(--biology);
+    }
+
+    :root.dark .link-card-title {
+      color: var(--biology-light);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root:not(.light) .link-card-title {
+        color: var(--biology-light);
+      }
+    }
+
+    .link-card-description {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    /* Recommendation list - more casual styling */
+    .rec-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1rem;
+    }
+
+    .rec-item {
+      padding: 1rem;
+      border-radius: 8px;
+      text-decoration: none;
+      color: var(--text);
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    .rec-item:hover {
+      transform: translateY(-2px);
+    }
+
+    .rec-item-title {
+      font-size: 1rem;
+      font-weight: 500;
+      margin-bottom: 0.2rem;
+    }
+
+    .rec-item-type {
+      font-size: 0.75rem;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* Author styling - warm amber tones, italic name */
+    .rec-item.rec-author {
+      background: linear-gradient(135deg, rgba(139, 90, 60, 0.08) 0%, rgba(168, 111, 77, 0.04) 100%);
+      border-left: 3px solid #8b5a3c;
+      padding-left: 1.25rem;
+    }
+
+    .rec-item.rec-author:hover {
+      background: linear-gradient(135deg, rgba(139, 90, 60, 0.15) 0%, rgba(168, 111, 77, 0.08) 100%);
+    }
+
+    .rec-item.rec-author .rec-item-title {
+      font-style: italic;
+    }
+
+    .rec-item.rec-author .rec-item-type {
+      color: #8b5a3c;
+    }
+
+    :root.dark .rec-item.rec-author {
+      border-left-color: #c4926e;
+    }
+
+    :root.dark .rec-item.rec-author .rec-item-type {
+      color: #c4926e;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root:not(.light) .rec-item.rec-author {
+        border-left-color: #c4926e;
+      }
+      :root:not(.light) .rec-item.rec-author .rec-item-type {
+        color: #c4926e;
+      }
+    }
+
+    /* Book styling - bold spine-like appearance */
+    .rec-item.rec-book {
+      background: var(--bg);
+      border: 1px solid var(--text-muted);
+      border-left: 6px solid var(--biology);
+      padding-left: 1rem;
+    }
+
+    .rec-item.rec-book:hover {
+      border-left-color: var(--biology-light);
+      box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .rec-item.rec-book .rec-item-title {
+      font-weight: 600;
+    }
+
+    .rec-item.rec-book .rec-item-type {
+      color: var(--biology);
+    }
+
+    :root.dark .rec-item.rec-book .rec-item-type {
+      color: var(--biology-light);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root:not(.light) .rec-item.rec-book .rec-item-type {
+        color: var(--biology-light);
+      }
+    }
+
+    /* Magazine styling - centered with badge label */
+    .rec-item.rec-magazine {
+      background: linear-gradient(135deg, rgba(74, 95, 141, 0.08) 0%, rgba(93, 118, 171, 0.04) 100%);
+      border-radius: 12px;
+      text-align: center;
+      padding: 1.25rem 1rem;
+    }
+
+    .rec-item.rec-magazine:hover {
+      background: linear-gradient(135deg, rgba(74, 95, 141, 0.15) 0%, rgba(93, 118, 171, 0.08) 100%);
+    }
+
+    .rec-item.rec-magazine .rec-item-title {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+
+    .rec-item.rec-magazine .rec-item-type {
+      color: #4a5f8d;
+      display: inline-block;
+      background: rgba(74, 95, 141, 0.12);
+      padding: 0.15rem 0.5rem;
+      border-radius: 10px;
+      margin-top: 0.25rem;
+    }
+
+    :root.dark .rec-item.rec-magazine .rec-item-type {
+      color: #8da3d4;
+      background: rgba(93, 118, 171, 0.2);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root:not(.light) .rec-item.rec-magazine .rec-item-type {
+        color: #8da3d4;
+        background: rgba(93, 118, 171, 0.2);
+      }
+    }
+
+    /* YouTube styling - red accent, play button feel */
+    .rec-item.rec-youtube {
+      background: linear-gradient(135deg, rgba(255, 0, 0, 0.06) 0%, rgba(200, 50, 50, 0.03) 100%);
+      border-radius: 8px;
+      padding-left: 2.5rem;
+      position: relative;
+    }
+
+    .rec-item.rec-youtube::before {
+      content: "▶";
+      position: absolute;
+      left: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #cc0000;
+      font-size: 0.9rem;
+    }
+
+    .rec-item.rec-youtube:hover {
+      background: linear-gradient(135deg, rgba(255, 0, 0, 0.12) 0%, rgba(200, 50, 50, 0.06) 100%);
+    }
+
+    .rec-item.rec-youtube .rec-item-type {
+      color: #cc0000;
+    }
+
+    :root.dark .rec-item.rec-youtube::before {
+      color: #ff4444;
+    }
+
+    :root.dark .rec-item.rec-youtube .rec-item-type {
+      color: #ff4444;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root:not(.light) .rec-item.rec-youtube::before {
+        color: #ff4444;
+      }
+      :root:not(.light) .rec-item.rec-youtube .rec-item-type {
+        color: #ff4444;
+      }
+    }
+
+    /* Category groups for recommendations */
+    .rec-category {
+      margin-bottom: 1.5rem;
+    }
+
+    .rec-category:last-child {
+      margin-bottom: 0;
+    }
+
+    .rec-category-label {
+      font-size: 0.8rem;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      margin-bottom: 0.75rem;
+      padding-bottom: 0.25rem;
+      border-bottom: 1px solid rgba(107, 103, 98, 0.2);
+    }
+
+    @media (max-width: 768px) {
+      .page-title {
+        font-size: 2.2rem;
+      }
+
+      .page-subtitle {
+        font-size: 1rem;
+      }
+
+      .content p {
+        font-size: 1rem;
+      }
+
+      .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+      }
+
+      .section-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+      }
+
+      .section-title {
+        font-size: 1.4rem;
+      }
+
+      .rec-list {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <nav class="header-nav">
+      <a href="/index.html">[home]</a> ·
+      <a href="/everything.html">[everything]</a> ·
+      <a href="/contact.html">[contact]</a> ·
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <span id="themeIcon">☾</span>
+      </button>
+    </nav>
+  </header>
+
+  <main>
+    <div class="page-hero">
+      <h1 class="page-title">Biology</h1>
+      <p class="page-subtitle">Hoping to get some science to the people.</p>
+    </div>
+
+    <div class="content">
+      <div class="intro">
+        <p>My <a href="https://www.belinlab.org/people#:~:text=carnegiescience%20dot%20edu-,Matt%20Lubin,-%2C%20B.S.%20%2D%20Graduate">actual day job</a> involves figuring out how germs (ok, "bacteria") that live inside soybean plants manage to swim through the soil. Personally, I think this is <a href="https://jsomers.net/e-coli-chemotaxis/">incredibly fascinating</a> and really important work! But let's be honest, the only people who care about this are other microbiologists/biophysicists.</p>
+        <p>But I do care very much about getting science to the people, about understanding the interactions between science and society, and generally just think the natural world is crazy awesome.</p>
+      </div>
+
+      <!-- Published Writings -->
+      <section class="section">
+        <div class="section-header">
+          <div class="section-icon">&#x270D;</div>
+          <h2 class="section-title">Published Writings</h2>
+        </div>
+        <p class="section-intro">Essays and such.</p>
+        <div class="link-list">
+          <a href="https://press.asimov.com" class="link-card">
+            <div class="link-card-title"><strong>Coming very soon: </strong>The History of Xenopus as a Model Organism</div>
+            <div class="link-card-description">Of all life on Earth, there are only about a dozen "model organisms" that dominate biological study. One of them, the African clawed frog, or Xenopus, has a rather colorful history. <em>Asimov Press, 2026.</em></div>
+          </a>
+          <a href="#" class="link-card">
+            <div class="link-card-title"><strong>Coming less soon: </strong>Looking at Macomolecules</div>
+            <div class="link-card-description">In the past few decades, scientists have developed brilliant tricks to find where specific DNA, RNA, and proteins can be found in a cell. But finding speific lipids and other biomolecules is still a challenge.</div>
+          </a>
+          <a href="#" class="link-card">
+            <div class="link-card-title"><strong>Coming hopefully someday: </strong>Rhizosphere Engineering</div>
+            <div class="link-card-description">Without industrial production of ammonium, there would not be nearly enough food to feed everyone alive. But bacteria have a better way, and maybe we can copy them.</div>
+          </a>
+        </div>
+      </section>
+
+      <!-- Interactive Models -->
+      <section class="section">
+        <div class="section-header">
+          <div class="section-icon">&#x1F9EC;</div>
+          <h2 class="section-title">Interactive Models</h2>
+        </div>
+        <p class="section-intro">Bret Victor asks people to <a href="https://vimeo.com/64895205">stop drawing dead fish</a>. Applied to biology, <a href="https://jsomers.net/i-should-have-loved-biology/">Jason Somers complains </a>how we teach it all wrong; with lots of facts and names instead of as dynaimc technologies of mind-blowing capabilities.
+          Thanks to the marvels of GenAI, we can do a lot better than teaching biology with dead fish, we can even do better than showing videos of <em>swimming</em> fish. I made a few simple examples to show what science education could look like in the era of LLMs. Until then,  every science teacher should be using <a href="https://netlogoweb.org/">NetLogo</a> and similar tools.</p>
+        <div class="link-list">
+          <a href="/models-chemotaxis.html" class="link-card">
+            <div class="link-card-title">Chemotaxis</div>
+            <div class="link-card-description">How bacteria navigate chemical gradients using a biased random walk. Compare random vs. chemotactic behavior in real time.</div>
+          </a>
+          <a href="/models-a-helix-game.html" class="link-card">
+            <div class="link-card-title">Alpha Helix Architect</div>
+            <div class="link-card-description">Build a polypeptide chain and see if it forms a stable alpha helix. Learn how amino acid properties affect protein folding.</div>
+          </a>
+          <a href="#" class="link-card">
+            <div class="link-card-title">More Coming Soon</div>
+            <div class="link-card-description">More interactive biology models in the works.</div>
+          </a>
+        </div>
+      </section>
+
+      <!-- Recommendations -->
+      <section class="section">
+        <div class="section-header">
+          <div class="section-icon">&#x1F4DA;</div>
+          <h2 class="section-title">Stuff I Like</h2>
+        </div>
+        <p class="section-intro">I love me a good popular science. Since I haven't done much of it myself, I might as well share some of my favorites (at least among living content producers; my favorite book list will be another project).</p>
+
+        <!-- Magazines -->
+        <div class="rec-category">
+          <div class="rec-category-label">Magazines</div>
+          <div class="rec-list">
+            <a href="https://www.quantamagazine.org/" class="rec-item rec-magazine">
+              <div class="rec-item-title">Quanta Magazine</div>
+              <div class="rec-item-type">Magazine</div>
+            </a>
+            <a href="https://press.asimov.com" class="rec-item rec-magazine">
+              <div class="rec-item-title">Asimov Press</div>
+              <div class="rec-item-type">Magazine</div>
+            </a>
+            <a href="https://nautil.us/" class="rec-item rec-magazine">
+              <div class="rec-item-title">Nautilus</div>
+              <div class="rec-item-type">Magazine</div>
+            </a>
+          </div>
+        </div>
+
+        <!-- Authors -->
+        <div class="rec-category">
+          <div class="rec-category-label">Authors</div>
+          <div class="rec-list">
+            <a href="https://jsomers.net/" class="rec-item rec-author">
+              <div class="rec-item-title">James Somers</div>
+              <div class="rec-item-type">Author</div>
+            </a>
+            <a href="https://www.experimental-history.com/" class="rec-item rec-author">
+              <div class="rec-item-title">Adam Mastroianni</div>
+              <div class="rec-item-type">Author</div>
+            </a>
+          </div>
+        </div>
+
+        <!-- YouTube -->
+        <div class="rec-category">
+          <div class="rec-category-label">YouTube</div>
+          <div class="rec-list">
+            <a href="https://www.youtube.com/@kurzgesagt" class="rec-item rec-youtube">
+              <div class="rec-item-title">Kurzgesagt by Philipp Dettmer</div>
+              <div class="rec-item-type">YouTube Channel</div>
+            </a>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = document.getElementById('themeIcon');
+    const html = document.documentElement;
+
+    const savedTheme = localStorage.getItem('theme');
+    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+    if (savedTheme === 'dark') {
+      html.classList.add('dark');
+      themeIcon.textContent = '☀';
+    } else if (savedTheme === 'light') {
+      html.classList.add('light');
+      themeIcon.textContent = '☾';
+    } else if (systemPrefersDark) {
+      themeIcon.textContent = '☀';
+    }
+
+    themeToggle.addEventListener('click', () => {
+      if (html.classList.contains('dark')) {
+        html.classList.remove('dark');
+        html.classList.add('light');
+        localStorage.setItem('theme', 'light');
+        themeIcon.textContent = '☾';
+      } else {
+        html.classList.remove('light');
+        html.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+        themeIcon.textContent = '☀';
+      }
+    });
+  </script>
+</body>
+</html>

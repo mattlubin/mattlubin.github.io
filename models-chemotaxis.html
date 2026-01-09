@@ -1,0 +1,1448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chemotaxis Modeling - Matt Lubin</title>
+    <meta name="description" content="Interactive simulation of bacterial chemotaxis - how bacteria navigate chemical gradients">
+    <style>
+        /* Root variables for theming - matching biology.html */
+        :root {
+            --bg-light: #faf8f5;
+            --bg-dark: #1a1614;
+            --text-light: #2d2a26;
+            --text-dark: #e8e4df;
+            --text-muted-light: #6b6762;
+            --text-muted-dark: #9a9288;
+            --biology: #2d7a5e;
+            --biology-light: #3d9a78;
+        }
+
+        :root {
+            --bg: var(--bg-light);
+            --text: var(--text-light);
+            --text-muted: var(--text-muted-light);
+        }
+
+        :root.dark {
+            --bg: var(--bg-dark);
+            --text: var(--text-dark);
+            --text-muted: var(--text-muted-dark);
+        }
+
+        /* Light mode is the default - dark mode only activates via toggle */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Iowan Old Style', 'Palatino Linotype', 'URW Palladio L', P052, serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .site-header {
+            padding: 1.5rem 2rem;
+            text-align: center;
+        }
+
+        .header-nav {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        .header-nav a {
+            color: var(--text-muted);
+            text-decoration: none;
+            margin: 0 0.4rem;
+            transition: color 0.2s ease;
+        }
+
+        .header-nav a:hover {
+            color: var(--text);
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            padding: 0;
+            margin: 0 0.4rem;
+            transition: color 0.2s ease;
+        }
+
+        .theme-toggle:hover {
+            color: var(--text);
+        }
+
+        .page-hero {
+            text-align: center;
+            padding: 2rem 2rem 1rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 400;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--biology) 0%, var(--biology-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .page-subtitle {
+            font-size: 1rem;
+            color: var(--text-muted);
+            font-weight: 300;
+            font-style: italic;
+        }
+
+        .intro {
+            max-width: 700px;
+            margin: 0 auto 2rem;
+            padding: 0 2rem;
+            font-size: 1.05rem;
+            line-height: 1.8;
+        }
+
+        .intro p {
+            margin-bottom: 1rem;
+        }
+
+        .intro a {
+            color: var(--biology);
+            text-decoration: none;
+            border-bottom: 1px solid var(--biology);
+            transition: color 0.2s ease;
+        }
+
+        :root.dark .intro a {
+            color: var(--biology-light);
+            border-bottom-color: var(--biology-light);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root:not(.light) .intro a {
+                color: var(--biology-light);
+                border-bottom-color: var(--biology-light);
+            }
+        }
+
+        .intro a:hover {
+            color: var(--biology-light);
+        }
+
+        .container {
+            text-align: center;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 1rem 3rem;
+        }
+
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .simulation-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #tumbleRunCanvasContainer {
+            display: inline-block;
+            cursor: pointer;
+            border-radius: 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .controls-section {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        canvas {
+            display: block;
+        }
+
+        .instructions {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-top: 8px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            padding: 15px 20px;
+            background: var(--bg);
+            border: 1px solid var(--text-muted);
+            border-left: 4px solid var(--biology);
+            border-radius: 0 12px 12px 0;
+            width: 100%;
+            transition: background-color 0.3s ease;
+        }
+
+        .graph-container {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            width: 100%;
+        }
+
+        :root.dark .graph-container {
+            background: #2a2520;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root:not(.light) .graph-container {
+                background: #2a2520;
+            }
+        }
+
+        .graph-canvas {
+            width: 100%;
+            height: auto;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            background: #f7fafc;
+        }
+
+        :root.dark .graph-canvas {
+            border-color: #4a4540;
+            background: #1a1614;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root:not(.light) .graph-canvas {
+                border-color: #4a4540;
+                background: #1a1614;
+            }
+        }
+
+        .graph-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--biology);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        :root.dark .graph-title {
+            color: var(--biology-light);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root:not(.light) .graph-title {
+                color: var(--biology-light);
+            }
+        }
+
+        .graph-title .icon {
+            width: 16px;
+            height: 16px;
+        }
+
+
+        .control-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            color: var(--biology);
+            font-size: 14px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        :root.dark .control-header {
+            color: var(--biology-light);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root:not(.light) .control-header {
+                color: var(--biology-light);
+            }
+        }
+
+        .icon {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .icon svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .slider-container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .slider {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            outline: none;
+            -webkit-appearance: none;
+            background: var(--text-muted);
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--biology);
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .slider:hover::-webkit-slider-thumb {
+            transform: scale(1.3);
+        }
+
+        .slider::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--biology);
+            cursor: pointer;
+            border: none;
+            transition: transform 0.2s ease;
+        }
+
+        .slider:hover::-moz-range-thumb {
+            transform: scale(1.3);
+        }
+
+        .slider-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: var(--text-muted);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        .value-display {
+            font-size: 12px;
+            color: var(--text);
+            text-align: center;
+            font-weight: 500;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        .stats-display {
+            margin-top: 8px;
+            padding: 8px;
+            background: rgba(45, 122, 94, 0.08);
+            border-radius: 6px;
+            font-size: 11px;
+            color: var(--text);
+            text-align: center;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        .stats-label {
+            font-weight: 600;
+            margin-bottom: 3px;
+            color: var(--biology);
+        }
+
+        :root.dark .stats-label {
+            color: var(--biology-light);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root:not(.light) .stats-label {
+                color: var(--biology-light);
+            }
+        }
+
+        .stats-value {
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .math-section {
+            max-width: 700px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .math-section h2 {
+            font-size: 1.4rem;
+            font-weight: 400;
+            color: var(--biology);
+            margin-bottom: 1rem;
+        }
+
+        :root.dark .math-section h2 {
+            color: var(--biology-light);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root:not(.light) .math-section h2 {
+                color: var(--biology-light);
+            }
+        }
+
+        .math-section p {
+            font-size: 1rem;
+            line-height: 1.8;
+            margin-bottom: 1rem;
+        }
+
+        .math-box {
+            background: rgba(45, 122, 94, 0.08);
+            border-left: 3px solid var(--biology);
+            padding: 1rem 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0 8px 8px 0;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+        }
+
+        .math-box .equation {
+            font-size: 1.1rem;
+            margin: 0.5rem 0;
+            color: var(--text);
+        }
+
+        .math-box .label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin-top: 0.5rem;
+        }
+
+        .math-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            font-size: 0.95rem;
+        }
+
+        .math-table th, .math-table td {
+            padding: 0.5rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--text-muted);
+        }
+
+        .math-table th {
+            font-weight: 600;
+            color: var(--biology);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        :root.dark .math-table th {
+            color: var(--biology-light);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root:not(.light) .math-table th {
+                color: var(--biology-light);
+            }
+        }
+
+        .math-table td {
+            font-family: 'Courier New', monospace;
+        }
+
+        .math-table td:first-child {
+            font-family: inherit;
+        }
+
+        .credit {
+            max-width: 700px;
+            margin: 2rem auto 0;
+            padding: 1rem 2rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-style: italic;
+            border-top: 1px solid var(--text-muted);
+        }
+
+        .credit a {
+            color: var(--text-muted);
+            text-decoration: none;
+            border-bottom: 1px solid var(--text-muted);
+        }
+
+        .credit a:hover {
+            color: var(--text);
+        }
+
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 2rem;
+            }
+
+            .intro {
+                font-size: 1rem;
+            }
+
+            .right-section {
+                height: auto;
+            }
+
+            .graphs-section {
+                height: auto;
+            }
+
+            .graph-container {
+                height: auto;
+                min-height: 160px;
+            }
+
+            .control-group {
+                height: auto;
+                min-height: 140px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <nav class="header-nav">
+            <a href="/index.html">[home]</a> ·
+            <a href="/biology.html">[biology]</a> ·
+            <a href="/everything.html">[everything]</a> ·
+            <button type="button" class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+                <span id="themeIcon">&#9790;</span>
+            </button>
+        </nav>
+    </header>
+
+    <main>
+        <div class="page-hero">
+            <h1 class="page-title">Chemotaxis</h1>
+            <p class="page-subtitle">How bacteria find food without brains</p>
+        </div>
+
+        <div class="intro">
+            <p>Bacteria need to eat, and often, that means they need to get somewhere to find food. But they cannot see, they have no brains, and they are actually too small to even tell whether a tasty something is in front of them or behind them. 
+                Instead, they use a trick based on memory: bacteria such as <em>E. coli</em> just keep swimming, and compare the concentration of food <em>now</em> to the concentration that it was a moment ago. 
+                As Howard Berg put it, they have a nice philosophy of life: if life is getting better, keep going, and if life is getting worse, switch directions.</p>
+            <p>The new direction, though, is random, so the result is a "biased random walk." Considering the tiny size of most bacterial cells (a thousand of them could easily fit inside many of your human cells), this strategy still works out well overall. 
+                In the simulation below, the triangle switches direction with 'medium' sensitivity, while the oval can be adjusted so that it changes directions more or less frequently</p>
+        </div>
+
+        <div class="container">
+            <div class="main-content">
+                <div class="simulation-section">
+                    <div id="tumbleRunCanvasContainer"></div>
+                    <div class="instructions">Click the simulation to reset</div>
+                </div>
+
+                <div class="controls-section">
+                    <div class="control-group">
+                        <div class="control-header">
+                            <div class="icon">
+                                <svg viewBox="0 0 24 24" fill="var(--biology)">
+                                    <ellipse cx="12" cy="12" rx="8" ry="4"/>
+                                </svg>
+                            </div>
+                            <span>Sensitivity</span>
+                        </div>
+                        <div class="slider-container">
+                            <input type="range" min="0" max="100" value="90" class="slider" id="slider2" aria-label="Sensitivity control">
+                            <div class="slider-labels">
+                                <span>Low</span>
+                                <span>High</span>
+                            </div>
+                            <div class="value-display" id="value2">Very High</div>
+                        </div>
+                        <div class="stats-display">
+                            <div class="stats-label">Avg Run Length</div>
+                            <div class="stats-value" id="stats2">0.0s</div>
+                        </div>
+                    </div>
+
+                    <div class="graph-container">
+                        <div class="graph-title">
+                            <span>Tumble Fraction Over Time</span>
+                        </div>
+                        <canvas id="runLengthGraph" class="graph-canvas"></canvas>
+                    </div>
+
+                    <div class="graph-container">
+                        <div class="graph-title">
+                            <span>Distance to Attractant Source</span>
+                        </div>
+                        <canvas id="distanceGraph" class="graph-canvas"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="math-section">
+            <h2>The Mathematical Model</h2>
+            <p>Each animation frame, the bacterium has a probability of tumbling. The sensitivity slider controls how much this probability changes based on whether the bacterium is swimming toward or away from the attractant.</p>
+
+            <p>Let <em>s</em> be the sensitivity (0 to 1, controlled by the slider), and let <em>p</em><sub>base</sub> = 0.05 be the baseline tumble probability per frame. We define a multiplier:</p>
+
+            <div class="math-box">
+                <div class="equation">m = 200<sup>s</sup></div>
+                <div class="label">where s ranges from 0 (slider left) to 1 (slider right)</div>
+            </div>
+
+            <p>The actual tumble probability depends on whether conditions are improving (swimming toward attractant) or worsening (swimming away):</p>
+
+            <div class="math-box">
+                <div class="equation">p<sub>tumble</sub> = p<sub>base</sub> / m &nbsp;&nbsp;(when improving)</div>
+                <div class="equation">p<sub>tumble</sub> = p<sub>base</sub> &times; m &nbsp;&nbsp;(when worsening)</div>
+                <div class="label">clamped to range [0.001, 0.5]</div>
+            </div>
+
+            <p>At maximum sensitivity, there is a 40,000-fold difference in tumble probability between improving and worsening conditions:</p>
+
+            <table class="math-table">
+                <tr>
+                    <th>Sensitivity</th>
+                    <th>Multiplier (m)</th>
+                    <th>P(tumble) improving</th>
+                    <th>P(tumble) worsening</th>
+                </tr>
+                <tr>
+                    <td>0% (blind)</td>
+                    <td>1</td>
+                    <td>0.050</td>
+                    <td>0.050</td>
+                </tr>
+                <tr>
+                    <td>50%</td>
+                    <td>14.1</td>
+                    <td>0.0035</td>
+                    <td>0.500*</td>
+                </tr>
+                <tr>
+                    <td>100% (max)</td>
+                    <td>200</td>
+                    <td>0.00025</td>
+                    <td>0.500*</td>
+                </tr>
+            </table>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: -0.5rem;">* clamped to maximum of 0.5</p>
+
+            <p>The graph below shows how tumble probability varies with sensitivity. Note the logarithmic y-axis: the two curves diverge exponentially as sensitivity increases.</p>
+
+            <div class="graph-container" style="max-width: 500px; margin: 1.5rem auto;">
+                <canvas id="theoreticalGraph" class="graph-canvas"></canvas>
+                <div style="display: flex; justify-content: center; gap: 2rem; margin-top: 0.75rem; font-size: 0.85rem; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+                    <span><span style="display: inline-block; width: 20px; height: 3px; background: #e63946; vertical-align: middle; margin-right: 6px;"></span>Worsening</span>
+                    <span><span style="display: inline-block; width: 20px; height: 3px; background: #2d7a5e; vertical-align: middle; margin-right: 6px;"></span>Improving</span>
+                </div>
+            </div>
+
+            <p>At maximum sensitivity, a bacterium heading away from the attractant tumbles within ~2 frames on average (traveling only ~8 pixels before reorienting), while one heading toward it can run for thousands of frames without tumbling.</p>
+
+            <p>This is a simplified model. Real <em>E. coli</em> chemotaxis involves a few more bells and whistles. See <a href="https://www.pnas.org/doi/10.1073/pnas.83.23.8987">Segall, Block, and Berg (1986)</a> and <a href="https://link.springer.com/chapter/10.1007/0-387-22438-6_5">Murray (2006)</a>.</p>
+        </div>
+
+    <script type="module">
+        // ========== HELPERS.JS ==========
+        const randomBetween = (min, max) => Math.random() * (max - min) + min;
+
+        const generateCanvas = ({ width, height, attachNode }) => {
+            const element = document.createElement("canvas");
+            const context = element.getContext("2d");
+
+            element.style.width = width + "px";
+            element.style.height = height + "px";
+
+            const scale = window.devicePixelRatio;
+            element.width = Math.floor(width * scale);
+            element.height = Math.floor(height * scale);
+            context.scale(scale, scale);
+
+            document.querySelector(attachNode).appendChild(element);
+
+            return [context, element];
+        };
+
+        const isAtBoundary = (point, boundaryTop, boundaryRight, boundaryBottom, boundaryLeft) => {
+            return (
+                point.x >= boundaryRight ||
+                point.x <= boundaryLeft ||
+                point.y >= boundaryBottom ||
+                point.y <= boundaryTop
+            );
+        };
+
+        const isColliding = (pos1, size1, pos2, size2) => {
+            return (
+                pos1.x < pos2.x + size2 &&
+                pos1.x + size1 > pos2.x &&
+                pos1.y < pos2.y + size2 &&
+                size1 + pos1.y > pos2.y
+            );
+        };
+
+        const nextPositionAlongHeading = (position, speed, headingInDeg, deltaTimeMultiplier = 1) => ({
+            x: position.x + deltaTimeMultiplier * (speed * Math.cos(headingInDeg * (Math.PI / 180))),
+            y: position.y + deltaTimeMultiplier * (speed * Math.sin(headingInDeg * (Math.PI / 180))),
+            heading: headingInDeg,
+        });
+
+        // ========== ANIMATION.JS ==========
+        const animate = (drawFunc) => {
+            let startTime = Date.now();
+            let previousTimestamp = false;
+            const getTimeElapsed = () => Date.now() - startTime;
+
+            const drawFuncContainer = (timestamp) => {
+                const deltaTime = previousTimestamp
+                    ? timestamp - previousTimestamp
+                    : performance.now() - timestamp;
+
+                drawFunc(getTimeElapsed);
+                window.requestAnimationFrame(drawFuncContainer);
+                previousTimestamp = timestamp;
+            };
+
+            window.requestAnimationFrame(drawFuncContainer);
+        };
+
+        // ========== SQUIRCLE.JS ==========
+        const make24pxCornerRadiusSquirclePath = (width, height) => `m 0 38.4 \
+c 0 -13.4413 0 -20.1619 2.6158 -25.2958 \
+c 2.301 -4.5159 5.9725 -8.1874 10.4884 -10.4884 \
+c 5.1339 -2.6158 11.8545 -2.6158 25.2958 -2.6158 \
+h ${width - 76.8} \
+c 13.441 0 20.162 0 25.296 2.6158 \
+c 4.516 2.301 8.187 5.9725 10.488 10.4884 \
+c 2.616 5.1339 2.616 11.8545 2.616 25.2958 \
+v ${height - 76.8} \
+c 0 13.4413 0 20.1619 -2.616 25.2958 \
+c -2.301 4.5159 -5.972 8.1874 -10.488 10.4884 \
+c -5.134 2.6158 -11.855 2.6158 -25.296 2.6158 \
+h ${-width + 76.8} \
+c -13.4413 0 -20.1619 0 -25.2958 -2.6158 \
+c -4.5159 -2.301 -8.1874 -5.9725 -10.4884 -10.4884 \
+c -2.6158 -5.1339 -2.6158 -11.8545 -2.6158 -25.2958 \
+v ${-height + 76.8} \
+z`;
+
+        // ========== MAIN SIMULATION ==========
+        const width = Math.min(500, window.innerWidth - 40);
+        const height = width;
+        const [CTX, canvasEl] = generateCanvas({
+            width,
+            height,
+            attachNode: "#tumbleRunCanvasContainer",
+        });
+
+        const cornerRadiusPathTumble = make24pxCornerRadiusSquirclePath(width, height);
+        canvasEl.style.clipPath = `path('${cornerRadiusPathTumble}')`;
+
+        const backgroundColor = "#d6e9ff";
+        const speed = 4;
+        const size = 14;
+
+        // Bacterium 1 (Triangle)
+        let bacteria1 = {
+            heading: 0,
+            position: { x: 0, y: 0 },
+            isRunning: true,
+            timeSinceLastRunBegan: 0,
+            timeSinceLastTumbleBegan: 0,
+            currentRunDuration: 2000,  // Duration decided at run start
+            previousDistance: 0,  // Track distance at start of run
+            currentPositionHistory: [],
+            pastPositions: new Array(6).fill([]),
+            color: "#ff6b6b",
+            trackColor: "#ff6b6b",
+            sensitivity: 0.5,  // 0 = low sensitivity, 1 = high sensitivity
+            runLengths: [],  // Track run durations
+            maxRunLengthSamples: 20  // Rolling average of last 20 runs
+        };
+
+        // Bacterium 2 (Oval/Stadium)
+        let bacteria2 = {
+            heading: 0,
+            position: { x: 0, y: 0 },
+            isRunning: true,
+            timeSinceLastRunBegan: 0,
+            timeSinceLastTumbleBegan: 0,
+            currentRunDuration: 2000,  // Duration decided at run start
+            previousDistance: 0,  // Track distance at start of run
+            currentPositionHistory: [],
+            pastPositions: new Array(6).fill([]),
+            color: "#00746d",
+            trackColor: "#00746d",
+            sensitivity: 0.9,  // 0 = low sensitivity, 1 = high sensitivity
+            runLengths: [],  // Track run durations
+            maxRunLengthSamples: 20,  // Rolling average of last 20 runs
+            tumbleStateHistory: [],  // Rolling window of tumble states (true/false)
+            tumbleFractionHistory: [],  // Time series of tumble fraction for graphing
+            distanceHistory: []  // Time series data for distance to attractant
+        };
+
+        const attractant = [
+            { x: width / 10, y: height / 10, size: width / 2.5 },
+        ];
+
+        const reset = () => {
+            // Reset bacterium 1
+            bacteria1.heading = randomBetween(0, 359);
+            bacteria1.position = {
+                x: randomBetween(0, width - size),
+                y: randomBetween(0, height - size),
+            };
+            bacteria1.isRunning = true;
+            bacteria1.timeSinceLastRunBegan = 0;
+            bacteria1.timeSinceLastTumbleBegan = 0;
+            bacteria1.currentPositionHistory = [];
+            bacteria1.pastPositions = new Array(6).fill([]);
+            bacteria1.runLengths = [];
+            bacteria1.currentRunDuration = 2000;
+            bacteria1.previousDistance = 0;
+
+            // Reset bacterium 2
+            bacteria2.heading = randomBetween(0, 359);
+            bacteria2.position = {
+                x: randomBetween(0, width - size),
+                y: randomBetween(0, height - size),
+            };
+            bacteria2.isRunning = true;
+            bacteria2.timeSinceLastRunBegan = 0;
+            bacteria2.timeSinceLastTumbleBegan = 0;
+            bacteria2.currentPositionHistory = [];
+            bacteria2.pastPositions = new Array(6).fill([]);
+            bacteria2.runLengths = [];
+            bacteria2.tumbleStateHistory = [];
+            bacteria2.tumbleFractionHistory = [];
+            bacteria2.distanceHistory = [];
+            bacteria2.currentRunDuration = 2000;
+            bacteria2.previousDistance = 0;
+        };
+
+        reset();
+
+        // Graph setup with high DPI support
+        const containerPadding = 30;  // 15px padding on each side of .graph-container
+        const graphWidth = width - containerPadding;  // Account for container padding
+        const graphHeight = 120;  // Match original height
+        const scale = window.devicePixelRatio;
+
+        const setupGraphCanvas = (canvas) => {
+            canvas.style.width = graphWidth + 'px';
+            canvas.style.height = graphHeight + 'px';
+            canvas.width = Math.floor(graphWidth * scale);
+            canvas.height = Math.floor(graphHeight * scale);
+            const ctx = canvas.getContext('2d');
+            ctx.scale(scale, scale);
+            return ctx;
+        };
+
+        const runLengthCanvas = document.getElementById('runLengthGraph');
+        const runLengthCtx = setupGraphCanvas(runLengthCanvas);
+        const distanceCanvas = document.getElementById('distanceGraph');
+        const distanceCtx = setupGraphCanvas(distanceCanvas);
+
+        const maxGraphPoints = 300;  // Show last 300 data points
+
+        const drawGraph = (ctx, canvas, data, color, label, minY, maxY) => {
+            const padding = 30;
+            // Use CSS pixel dimensions, not canvas.width/height (which are scaled)
+            const cssWidth = graphWidth;
+            const cssHeight = graphHeight;
+            const gWidth = cssWidth - padding * 2;
+            const gHeight = cssHeight - padding * 2;
+
+            // Clear canvas (use CSS dimensions) - use light gray background like original
+            const isDark = document.documentElement.classList.contains('dark') ||
+                (!document.documentElement.classList.contains('light') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+            ctx.fillStyle = isDark ? '#1a1614' : '#f7fafc';
+            ctx.fillRect(0, 0, cssWidth, cssHeight);
+
+            // Use fixed Y range
+            const yRange = maxY - minY;
+
+            // Draw grid lines
+            ctx.strokeStyle = isDark ? '#3a3530' : '#e2e8f0';
+            ctx.lineWidth = 1;
+            for (let i = 0; i <= 4; i++) {
+                const y = padding + (gHeight / 4) * i;
+                ctx.beginPath();
+                ctx.moveTo(padding, y);
+                ctx.lineTo(cssWidth - padding, y);
+                ctx.stroke();
+
+                // Y-axis labels
+                const value = maxY - (yRange / 4) * i;
+                ctx.fillStyle = isDark ? '#9a9288' : '#718096';
+                ctx.font = '10px sans-serif';
+                ctx.textAlign = 'right';
+                ctx.fillText(value.toFixed(1), padding - 5, y + 3);
+            }
+
+            // Draw data line only if we have data
+            if (data.length > 0) {
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+
+                const startIndex = Math.max(0, data.length - maxGraphPoints);
+                const visibleData = data.slice(startIndex);
+
+                visibleData.forEach((value, index) => {
+                    const x = padding + (index / (maxGraphPoints - 1)) * gWidth;
+                    const normalizedValue = Math.max(0, Math.min(1, (value - minY) / yRange));
+                    const y = padding + gHeight - (normalizedValue * gHeight);
+
+                    if (index === 0) {
+                        ctx.moveTo(x, y);
+                    } else {
+                        ctx.lineTo(x, y);
+                    }
+                });
+
+                ctx.stroke();
+            }
+
+            // Draw axes
+            ctx.strokeStyle = isDark ? '#6a6560' : '#4a5568';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(padding, padding);
+            ctx.lineTo(padding, cssHeight - padding);
+            ctx.lineTo(cssWidth - padding, cssHeight - padding);
+            ctx.stroke();
+        };
+
+        const calculateDistance = (pos1, pos2) => {
+            return Math.sqrt(Math.pow(pos2.x - pos1.x, 2) + Math.pow(pos2.y - pos1.y, 2));
+        };
+
+        const drawAttractant = () => {
+            attractant.forEach(({ x, y, size }) => {
+                CTX.save();
+                // Draw radial gradient for concentration
+                const gradient = CTX.createRadialGradient(
+                    x + size / 2,
+                    y + size / 2,
+                    0,
+                    x + size / 2,
+                    y + size / 2,
+                    size / 2
+                );
+                gradient.addColorStop(0, 'rgba(255, 215, 0, 0.6)');    // Gold center
+                gradient.addColorStop(0.3, 'rgba(255, 165, 0, 0.4)');  // Orange
+                gradient.addColorStop(0.6, 'rgba(255, 140, 0, 0.2)');  // Dark orange
+                gradient.addColorStop(1, 'rgba(255, 140, 0, 0)');      // Fade out
+
+                CTX.fillStyle = gradient;
+                CTX.beginPath();
+                CTX.arc(x + size / 2, y + size / 2, size / 2, 0, 2 * Math.PI);
+                CTX.fill();
+                CTX.restore();
+            });
+        };
+
+        const drawTriangle = (bacterium, isOnAttractant) => {
+            CTX.save();
+            CTX.translate(bacterium.position.x, bacterium.position.y);
+            CTX.fillStyle = bacterium.color;
+            CTX.strokeStyle = bacterium.color;
+            CTX.lineWidth = 2;
+
+            CTX.rotate((bacterium.heading + 90) * (Math.PI / 180));
+            CTX.beginPath();
+            CTX.moveTo(0, -size / 2);
+            CTX.lineTo(size / 2, size / 2);
+            CTX.lineTo(-size / 2, size / 2);
+            CTX.closePath();
+            CTX.fill();
+            CTX.restore();
+        };
+
+        const drawOval = (bacterium, isOnAttractant) => {
+            CTX.save();
+            CTX.translate(bacterium.position.x, bacterium.position.y);
+            CTX.fillStyle = bacterium.color;
+            CTX.strokeStyle = bacterium.color;
+            CTX.lineWidth = 2;
+
+            CTX.rotate((bacterium.heading) * (Math.PI / 180));
+
+            // Draw stadium/pill shape (oval)
+            CTX.beginPath();
+            CTX.ellipse(0, 0, size * 0.7, size * 0.35, 0, 0, 2 * Math.PI);
+            CTX.fill();
+            CTX.restore();
+        };
+
+        const drawPositionHistory = (bacterium) => {
+            bacterium.pastPositions.forEach((positionHistory, index) => {
+                CTX.save();
+                CTX.globalAlpha = index * 0.1;
+                CTX.strokeStyle = bacterium.trackColor;
+                CTX.lineWidth = 1.5;
+                CTX.beginPath();
+                positionHistory.forEach(({ x, y }, index) => {
+                    if (index > 0) {
+                        CTX.lineTo(x, y);
+                    } else {
+                        CTX.moveTo(x, y);
+                    }
+                });
+                CTX.stroke();
+                CTX.restore();
+            });
+
+            CTX.save();
+            CTX.globalAlpha = 0.4;
+            CTX.strokeStyle = bacterium.trackColor;
+            CTX.lineWidth = 1.5;
+            CTX.beginPath();
+            bacterium.currentPositionHistory.forEach(({ x, y }, index) => {
+                if (index > 0) {
+                    CTX.lineTo(x, y);
+                } else {
+                    CTX.moveTo(x, y);
+                }
+            });
+            CTX.stroke();
+            CTX.restore();
+        };
+
+        const getNewLocation = (heading, currentSpeed, currentLocation) => {
+            let prospectiveNewLocation = nextPositionAlongHeading(
+                currentLocation,
+                currentSpeed,
+                heading
+            );
+
+            let _positionWasReset = false;
+
+            if (isAtBoundary(prospectiveNewLocation, 0, width, height, 0)) {
+                prospectiveNewLocation = {
+                    x: prospectiveNewLocation.x > width
+                        ? 0
+                        : prospectiveNewLocation.x < 0
+                        ? width
+                        : prospectiveNewLocation.x,
+                    y: prospectiveNewLocation.y > height
+                        ? 0
+                        : prospectiveNewLocation.y < 0
+                        ? height
+                        : prospectiveNewLocation.y,
+                };
+                _positionWasReset = true;
+            }
+
+            return [prospectiveNewLocation, _positionWasReset];
+        };
+
+        const updateBacterium = (bacterium, getTimeElapsed) => {
+            // Calculate distance to attractant center (gradient sensing)
+            const a = attractant[0];
+            const aCenter = { x: a.x + a.size / 2, y: a.y + a.size / 2 };
+
+            const distBeforeMove = calculateDistance(bacterium.position, aCenter);
+
+            let positionWasReset;
+            [bacterium.position, positionWasReset] = getNewLocation(
+                bacterium.heading,
+                speed,
+                bacterium.position
+            );
+
+            const distAfterMove = calculateDistance(bacterium.position, aCenter);
+
+            // Check if inside attractant visual area (for display only)
+            const isOnAttractant = distAfterMove < a.size / 2;
+
+            // CHEMOTAXIS: Only information available is gradient direction
+            // Compare current distance to distance from previous frame
+            const isImproving = !positionWasReset && (distAfterMove < distBeforeMove);
+
+            // Fixed tumble duration - long enough to be visually noticeable
+            const tumbleDuration = 500;
+
+            if (bacterium.isRunning) {
+                bacterium.heading += randomBetween(-10, 10);
+
+                // Per-frame tumble probability - this is the core of chemotaxis
+                // Use logarithmic scaling for sensitivity (models real receptor response)
+                // sensitivity 0->1 maps to multiplier using log scale
+
+                const baseTumbleProb = 0.05; // ~3 tumbles per second at 60fps baseline
+
+                // Log-scaled sensitivity: 1 at sens=0, up to 200 at sens=1
+                const logMultiplier = Math.pow(200, bacterium.sensitivity);
+
+                let tumbleProb;
+                if (isImproving) {
+                    // Suppress tumbling strongly when heading toward attractant
+                    // Divide by logMultiplier: at max sensitivity, prob drops to 1/20th
+                    tumbleProb = baseTumbleProb / logMultiplier;
+                } else {
+                    // Increase tumbling when heading away
+                    // Multiply by logMultiplier: at max sensitivity, prob increases 20x
+                    tumbleProb = baseTumbleProb * logMultiplier;
+                }
+
+                // Clamp to reasonable range
+                tumbleProb = Math.min(0.5, Math.max(0.001, tumbleProb));
+
+                if (Math.random() < tumbleProb) {
+                    // Record run length before switching to tumble
+                    const runLength = getTimeElapsed() - bacterium.timeSinceLastRunBegan;
+                    bacterium.runLengths.push(runLength);
+
+                    // Keep only the last N samples for rolling average
+                    if (bacterium.runLengths.length > bacterium.maxRunLengthSamples) {
+                        bacterium.runLengths.shift();
+                    }
+
+                    bacterium.isRunning = false;
+                    bacterium.timeSinceLastTumbleBegan = getTimeElapsed();
+                }
+            } else {
+                bacterium.heading += randomBetween(-30, 30); // Tumble rotation
+
+                if (getTimeElapsed() - bacterium.timeSinceLastTumbleBegan > tumbleDuration) {
+                    bacterium.heading = randomBetween(0, 360); // Pick new random direction
+                    bacterium.isRunning = true;
+                    bacterium.timeSinceLastRunBegan = getTimeElapsed();
+                }
+            }
+
+            if (positionWasReset) {
+                if (bacterium.currentPositionHistory.length > 0) {
+                    bacterium.pastPositions.push(bacterium.currentPositionHistory);
+                    if (bacterium.pastPositions.length > 6) bacterium.pastPositions.shift();
+                }
+                bacterium.currentPositionHistory = [];
+            }
+            bacterium.currentPositionHistory.push({...bacterium.position});
+
+            return isOnAttractant;
+        };
+
+        canvasEl.addEventListener("click", reset);
+
+        // Slider controls
+        const slider2 = document.getElementById('slider2');
+        const value2 = document.getElementById('value2');
+        const stats2 = document.getElementById('stats2');
+
+        const getSensitivityLabel = (value) => {
+            if (value < 25) return 'Very Low';
+            if (value < 45) return 'Low';
+            if (value < 55) return 'Medium';
+            if (value < 75) return 'High';
+            return 'Very High';
+        };
+
+        let lastGraphUpdate = 0;
+        const graphUpdateInterval = 100; // Update graphs every 100ms
+
+        const tumbleWindowSize = 60;  // Rolling window for tumble fraction (about 1 second at 60fps equivalent)
+
+        const updateStats = (currentTime) => {
+            // Update bacteria 2 stats display
+            if (bacteria2.runLengths.length > 0) {
+                const avg2 = bacteria2.runLengths.reduce((a, b) => a + b, 0) / bacteria2.runLengths.length;
+                stats2.textContent = (avg2 / 1000).toFixed(2) + 's';
+            }
+
+            // Update graphs at intervals
+            if (currentTime - lastGraphUpdate > graphUpdateInterval) {
+                // Record current tumble state (true if tumbling, false if running)
+                bacteria2.tumbleStateHistory.push(!bacteria2.isRunning);
+
+                // Keep rolling window
+                if (bacteria2.tumbleStateHistory.length > tumbleWindowSize) {
+                    bacteria2.tumbleStateHistory.shift();
+                }
+
+                // Calculate tumble fraction over the window
+                const tumbleCount = bacteria2.tumbleStateHistory.filter(s => s).length;
+                const tumbleFraction = tumbleCount / bacteria2.tumbleStateHistory.length;
+                bacteria2.tumbleFractionHistory.push(tumbleFraction);
+
+                // Calculate distance to nearest attractant
+                let minDistance = Infinity;
+                attractant.forEach(a => {
+                    const attractantCenter = { x: a.x + a.size / 2, y: a.y + a.size / 2 };
+                    const dist = calculateDistance(bacteria2.position, attractantCenter);
+                    minDistance = Math.min(minDistance, dist);
+                });
+                bacteria2.distanceHistory.push(minDistance);
+
+                // Keep only recent data for graphs
+                if (bacteria2.tumbleFractionHistory.length > maxGraphPoints * 2) {
+                    bacteria2.tumbleFractionHistory.shift();
+                }
+                if (bacteria2.distanceHistory.length > maxGraphPoints * 2) {
+                    bacteria2.distanceHistory.shift();
+                }
+
+                // Draw graphs with fixed Y axes
+                const graphColor = getComputedStyle(document.documentElement).getPropertyValue('--biology').trim() || '#2d7a5e';
+                // Tumble fraction graph: 0 to 1 (percentage of time tumbling)
+                drawGraph(runLengthCtx, runLengthCanvas, bacteria2.tumbleFractionHistory, graphColor, 'Tumble Fraction', 0, 1);
+                // Distance graph: 0 to max canvas dimension
+                const maxDistance = Math.sqrt(width * width + height * height);
+                drawGraph(distanceCtx, distanceCanvas, bacteria2.distanceHistory, graphColor, 'Distance (px)', 0, maxDistance);
+
+                lastGraphUpdate = currentTime;
+            }
+        };
+
+        // Animation loop with stats updates
+        let lastStatsUpdate = 0;
+        const statsUpdateInterval = 100;
+
+        animate((getTimeElapsed) => {
+            const currentTime = Date.now();
+
+            if (currentTime - lastStatsUpdate > statsUpdateInterval) {
+                updateStats(currentTime);
+                lastStatsUpdate = currentTime;
+            }
+
+            CTX.fillStyle = backgroundColor;
+            CTX.fillRect(0, 0, width, height);
+
+            drawAttractant();
+
+            // Update and draw bacterium 1 (triangle)
+            const isOnAttractant1 = updateBacterium(bacteria1, getTimeElapsed);
+            drawPositionHistory(bacteria1);
+            drawTriangle(bacteria1, isOnAttractant1);
+
+            // Update and draw bacterium 2 (oval)
+            const isOnAttractant2 = updateBacterium(bacteria2, getTimeElapsed);
+            drawPositionHistory(bacteria2);
+            drawOval(bacteria2, isOnAttractant2);
+        });
+
+        slider2.addEventListener('input', (e) => {
+            bacteria2.sensitivity = e.target.value / 100;
+            value2.textContent = getSensitivityLabel(e.target.value);
+        });
+
+        // Draw theoretical tumble probability graph
+        const drawTheoreticalGraph = () => {
+            const canvas = document.getElementById('theoreticalGraph');
+            if (!canvas) return;
+
+            const dpr = window.devicePixelRatio;
+            const cssWidth = 470;
+            const cssHeight = 200;
+
+            canvas.style.width = cssWidth + 'px';
+            canvas.style.height = cssHeight + 'px';
+            canvas.width = Math.floor(cssWidth * dpr);
+            canvas.height = Math.floor(cssHeight * dpr);
+
+            const ctx = canvas.getContext('2d');
+            ctx.scale(dpr, dpr);
+
+            const padding = { left: 55, right: 20, top: 20, bottom: 40 };
+            const gWidth = cssWidth - padding.left - padding.right;
+            const gHeight = cssHeight - padding.top - padding.bottom;
+
+            // Check dark mode
+            const isDark = document.documentElement.classList.contains('dark') ||
+                (!document.documentElement.classList.contains('light') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+
+            // Background
+            ctx.fillStyle = isDark ? '#1a1614' : '#f7fafc';
+            ctx.fillRect(0, 0, cssWidth, cssHeight);
+
+            // Grid lines (log scale: 0.001, 0.01, 0.1, 1)
+            const logValues = [0.001, 0.01, 0.1, 0.5];
+            ctx.strokeStyle = isDark ? '#3a3530' : '#e2e8f0';
+            ctx.lineWidth = 1;
+
+            const minLog = Math.log10(0.0001);
+            const maxLog = Math.log10(1);
+            const logRange = maxLog - minLog;
+
+            logValues.forEach(val => {
+                const logVal = Math.log10(val);
+                const y = padding.top + gHeight - ((logVal - minLog) / logRange) * gHeight;
+                ctx.beginPath();
+                ctx.moveTo(padding.left, y);
+                ctx.lineTo(cssWidth - padding.right, y);
+                ctx.stroke();
+
+                // Y-axis labels
+                ctx.fillStyle = isDark ? '#9a9288' : '#718096';
+                ctx.font = '11px -apple-system, BlinkMacSystemFont, sans-serif';
+                ctx.textAlign = 'right';
+                ctx.fillText(val.toString(), padding.left - 8, y + 4);
+            });
+
+            // X-axis labels
+            ctx.textAlign = 'center';
+            for (let s = 0; s <= 1; s += 0.25) {
+                const x = padding.left + s * gWidth;
+                ctx.fillText((s * 100).toFixed(0) + '%', x, cssHeight - padding.bottom + 20);
+            }
+
+            // Axis labels
+            ctx.fillStyle = isDark ? '#9a9288' : '#718096';
+            ctx.font = '12px -apple-system, BlinkMacSystemFont, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('Sensitivity', padding.left + gWidth / 2, cssHeight - 5);
+
+            ctx.save();
+            ctx.translate(15, padding.top + gHeight / 2);
+            ctx.rotate(-Math.PI / 2);
+            ctx.fillText('P(tumble)', 0, 0);
+            ctx.restore();
+
+            // Draw axes
+            ctx.strokeStyle = isDark ? '#6a6560' : '#4a5568';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(padding.left, padding.top);
+            ctx.lineTo(padding.left, cssHeight - padding.bottom);
+            ctx.lineTo(cssWidth - padding.right, cssHeight - padding.bottom);
+            ctx.stroke();
+
+            // Calculate and draw curves
+            const baseTumbleProb = 0.05;
+            const numPoints = 100;
+
+            // Worsening curve (red)
+            ctx.strokeStyle = '#e63946';
+            ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            for (let i = 0; i <= numPoints; i++) {
+                const s = i / numPoints;
+                const m = Math.pow(200, s);
+                let prob = baseTumbleProb * m;
+                prob = Math.min(0.5, Math.max(0.0001, prob));
+
+                const x = padding.left + s * gWidth;
+                const logProb = Math.log10(prob);
+                const y = padding.top + gHeight - ((logProb - minLog) / logRange) * gHeight;
+
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+
+            // Improving curve (green)
+            ctx.strokeStyle = '#2d7a5e';
+            ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            for (let i = 0; i <= numPoints; i++) {
+                const s = i / numPoints;
+                const m = Math.pow(200, s);
+                let prob = baseTumbleProb / m;
+                prob = Math.min(0.5, Math.max(0.0001, prob));
+
+                const x = padding.left + s * gWidth;
+                const logProb = Math.log10(prob);
+                const y = padding.top + gHeight - ((logProb - minLog) / logRange) * gHeight;
+
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+
+            // Mark baseline at s=0
+            ctx.fillStyle = isDark ? '#9a9288' : '#718096';
+            ctx.beginPath();
+            const baseY = padding.top + gHeight - ((Math.log10(0.05) - minLog) / logRange) * gHeight;
+            ctx.arc(padding.left, baseY, 4, 0, 2 * Math.PI);
+            ctx.fill();
+        };
+
+        // Draw on load and theme change
+        drawTheoreticalGraph();
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', drawTheoreticalGraph);
+        // Listen for manual theme toggle
+        window.addEventListener('themeChanged', drawTheoreticalGraph);
+    </script>
+
+    <div class="credit">
+        Inspired by <a href="https://jsomers.net/e-coli-chemotaxis/">James Somers and Edwin Morris</a>.
+    </div>
+    </main>
+
+    <script>
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = document.getElementById('themeIcon');
+        const html = document.documentElement;
+
+        const savedTheme = localStorage.getItem('theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        if (savedTheme === 'dark') {
+            html.classList.add('dark');
+            themeIcon.textContent = '\u2600';
+        } else if (savedTheme === 'light') {
+            html.classList.add('light');
+            themeIcon.textContent = '\u263E';
+        } else if (systemPrefersDark) {
+            themeIcon.textContent = '\u2600';
+        }
+
+        themeToggle.addEventListener('click', () => {
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                html.classList.add('light');
+                localStorage.setItem('theme', 'light');
+                themeIcon.textContent = '\u263E';
+            } else {
+                html.classList.remove('light');
+                html.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+                themeIcon.textContent = '\u2600';
+            }
+            // Notify graphs to redraw with new theme
+            window.dispatchEvent(new Event('themeChanged'));
+        });
+    </script>
+</body>
+</html>

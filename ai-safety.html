@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI Safety - Matt Lubin</title>
+  <meta name="description" content="Research and writing on AI safety, alignment, and governance">
+  <style>
+    /* Root variables for theming */
+    :root {
+      --bg-light: #faf8f5;
+      --bg-dark: #1a1614;
+      --text-light: #2d2a26;
+      --text-dark: #e8e4df;
+      --text-muted-light: #6b6762;
+      --text-muted-dark: #9a9288;
+      --ai-safety: #8b5a3c;
+      --ai-safety-light: #a86f4d;
+    }
+
+    :root {
+      --bg: var(--bg-light);
+      --text: var(--text-light);
+      --text-muted: var(--text-muted-light);
+    }
+
+    :root.dark {
+      --bg: var(--bg-dark);
+      --text: var(--text-dark);
+      --text-muted: var(--text-muted-dark);
+    }
+
+    /* Light mode is the default - dark mode only activates via toggle */
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Iowan Old Style', 'Palatino Linotype', 'URW Palladio L', P052, serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      transition: background-color 0.3s ease, color 0.3s ease;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .site-header {
+      padding: 1.5rem 2rem;
+      text-align: center;
+    }
+
+    .header-nav {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    .header-nav a {
+      color: var(--text-muted);
+      text-decoration: none;
+      margin: 0 0.4rem;
+      transition: color 0.2s ease;
+    }
+
+    .header-nav a:hover {
+      color: var(--text);
+    }
+
+    .theme-toggle {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      padding: 0;
+      margin: 0 0.4rem;
+      transition: color 0.2s ease;
+    }
+
+    .theme-toggle:hover {
+      color: var(--text);
+    }
+
+    .page-hero {
+      text-align: center;
+      padding: 3rem 2rem 2rem;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .page-title {
+      font-size: 3rem;
+      font-weight: 400;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, var(--ai-safety) 0%, var(--ai-safety-light) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .page-subtitle {
+      font-size: 1.1rem;
+      color: var(--text-muted);
+      font-weight: 300;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .content {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 0 2rem 4rem;
+    }
+
+    .content p {
+      margin-bottom: 1.5rem;
+      font-size: 1.05rem;
+    }
+
+    /* Link card styles */
+    .link-card {
+      display: block;
+      padding: 1.25rem 1.5rem;
+      background: var(--bg);
+      border: 1px solid var(--text-muted);
+      border-left: 4px solid var(--ai-safety);
+      border-radius: 0 8px 8px 0;
+      text-decoration: none;
+      color: var(--text);
+      transition: all 0.2s ease;
+      margin-bottom: 2rem;
+    }
+
+    .link-card:hover {
+      border-left-color: var(--ai-safety-light);
+      background: linear-gradient(90deg, rgba(139, 90, 60, 0.08) 0%, transparent 100%);
+      transform: translateX(4px);
+    }
+
+    :root.dark .link-card:hover {
+      background: linear-gradient(90deg, rgba(168, 111, 77, 0.12) 0%, transparent 100%);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root:not(.light) .link-card:hover {
+        background: linear-gradient(90deg, rgba(168, 111, 77, 0.12) 0%, transparent 100%);
+      }
+    }
+
+    .link-card-title {
+      font-size: 1.1rem;
+      font-weight: 500;
+      margin-bottom: 0.3rem;
+      color: var(--ai-safety);
+    }
+
+    :root.dark .link-card-title {
+      color: var(--ai-safety-light);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root:not(.light) .link-card-title {
+        color: var(--ai-safety-light);
+      }
+    }
+
+    .link-card-description {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    @media (max-width: 768px) {
+      .page-title {
+        font-size: 2.2rem;
+      }
+
+      .page-subtitle {
+        font-size: 1rem;
+      }
+
+      .content p {
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <nav class="header-nav">
+      <a href="/index.html">[home]</a> ·
+      <a href="/everything.html">[everything]</a> ·
+      <a href="/contact.html">[contact]</a> ·
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <span id="themeIcon">☾</span>
+      </button>
+    </nav>
+  </header>
+
+  <main>
+    <div class="page-hero">
+      <h1 class="page-title">AI Safety</h1>
+      <p class="page-subtitle">Research and writing on AI safety, alignment, and governance</p>
+    </div>
+
+    <div class="content">
+      <a href="https://mattsbiodefense.substack.com/p/five-things-2025-the-year-in-ai" class="link-card">
+        <div class="link-card-title">Five Things from 2025 in AI Safety</div>
+        <div class="link-card-description">My year-end roundup of five significant developments and five "vibe shifts" in AI from 2025.</div>
+      </a>
+
+      <p>Artificial Intelligence, particularly Generative AI models such as ChatGPT etc., are eating the world fast. I find this to be very concerning! 
+        It seems extremely likely that the widespread use of powerful AI will completely transform society, but whether that transformation will bring us into a hell or utopia or more of life as it is seems uncertain. 
+        Like Ethereum-founder <a href="https://vitalik.eth.limo/general/2023/11/27/techno_optimism.html"> Vitalik Butarin</a> and the good people at <a href="https://ifp.org/preparing-for-launch/">The Institute for Progress</a> think tank, I think humanity really needs to work hard to ensure that our transition to an AI future goes well. 
+        As <a href="https://thezvi.substack.com/p/the-risk-of-gradual-disempowerment?open=false#%C2%A7the-odds-are-against-us-and-the-situation-is-grim"> Zvi Mowshowitz</a> likes to quote from Star Treck, "The Odds Are Against Us and the Situation is Grim."</p>
+      <p> But nothing is certain, and I want to do my part in steering towards a better future. For now, I'm still just catching up. </p>
+      <p> I started my own weekly (sort-of) <a href="https://mattsbiodefense.substack.com/">Substack newsletter</a> to try and keep up with the crazy fastpaced world of AI safety. I'm not really looking for subscribers, but feel free to do that I guess.</p>
+      <p>If you too want to get thinking about how we can help make sure AI development and deployment goes well for humanity, here are a few suggestions to getting started:</p>
+      <ul>
+        <li>If you've never considered these problems before, I'd suggest this <a href="https://www.youtube.com/watch?v=r_9wkavYt4Y">YouTube video</a> on Grok's Hitler meltdown, which emphasizes the fact that the creators of AI models <em>cannot really control them</em>.</li>
+        <li>The best book on the subject, I think, is still Brian Christian's <a href="https://brianchristian.org/the-alignment-problem/">"The Alignment Problem"</a>, even though it was written in 2020, well before things got 'crazy.' It covers the history and context that gave rise to generative AI and the problems that its engineers thought about before they really rose to public consciousness.</li>
+        <li>Another good book is Nick Bostrom's <a href="https://www.amazon.com/Superintelligence-Dangers-Strategies-Nick-Bostrom/dp/0198739834">Superintelligence</a>, although, as the tile implies, it is focused specifically on the dangers of creating an artificial mind which is more intelligent than humans across every relevant domain, and so doesn't focus on more "mundane" risks.</li>
+        <li>There are several think tanks and nonprofit organizations working on AI safety who have blog posts and essays with varying degrees of accessibility and academic rigor. My favorite is probably the <a href="https://ifp.org/preparing-for-launch/">"Launch Sequence" by the Institute for Progress</a> because of their balance of good scholarship, accessibility, and evenhandedness, but I'm a little more "hair on fire panicking" than they are.</li>
+        <li>Some more creative/artistic blogposts can be found at <a href="https://www.tomorrows-ai.org/">Tomorrow's AI</a> and <a href="https://control-inversion.ai/">Control Inversion</a>, both of which are affiliated with the <a href="https://futureoflife.org/">Future of Life</a> Institute.</li></ul>
+        <li><a href="https://bluedot.org/courses">BlueDot Impact</a> offers excellent free courses on AI safety fundamentals and governance</li>
+        <li>Some of the original thinking on problems of AI getting out of control and killing everyone (which, according to <a href="https://www.yahoo.com/news/article/poll-most-americans-think-ai-will-destroy-humanity-someday-212132958.html">this sketchy YouGov poll</a>, is a concern for 53% of Americans!), was done at lesswrong. There's a lot of good stuff there but the writing style (and intellectual culture) is definitely not for everyone.</li>
+        <li>Another good but weird and (in my opinion) overly pessimist book: <a href="https://ifanyonebuildsit.com/">"If Anyone Builds It, Everyone Dies"</a> by Eliezer Yudkowsky and Nate Soares.</li>
+        <li><em>And then...</em> there is a <a href="https://www.aisafety.com/map">whole world of AI safety</a> out there to explore!</li>
+      </ul>
+    </div>
+  </main>
+
+  <script>
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = document.getElementById('themeIcon');
+    const html = document.documentElement;
+
+    const savedTheme = localStorage.getItem('theme');
+    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+    if (savedTheme === 'dark') {
+      html.classList.add('dark');
+      themeIcon.textContent = '☀';
+    } else if (savedTheme === 'light') {
+      html.classList.add('light');
+      themeIcon.textContent = '☾';
+    } else if (systemPrefersDark) {
+      themeIcon.textContent = '☀';
+    }
+
+    themeToggle.addEventListener('click', () => {
+      if (html.classList.contains('dark')) {
+        html.classList.remove('dark');
+        html.classList.add('light');
+        localStorage.setItem('theme', 'light');
+        themeIcon.textContent = '☾';
+      } else {
+        html.classList.remove('light');
+        html.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+        themeIcon.textContent = '☀';
+      }
+    });
+  </script>
+</body>
+</html>

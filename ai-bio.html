@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI × Biology - Matt Lubin</title>
+  <meta name="description" content="Exploring the intersection of artificial intelligence and biology">
+  <style>
+    /* Root variables for theming */
+    :root {
+      --bg-light: #faf8f5;
+      --bg-dark: #1a1614;
+      --text-light: #2d2a26;
+      --text-dark: #e8e4df;
+      --text-muted-light: #6b6762;
+      --text-muted-dark: #9a9288;
+      --bio-ai: #4d6a4e;
+      --bio-ai-light: #5d7d5e;
+    }
+
+    :root {
+      --bg: var(--bg-light);
+      --text: var(--text-light);
+      --text-muted: var(--text-muted-light);
+    }
+
+    :root.dark {
+      --bg: var(--bg-dark);
+      --text: var(--text-dark);
+      --text-muted: var(--text-muted-dark);
+    }
+
+    /* Light mode is the default - dark mode only activates via toggle */
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Iowan Old Style', 'Palatino Linotype', 'URW Palladio L', P052, serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      transition: background-color 0.3s ease, color 0.3s ease;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .site-header {
+      padding: 1.5rem 2rem;
+      text-align: center;
+    }
+
+    .header-nav {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    .header-nav a {
+      color: var(--text-muted);
+      text-decoration: none;
+      margin: 0 0.4rem;
+      transition: color 0.2s ease;
+    }
+
+    .header-nav a:hover {
+      color: var(--text);
+    }
+
+    .theme-toggle {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      padding: 0;
+      margin: 0 0.4rem;
+      transition: color 0.2s ease;
+    }
+
+    .theme-toggle:hover {
+      color: var(--text);
+    }
+
+    .page-hero {
+      text-align: center;
+      padding: 3rem 2rem 2rem;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .page-title {
+      font-size: 3rem;
+      font-weight: 400;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, var(--bio-ai) 0%, var(--bio-ai-light) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .page-subtitle {
+      font-size: 1.1rem;
+      color: var(--text-muted);
+      font-weight: 300;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .content {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 0 2rem 4rem;
+    }
+
+    .content p {
+      margin-bottom: 1.5rem;
+      font-size: 1.05rem;
+    }
+
+    /* Link card styles */
+    .link-card {
+      display: block;
+      padding: 1.25rem 1.5rem;
+      background: var(--bg);
+      border: 1px solid var(--text-muted);
+      border-left: 4px solid var(--bio-ai);
+      border-radius: 0 8px 8px 0;
+      text-decoration: none;
+      color: var(--text);
+      transition: all 0.2s ease;
+      margin-bottom: 2rem;
+    }
+
+    .link-card:hover {
+      border-left-color: var(--bio-ai-light);
+      background: linear-gradient(90deg, rgba(77, 106, 78, 0.08) 0%, transparent 100%);
+      transform: translateX(4px);
+    }
+
+    :root.dark .link-card:hover {
+      background: linear-gradient(90deg, rgba(93, 125, 94, 0.12) 0%, transparent 100%);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root:not(.light) .link-card:hover {
+        background: linear-gradient(90deg, rgba(93, 125, 94, 0.12) 0%, transparent 100%);
+      }
+    }
+
+    .link-card-title {
+      font-size: 1.1rem;
+      font-weight: 500;
+      margin-bottom: 0.3rem;
+      color: var(--bio-ai);
+    }
+
+    :root.dark .link-card-title {
+      color: var(--bio-ai-light);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root:not(.light) .link-card-title {
+        color: var(--bio-ai-light);
+      }
+    }
+
+    .link-card-description {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    @media (max-width: 768px) {
+      .page-title {
+        font-size: 2.2rem;
+      }
+
+      .page-subtitle {
+        font-size: 1rem;
+      }
+
+      .content p {
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <nav class="header-nav">
+      <a href="/index.html">[home]</a> ·
+      <a href="/everything.html">[everything]</a> ·
+      <a href="/contact.html">[contact]</a> ·
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <span id="themeIcon">☾</span>
+      </button>
+    </nav>
+  </header>
+
+  <main>
+    <div class="page-hero">
+      <h1 class="page-title">AI × Biology</h1>
+      <p class="page-subtitle">Exploring the intersection of artificial intelligence and biology</p>
+    </div>
+    <div class="content">
+      <p> My intro to this topic can be found here:</p>
+
+      <a href="https://mattsbiodefense.substack.com/p/bioterrorism-and-ai-part-1" class="link-card">
+        <div class="link-card-title">Bioterrorism and AI, Part 1</div>
+        <div class="link-card-description">Exploring the intersection of artificial intelligence and biological risks.</div>
+      </a>
+
+      <p>AI has the power to totally transform the way we do biology and usher in a new era of improvements for human health. But it also has the potential to enable catastrophic misuse, particularly by actors who may with to cause widespread harm. Or, it might be a problem. 
+        We're working on figuring that out.</p>
+      <p>For the most recent scholarship on AI and biosecurity risk, see <a href="https://cdn.governance.ai/Dual-Use_AI_Capabilities_and_the_Risk_of_Bioterrorism.pdf">Luca Righetti's report at GovAI</a> on dual-use AI capabilities and bioterrorism risk.</p>
+    </div>
+  </main>
+
+  <script>
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = document.getElementById('themeIcon');
+    const html = document.documentElement;
+
+    const savedTheme = localStorage.getItem('theme');
+    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+    if (savedTheme === 'dark') {
+      html.classList.add('dark');
+      themeIcon.textContent = '☀';
+    } else if (savedTheme === 'light') {
+      html.classList.add('light');
+      themeIcon.textContent = '☾';
+    } else if (systemPrefersDark) {
+      themeIcon.textContent = '☀';
+    }
+
+    themeToggle.addEventListener('click', () => {
+      if (html.classList.contains('dark')) {
+        html.classList.remove('dark');
+        html.classList.add('light');
+        localStorage.setItem('theme', 'light');
+        themeIcon.textContent = '☾';
+      } else {
+        html.classList.remove('light');
+        html.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+        themeIcon.textContent = '☀';
+      }
+    });
+  </script>
+</body>
+</html>

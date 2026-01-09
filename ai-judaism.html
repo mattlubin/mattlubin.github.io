@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI × Judaism - Matt Lubin</title>
+  <meta name="description" content="Exploring the intersection of artificial intelligence and Jewish thought">
+  <style>
+    /* Root variables for theming */
+    :root {
+      --bg-light: #faf8f5;
+      --bg-dark: #1a1614;
+      --text-light: #2d2a26;
+      --text-dark: #e8e4df;
+      --text-muted-light: #6b6762;
+      --text-muted-dark: #9a9288;
+      --ai-judaism: #6d5965;
+      --ai-judaism-light: #806775;
+    }
+
+    :root {
+      --bg: var(--bg-light);
+      --text: var(--text-light);
+      --text-muted: var(--text-muted-light);
+    }
+
+    :root.dark {
+      --bg: var(--bg-dark);
+      --text: var(--text-dark);
+      --text-muted: var(--text-muted-dark);
+    }
+
+    /* Light mode is the default - dark mode only activates via toggle */
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Iowan Old Style', 'Palatino Linotype', 'URW Palladio L', P052, serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      transition: background-color 0.3s ease, color 0.3s ease;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .site-header {
+      padding: 1.5rem 2rem;
+      text-align: center;
+    }
+
+    .header-nav {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    .header-nav a {
+      color: var(--text-muted);
+      text-decoration: none;
+      margin: 0 0.4rem;
+      transition: color 0.2s ease;
+    }
+
+    .header-nav a:hover {
+      color: var(--text);
+    }
+
+    .theme-toggle {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      padding: 0;
+      margin: 0 0.4rem;
+      transition: color 0.2s ease;
+    }
+
+    .theme-toggle:hover {
+      color: var(--text);
+    }
+
+    .page-hero {
+      text-align: center;
+      padding: 3rem 2rem 2rem;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .page-title {
+      font-size: 3rem;
+      font-weight: 400;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, var(--ai-judaism) 0%, var(--ai-judaism-light) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .page-subtitle {
+      font-size: 1.1rem;
+      color: var(--text-muted);
+      font-weight: 300;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .content {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 0 2rem 4rem;
+    }
+
+    .content p {
+      margin-bottom: 1.5rem;
+      font-size: 1.05rem;
+    }
+
+    @media (max-width: 768px) {
+      .page-title {
+        font-size: 2.2rem;
+      }
+
+      .page-subtitle {
+        font-size: 1rem;
+      }
+
+      .content p {
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <nav class="header-nav">
+      <a href="/index.html">[home]</a> ·
+      <a href="/everything.html">[everything]</a> ·
+      <a href="/contact.html">[contact]</a> ·
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <span id="themeIcon">☾</span>
+      </button>
+    </nav>
+  </header>
+
+  <main>
+    <div class="page-hero">
+      <h1 class="page-title">AI × Judaism</h1>
+      <p class="page-subtitle">Exploring the intersection of artificial intelligence and Jewish thought</p>
+    </div>
+
+    <div class="content">
+      <p>Besides for a few small articles on Judaism and Artificial Intelligence, I am working on two substantial projects on the interaction of AI with the Jewish community and Jewish thought.
+        One of those is a secret! But I assure you my cabal of kabbalists are doing well.  
+      </p>
+      <p>My public project - and soon to be an actual book from a real publishing company! - is the <a href="https://jewishai.me"><strong> Jewish Handbook of AI Ethics</strong></a>. I'd love for help on developing the online resources associated with that book to make it into something actually useful!
+      </p>
+    </div>
+  </main>
+
+  <script>
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = document.getElementById('themeIcon');
+    const html = document.documentElement;
+
+    const savedTheme = localStorage.getItem('theme');
+    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+    if (savedTheme === 'dark') {
+      html.classList.add('dark');
+      themeIcon.textContent = '☀';
+    } else if (savedTheme === 'light') {
+      html.classList.add('light');
+      themeIcon.textContent = '☾';
+    } else if (systemPrefersDark) {
+      themeIcon.textContent = '☀';
+    }
+
+    themeToggle.addEventListener('click', () => {
+      if (html.classList.contains('dark')) {
+        html.classList.remove('dark');
+        html.classList.add('light');
+        localStorage.setItem('theme', 'light');
+        themeIcon.textContent = '☾';
+      } else {
+        html.classList.remove('light');
+        html.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+        themeIcon.textContent = '☀';
+      }
+    });
+  </script>
+</body>
+</html>

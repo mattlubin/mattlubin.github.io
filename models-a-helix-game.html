@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alpha Helix Architect - Matt Lubin</title>
+    <meta name="description" content="Interactive game to learn about protein alpha helix structure and stability">
+    <style>
+        /* Root variables for theming - Adapted from personal website */
+        :root {
+            --bg-light: #faf8f5;
+            --bg-dark: #1a1614;
+            --text-light: #2d2a26;
+            --text-dark: #e8e4df;
+            --text-muted-light: #6b6762;
+            --text-muted-dark: #9a9288;
+            
+            /* Game specific accents */
+            --accent-blue: #4a5f8d; /* Judaism color */
+            --accent-red: #8b5a3c;  /* AI Safety color */
+            --accent-yellow: #d4a017;
+            --accent-green: #2d7a5e; /* Biology color */
+        }
+
+        :root {
+            --bg: var(--bg-light);
+            --text: var(--text-light);
+            --text-muted: var(--text-muted-light);
+            --canvas-bg: #1a1614; /* Always dark for contrast */
+            --container-bg: #ffffff;
+            --container-shadow: rgba(0,0,0,0.1);
+        }
+
+        :root.dark {
+            --bg: var(--bg-dark);
+            --text: var(--text-dark);
+            --text-muted: var(--text-muted-dark);
+            --canvas-bg: #000000;
+            --container-bg: #262220;
+            --container-shadow: rgba(0,0,0,0.3);
+        }
+
+        /* Light mode is the default - dark mode only activates via toggle */
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body { 
+            font-family: 'Iowan Old Style', 'Palatino Linotype', 'URW Palladio L', P052, serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header Styles */
+        .site-header { padding: 1.5rem 2rem; text-align: center; }
+        .header-nav { font-size: 0.9rem; color: var(--text-muted); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+        .header-nav a { color: var(--text-muted); text-decoration: none; margin: 0 0.4rem; transition: color 0.2s ease; }
+        .header-nav a:hover { color: var(--text); }
+        .theme-toggle { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 0.9rem; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 0; margin: 0 0.4rem; transition: color 0.2s ease; }
+        .theme-toggle:hover { color: var(--text); }
+
+        /* Page Hero */
+        .page-hero { text-align: center; padding: 2rem 2rem 1rem; max-width: 800px; margin: 0 auto; }
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 400;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--accent-green) 0%, #3d9a78 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .page-subtitle { font-size: 1rem; color: var(--text-muted); font-weight: 300; font-style: italic; }
+
+        /* Intro Section */
+        .intro {
+            max-width: 700px;
+            margin: 0 auto 2rem;
+            padding: 0 2rem;
+            font-size: 1.05rem;
+            line-height: 1.8;
+        }
+        .intro p { margin-bottom: 1rem; }
+        .intro em { color: var(--accent-green); font-style: italic; }
+        :root.dark .intro em { color: #3d9a78; }
+        @media (prefers-color-scheme: dark) {
+            :root:not(.light) .intro em { color: #3d9a78; }
+        }
+        
+        /* Game Container */
+        #game-container { 
+            background: var(--container-bg); 
+            padding: 30px; 
+            border-radius: 2px; 
+            box-shadow: 0 4px 20px var(--container-shadow); 
+            max-width: 900px; 
+            width: 95%; 
+            margin: 20px auto; 
+            transition: background-color 0.3s ease;
+        }
+        
+        /* Controls */
+        .controls { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; justify-content: center; }
+        .aa-btn { 
+            padding: 10px 15px; 
+            border: none; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            font-weight: 500; 
+            color: white; 
+            transition: all 0.2s; 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            letter-spacing: 0.05em;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .aa-btn:active { transform: scale(0.95); }
+        .aa-btn:hover { opacity: 0.9; transform: translateY(-1px); box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
+
+        /* Colors based on properties */
+        .pos { background: linear-gradient(135deg, #4a5f8d 0%, #5d76ab 100%); } /* Judaism Blue */
+        .neg { background: linear-gradient(135deg, #8b5a3c 0%, #a86f4d 100%); } /* AI Safety Red/Brown */
+        .hydro { background: linear-gradient(135deg, #d4a017 0%, #eac159 100%); color: black; } /* Yellow */
+        .special { background: linear-gradient(135deg, #6b6762 0%, #8a827a 100%); } /* Muted Gray */
+
+        /* Sequence Display */
+        #sequence-display { display: flex; flex-wrap: wrap; gap: 5px; min-height: 50px; margin-bottom: 20px; padding: 15px; background: rgba(0,0,0,0.05); border-radius: 4px; border: 1px solid rgba(0,0,0,0.1); }
+        .residue { width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 12px; font-weight: bold; color: white; position: relative; }
+        .residue span { z-index: 2; }
+        .residue.hydro { color: black; }
+
+        /* Canvas */
+        canvas { background: var(--canvas-bg); border-radius: 4px; width: 100%; height: 400px; cursor: grab; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); }
+        canvas:active { cursor: grabbing; }
+
+        /* Status Bar */
+        #status { margin-top: 10px; font-weight: bold; color: var(--text); display: flex; justify-content: space-between; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+        .legend { font-size: 0.9em; margin-top: 5px; color: var(--text-muted); text-align: center; margin-bottom: 15px; }
+        
+        button#fold-btn { background: linear-gradient(135deg, #2d7a5e 0%, #3d9a78 100%); font-size: 1.1em; padding: 12px 30px; } /* Biology Green */
+        button#reset-btn { background: #6b6762; }
+        
+        #log { font-family: 'Courier New', monospace; font-size: 0.9em; color: var(--text-muted); margin-top:10px; height: 100px; overflow-y: auto; border: 1px solid rgba(0,0,0,0.1); padding: 10px; background: rgba(0,0,0,0.02); }
+
+    </style>
+</head>
+<body>
+
+    <header class="site-header">
+        <nav class="header-nav">
+            <a href="/index.html">[home]</a> ·
+            <a href="/biology.html">[biology]</a> ·
+            <a href="/everything.html">[everything]</a> ·
+            <button type="button" class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+                <span id="themeIcon">&#9790;</span>
+            </button>
+        </nav>
+    </header>
+
+    <main>
+        <div class="page-hero">
+            <h1 class="page-title">Alpha Helix Architect</h1>
+            <p class="page-subtitle">Build a stable protein secondary structure</p>
+        </div>
+
+        <div class="intro">
+            <p>The alpha helix is one of the most common structural motifs in proteins. It forms when the backbone of a polypeptide chain coils into a right-handed spiral, stabilized by hydrogen bonds between the C=O group of residue <em>i</em> and the N-H group of residue <em>i+4</em>.</p>
+            <p>In this game, you select amino acids to build a polypeptide chain, then fold it to see how stable your helix is. Some residues stabilize the helix (like alanine), while others can break it (like proline, which lacks an amide hydrogen) or destabilize it through charge repulsion.</p>
+        </div>
+    
+    <div id="game-container">
+        <div class="legend">
+            <span style="color:#4a5f8d">● Positive</span> 
+            <span style="color:#8b5a3c">● Negative</span> 
+            <span style="color:#d4a017">● Hydrophobic</span> 
+            <span style="color:#6b7280">● Special (Pro/Gly)</span>
+        </div>
+
+        <div class="controls">
+            <!-- Positive -->
+            <button class="aa-btn pos" onclick="addAA('K', 'pos')">Lys (K)</button>
+            <button class="aa-btn pos" onclick="addAA('R', 'pos')">Arg (R)</button>
+            <!-- Negative -->
+            <button class="aa-btn neg" onclick="addAA('D', 'neg')">Asp (D)</button>
+            <button class="aa-btn neg" onclick="addAA('E', 'neg')">Glu (E)</button>
+            <!-- Hydrophobic -->
+            <button class="aa-btn hydro" onclick="addAA('A', 'hydro')">Ala (A)</button>
+            <button class="aa-btn hydro" onclick="addAA('L', 'hydro')">Leu (L)</button>
+            <button class="aa-btn hydro" onclick="addAA('F', 'hydro')">Phe (F)</button>
+            <!-- Special -->
+            <button class="aa-btn special" onclick="addAA('G', 'special')">Gly (G)</button>
+            <button class="aa-btn special" onclick="addAA('P', 'special')">Pro (P)</button>
+        </div>
+
+        <div id="status">
+            <span id="count">Length: 0 / 18</span>
+            <span id="score">Stability Score: 0%</span>
+        </div>
+
+        <div id="sequence-display"></div>
+
+        <div class="controls">
+            <button id="fold-btn" class="aa-btn" onclick="foldHelix()">FOLD HELIX</button>
+            <button id="undo-btn" class="aa-btn" style="background-color: #f59e0b;" onclick="removeLastAA()">UNDO</button>
+            <button id="reset-btn" class="aa-btn" onclick="resetGame()">RESET</button>
+        </div>
+
+        <canvas id="helixCanvas" width="800" height="400"></canvas>
+        <div id="log" style="font-family: monospace; font-size: 0.9em; color: #444; margin-top:10px; height: 100px; overflow-y: auto; border: 1px solid #ddd; padding: 5px;"></div>
+    </div>
+
+<script>
+    const MAX_LENGTH = 18;
+    let sequence = [];
+    const canvas = document.getElementById('helixCanvas');
+    const ctx = canvas.getContext('2d');
+    const logDiv = document.getElementById('log');
+
+    // 3D Engine State
+    let sceneObjects = [];
+    let rotX = 0.2; // Slight initial tilt
+    let rotY = 0.5;
+    let isDragging = false;
+    let lastMouseX = 0;
+    let lastMouseY = 0;
+
+    // Mouse Interaction for 3D Rotation
+    canvas.addEventListener('mousedown', e => {
+        isDragging = true;
+        lastMouseX = e.offsetX;
+        lastMouseY = e.offsetY;
+    });
+    window.addEventListener('mouseup', () => isDragging = false);
+    canvas.addEventListener('mousemove', e => {
+        if (!isDragging) return;
+        const dx = e.offsetX - lastMouseX;
+        const dy = e.offsetY - lastMouseY;
+        rotY += dx * 0.01; // Turn side to side
+        rotX += dy * 0.01; // Turn up and down
+        lastMouseX = e.offsetX;
+        lastMouseY = e.offsetY;
+        drawScene();
+    });
+
+    // Amino Acid Properties
+    const aaProps = {
+        'K': { charge: 1, type: 'pos', name: 'Lysine' },
+        'R': { charge: 1, type: 'pos', name: 'Arginine' },
+        'D': { charge: -1, type: 'neg', name: 'Aspartic Acid' },
+        'E': { charge: -1, type: 'neg', name: 'Glutamic Acid' },
+        'A': { charge: 0, type: 'hydro', name: 'Alanine' },
+        'L': { charge: 0, type: 'hydro', name: 'Leucine' },
+        'F': { charge: 0, type: 'hydro', name: 'Phenylalanine' },
+        'G': { charge: 0, type: 'special', name: 'Glycine' }, // Destabilizer
+        'P': { charge: 0, type: 'special', name: 'Proline' }  // Breaker
+    };
+
+    function addAA(code, type) {
+        if (sequence.length >= MAX_LENGTH) return;
+        
+        sequence.push({ code, ...aaProps[code], id: sequence.length });
+        updateUI();
+    }
+
+    function removeLastAA() {
+        sequence.pop();
+        updateUI();
+    }
+
+    function updateUI() {
+        const display = document.getElementById('sequence-display');
+        display.innerHTML = '';
+        
+        sequence.forEach((aa, index) => {
+            const div = document.createElement('div');
+            div.className = `residue ${aa.type}`;
+            div.innerHTML = `<span>${aa.code}</span>`;
+            display.appendChild(div);
+        });
+
+        document.getElementById('count').innerText = `Length: ${sequence.length} / ${MAX_LENGTH}`;
+    }
+
+    function resetGame() {
+        sequence = [];
+        updateUI();
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        logDiv.innerHTML = "Ready to build...";
+        document.getElementById('score').innerText = "Stability Score: 0%";
+    }
+
+    function log(msg) {
+        logDiv.innerHTML += `<div>> ${msg}</div>`;
+        logDiv.scrollTop = logDiv.scrollHeight;
+    }
+
+    function foldHelix() {
+        if (sequence.length < 5) {
+            alert("Chain too short to fold! Add at least 5 amino acids.");
+            return;
+        }
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        logDiv.innerHTML = "";
+
+        let stableBonds = 0;
+        let totalPossibleBonds = 0;
+        sceneObjects = []; // Clear 3D scene
+
+        // --- ALPHA HELIX LOGIC ---
+        // In an alpha helix, residue i forms a hydrogen bond with residue i+4
+        const residueStability = new Array(sequence.length).fill(0);
+        const bondInfo = [];
+
+        for (let i = 0; i < sequence.length - 4; i++) {
+            totalPossibleBonds++;
+            const aa1 = sequence[i];     // C=O donor
+            const aa2 = sequence[i + 4]; // N-H acceptor
+
+            let isBondStable = true;
+            let color = "#00ff00"; // Green = stable H-bond
+            let reason = "";
+
+            // 1. Proline at i+4 breaks the helix (no amide hydrogen)
+            if (aa2.code === 'P') {
+                isBondStable = false;
+                reason = "Proline breaks helix (no N-H)";
+                color = "transparent";
+            }
+            // 2. Glycine destabilizes (too flexible, entropic penalty)
+            else if (aa1.code === 'G' || aa2.code === 'G') {
+                color = "#ffff00"; // Yellow = weakened
+                reason = "Glycine flexibility weakens";
+            }
+            // 3. Same charge = electrostatic repulsion
+            else if (aa1.charge !== 0 && aa1.charge === aa2.charge) {
+                isBondStable = false;
+                reason = "Charge repulsion destabilizes";
+                color = "#ff0000"; // Red = broken
+            }
+            // 4. Opposite charges = salt bridge (extra stabilization)
+            else if (aa1.charge !== 0 && aa2.charge !== 0 && aa1.charge !== aa2.charge) {
+                color = "#00ffff"; // Cyan = salt bridge
+                reason = "Salt bridge stabilization!";
+            }
+
+            if (isBondStable) {
+                stableBonds++;
+                for (let k = i; k <= i + 4; k++) residueStability[k]++;
+            }
+
+            bondInfo.push({ i, color, reason });
+        }
+
+        // Generate 3D Coordinates
+        const spacing = 25;
+        const helixRadius = 35;
+        const anglePerResidue = 1.74; // ~100 degrees
+
+        const totalWidth = sequence.length * spacing;
+        const offsetX = -totalWidth / 2;
+
+        let currentX = offsetX;
+        let angle = 0;
+        let currentRadius = 0;
+
+        for (let i = 0; i < sequence.length; i++) {
+            const isHelical = residueStability[i] > 0;
+            const targetRadius = isHelical ? helixRadius : 5;
+            currentRadius = currentRadius * 0.6 + targetRadius * 0.4;
+
+            const y = currentRadius * Math.cos(angle);
+            const z = currentRadius * Math.sin(angle);
+
+            sequence[i].pos3D = { x: currentX, y, z };
+
+            addSphere(currentX, y, z, 10, getColor(sequence[i].type), sequence[i].code);
+
+            if (i > 0) {
+                const prev = sequence[i - 1].pos3D;
+                addLine(prev.x, prev.y, prev.z, currentX, y, z, "#e5e7eb", 6);
+            }
+
+            const dirY = Math.cos(angle);
+            const dirZ = Math.sin(angle);
+            generateSideChain3D(currentX, y, z, dirY, dirZ, sequence[i]);
+
+            currentX += spacing;
+            angle += anglePerResidue;
+        }
+
+        // Draw Hydrogen Bonds
+        bondInfo.forEach(bond => {
+            const aa1 = sequence[bond.i];
+            const aa2 = sequence[bond.i + 4];
+
+            if (bond.color !== "transparent") {
+                addLine(
+                    aa1.pos3D.x, aa1.pos3D.y, aa1.pos3D.z,
+                    aa2.pos3D.x, aa2.pos3D.y, aa2.pos3D.z,
+                    bond.color, 3, true
+                );
+            }
+
+            if (bond.reason) log(`Pos ${bond.i + 1}-${bond.i + 5}: ${bond.reason}`);
+        });
+
+        const score = totalPossibleBonds > 0 ? Math.round((stableBonds / totalPossibleBonds) * 100) : 0;
+        document.getElementById('score').innerText = `Stability Score: ${score}%`;
+
+        if (score === 100 && sequence.length >= 10) {
+            log("PERFECT HELIX!");
+        }
+
+        drawScene();
+    }
+
+    // --- 3D Helper Functions ---
+
+    function addSphere(x, y, z, r, color, text) {
+        sceneObjects.push({ type: 'sphere', x, y, z, r, color, text });
+    }
+
+    function addLine(x1, y1, z1, x2, y2, z2, color, width, dashed = false) {
+        sceneObjects.push({ type: 'line', x1, y1, z1, x2, y2, z2, color, width, dashed });
+    }
+
+    function addPolygon(points, color, fill) {
+        sceneObjects.push({ type: 'poly', points, color, fill });
+    }
+
+    function generateSideChain3D(bx, by, bz, dy, dz, aa) {
+        const scale = 1.5; // Scale up side chains
+        // Start position (C-beta)
+        const s1x = bx; 
+        const s1y = by + (dy * 20 * scale);
+        const s1z = bz + (dz * 20 * scale);
+
+        // Draw stem
+        addLine(bx, by, bz, s1x, s1y, s1z, "#94a3b8", 3);
+
+        if (aa.code === 'G') return; // Glycine has no side chain
+
+        // Helper for extending points
+        const extend = (dist) => ({
+            x: s1x,
+            y: s1y + (dy * dist * scale),
+            z: s1z + (dz * dist * scale)
+        });
+
+        if (aa.code === 'F') { // Phenylalanine (Hexagon)
+            const center = extend(25);
+            const r = 15 * scale;
+            const points = [];
+            for(let i=0; i<6; i++) {
+                // Create hexagon in the plane perpendicular to X
+                const ang = i * Math.PI / 3;
+                points.push({
+                    x: center.x + Math.cos(ang) * r, // Rotate in X dimension for 3D look
+                    y: center.y + Math.sin(ang) * r * 0.5, // Flatten slightly
+                    z: center.z 
+                });
+            }
+            addPolygon(points, "#eab308", true);
+            // Connect stem to hexagon
+            addLine(s1x, s1y, s1z, points[0].x, points[0].y, points[0].z, "#94a3b8", 3);
+        }
+        else if (aa.code === 'P') { // Proline (Pentagon back to backbone)
+            const p2 = extend(10);
+            const points = [
+                {x: bx, y: by, z: bz}, // Backbone
+                {x: bx+5, y: by+10, z: bz},
+                {x: s1x, y: s1y, z: s1z},
+                {x: bx-5, y: by+10, z: bz}
+            ];
+            addPolygon(points, "#9ca3af", false);
+        }
+        else if (aa.code === 'L') { // Leucine (Fork)
+            const mid = extend(15);
+            addLine(s1x, s1y, s1z, mid.x, mid.y, mid.z, "#94a3b8", 3);
+            // Fork
+            addLine(mid.x, mid.y, mid.z, mid.x - 10, mid.y + (dy*10), mid.z + (dz*10), "#94a3b8", 3);
+            addLine(mid.x, mid.y, mid.z, mid.x + 10, mid.y + (dy*10), mid.z + (dz*10), "#94a3b8", 3);
+        }
+        else if (['K', 'R'].includes(aa.code)) { // Long Positive
+            const end = extend(40);
+            // Zigzag approximation
+            addLine(s1x, s1y, s1z, end.x, end.y, end.z, "#3b82f6", 3);
+            addSphere(end.x, end.y, end.z, 6, "#3b82f6", "+");
+        }
+        else if (['D', 'E'].includes(aa.code)) { // Negative
+            const end = extend(20);
+            addLine(s1x, s1y, s1z, end.x, end.y, end.z, "#ef4444", 3);
+            addSphere(end.x, end.y, end.z, 6, "#ef4444", "-");
+        }
+        else { // Default (Ala, etc)
+            // Just the stem is enough for Ala, maybe a small cap
+            addSphere(s1x, s1y, s1z, 4, "#94a3b8", "");
+        }
+    }
+
+    function drawScene() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const cx = canvas.width / 2;
+        const cy = canvas.height / 2;
+
+        // Projection Helper
+        const project = (x, y, z) => {
+            // 1. Rotate Y
+            let x1 = x * Math.cos(rotY) - z * Math.sin(rotY);
+            let z1 = x * Math.sin(rotY) + z * Math.cos(rotY);
+            // 2. Rotate X
+            let y2 = y * Math.cos(rotX) - z1 * Math.sin(rotX);
+            let z2 = y * Math.sin(rotX) + z1 * Math.cos(rotX);
+            
+            // 3. Perspective
+            const scale = 400 / (400 - z2); // Simple perspective
+            return {
+                x: cx + x1 * scale,
+                y: cy + y2 * scale,
+                z: z2, // Depth for sorting
+                scale: scale
+            };
+        };
+
+        // Process Objects
+        const renderList = sceneObjects.map(obj => {
+            if (obj.type === 'sphere') {
+                const p = project(obj.x, obj.y, obj.z);
+                return { ...obj, p, z: p.z };
+            } else if (obj.type === 'line') {
+                const p1 = project(obj.x1, obj.y1, obj.z1);
+                const p2 = project(obj.x2, obj.y2, obj.z2);
+                return { ...obj, p1, p2, z: (p1.z + p2.z) / 2 };
+            } else if (obj.type === 'poly') {
+                const projPoints = obj.points.map(pt => project(pt.x, pt.y, pt.z));
+                const avgZ = projPoints.reduce((sum, pt) => sum + pt.z, 0) / projPoints.length;
+                return { ...obj, projPoints, z: avgZ };
+            }
+        });
+
+        // Sort by Depth (Painter's Algorithm)
+        renderList.sort((a, b) => a.z - b.z);
+
+        // Draw
+        renderList.forEach(obj => {
+            if (obj.type === 'line') {
+                ctx.beginPath();
+                if (obj.dashed) ctx.setLineDash([5, 5]);
+                ctx.moveTo(obj.p1.x, obj.p1.y);
+                ctx.lineTo(obj.p2.x, obj.p2.y);
+                ctx.strokeStyle = obj.color;
+                ctx.lineWidth = obj.width * ((obj.p1.scale + obj.p2.scale)/2); // Scale width
+                ctx.stroke();
+                ctx.setLineDash([]);
+            } else if (obj.type === 'sphere') {
+                ctx.beginPath();
+                ctx.arc(obj.p.x, obj.p.y, obj.r * obj.p.scale, 0, Math.PI * 2);
+                ctx.fillStyle = obj.color;
+                ctx.fill();
+                if (obj.text) {
+                    ctx.fillStyle = "white";
+                    ctx.font = `bold ${10 * obj.p.scale}px Arial`;
+                    ctx.textAlign = "center";
+                    ctx.textBaseline = "middle";
+                    ctx.fillText(obj.text, obj.p.x, obj.p.y);
+                }
+            } else if (obj.type === 'poly') {
+                ctx.beginPath();
+                obj.projPoints.forEach((pt, i) => {
+                    if (i===0) ctx.moveTo(pt.x, pt.y);
+                    else ctx.lineTo(pt.x, pt.y);
+                });
+                ctx.closePath();
+                if (obj.fill) {
+                    ctx.fillStyle = obj.color;
+                    ctx.fill();
+                }
+                ctx.strokeStyle = "#fff";
+                ctx.lineWidth = 1;
+                ctx.stroke();
+            }
+        });
+    }
+
+    // Theme Toggle Logic
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = document.getElementById('themeIcon');
+    const html = document.documentElement;
+    const savedTheme = localStorage.getItem('theme');
+    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+    if (savedTheme === 'dark') { html.classList.add('dark'); themeIcon.textContent = '☀'; }
+    else if (savedTheme === 'light') { html.classList.add('light'); themeIcon.textContent = '☾'; }
+    else if (systemPrefersDark) { themeIcon.textContent = '☀'; }
+
+    themeToggle.addEventListener('click', () => {
+        if (html.classList.contains('dark')) {
+            html.classList.remove('dark'); html.classList.add('light'); localStorage.setItem('theme', 'light'); themeIcon.textContent = '☾';
+        } else {
+            html.classList.remove('light'); html.classList.add('dark'); localStorage.setItem('theme', 'dark'); themeIcon.textContent = '☀';
+        }
+        drawScene(); // Redraw canvas if needed (though canvas bg is CSS handled, content might need update if colors changed)
+    });
+
+    function getColor(type) {
+        if (type === 'pos') return '#4a5f8d';
+        if (type === 'neg') return '#8b5a3c';
+        if (type === 'hydro') return '#d4a017';
+        if (type === 'special') return '#9ca3af';
+        return '#fff';
+    }
+</script>
+    </main>
+</body>
+</html>

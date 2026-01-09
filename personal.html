@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Personal - Matt Lubin</title>
+  <meta name="description" content="Personal stuff">
+  <style>
+    /* Root variables for theming */
+    :root {
+      --bg-light: #faf8f5;
+      --bg-dark: #1a1614;
+      --text-light: #2d2a26;
+      --text-dark: #e8e4df;
+      --text-muted-light: #6b6762;
+      --text-muted-dark: #9a9288;
+      --biology: #2d7a5e;
+      --biology-light: #3d9a78;
+    }
+
+    :root {
+      --bg: var(--bg-light);
+      --text: var(--text-light);
+      --text-muted: var(--text-muted-light);
+    }
+
+    :root.dark {
+      --bg: var(--bg-dark);
+      --text: var(--text-dark);
+      --text-muted: var(--text-muted-dark);
+    }
+
+    /* Light mode is the default - dark mode only activates via toggle */
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Iowan Old Style', 'Palatino Linotype', 'URW Palladio L', P052, serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      transition: background-color 0.3s ease, color 0.3s ease;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .site-header {
+      padding: 1.5rem 2rem;
+      text-align: center;
+    }
+
+    .header-nav {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    .header-nav a {
+      color: var(--text-muted);
+      text-decoration: none;
+      margin: 0 0.4rem;
+      transition: color 0.2s ease;
+    }
+
+    .header-nav a:hover {
+      color: var(--text);
+    }
+
+    .theme-toggle {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      padding: 0;
+      margin: 0 0.4rem;
+      transition: color 0.2s ease;
+    }
+
+    .theme-toggle:hover {
+      color: var(--text);
+    }
+
+    .page-hero {
+      text-align: center;
+      padding: 3rem 2rem 2rem;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .page-title {
+      font-size: 3rem;
+      font-weight: 400;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, var(--biology) 0%, var(--biology-light) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .page-subtitle {
+      font-size: 1.1rem;
+      color: var(--text-muted);
+      font-weight: 300;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .content {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 0 2rem 4rem;
+    }
+
+    .content p {
+      margin-bottom: 1.5rem;
+      font-size: 1.05rem;
+    }
+
+    .intro {
+      font-size: 1.1rem;
+      line-height: 1.8;
+      margin-bottom: 3rem;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid var(--text-muted);
+      opacity: 0.9;
+    }
+
+    .intro em {
+      font-style: italic;
+    }
+
+    /* Section styling */
+    .section {
+      margin-bottom: 4rem;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .section-icon {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, var(--biology) 0%, var(--biology-light) 100%);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+
+    .section-title {
+      font-size: 1.6rem;
+      font-weight: 400;
+      color: var(--biology);
+    }
+
+    :root.dark .section-title {
+      color: var(--biology-light);
+    }
+
+    .section-intro {
+      font-size: 1rem;
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+      line-height: 1.7;
+      font-style: italic;
+    }
+
+    /* Link cards */
+    .link-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .link-card {
+      display: block;
+      padding: 1.25rem 1.5rem;
+      background: var(--bg);
+      border: 1px solid var(--text-muted);
+      border-left: 4px solid var(--biology);
+      border-radius: 0 8px 8px 0;
+      text-decoration: none;
+      color: var(--text);
+      transition: all 0.2s ease;
+    }
+
+    .link-card:hover {
+      border-left-color: var(--biology-light);
+      background: linear-gradient(90deg, rgba(45, 122, 94, 0.08) 0%, transparent 100%);
+      transform: translateX(4px);
+    }
+
+    :root.dark .link-card:hover {
+      background: linear-gradient(90deg, rgba(61, 154, 120, 0.12) 0%, transparent 100%);
+    }
+
+    .link-card-title {
+      font-size: 1.1rem;
+      font-weight: 500;
+      margin-bottom: 0.3rem;
+      color: var(--biology);
+    }
+
+    :root.dark .link-card-title {
+      color: var(--biology-light);
+    }
+
+    .link-card-description {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    /* Recommendation list - more casual styling */
+    .rec-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1rem;
+    }
+
+    .rec-item {
+      padding: 1rem;
+      border-radius: 8px;
+      text-decoration: none;
+      color: var(--text);
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    .rec-item:hover {
+      transform: translateY(-2px);
+    }
+
+    .rec-item-title {
+      font-size: 1rem;
+      font-weight: 500;
+      margin-bottom: 0.2rem;
+    }
+
+    .rec-item-type {
+      font-size: 0.75rem;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* Author styling - warm amber tones, italic name */
+    .rec-item.rec-author {
+      background: linear-gradient(135deg, rgba(139, 90, 60, 0.08) 0%, rgba(168, 111, 77, 0.04) 100%);
+      border-left: 3px solid #8b5a3c;
+      padding-left: 1.25rem;
+    }
+
+    .rec-item.rec-author:hover {
+      background: linear-gradient(135deg, rgba(139, 90, 60, 0.15) 0%, rgba(168, 111, 77, 0.08) 100%);
+    }
+
+    .rec-item.rec-author .rec-item-title {
+      font-style: italic;
+    }
+
+    .rec-item.rec-author .rec-item-type {
+      color: #8b5a3c;
+    }
+
+    :root.dark .rec-item.rec-author {
+      border-left-color: #c4926e;
+    }
+
+    :root.dark .rec-item.rec-author .rec-item-type {
+      color: #c4926e;
+    }
+
+    /* Book styling - bold spine-like appearance */
+    .rec-item.rec-book {
+      background: var(--bg);
+      border: 1px solid var(--text-muted);
+      border-left: 6px solid var(--biology);
+      padding-left: 1rem;
+    }
+
+    .rec-item.rec-book:hover {
+      border-left-color: var(--biology-light);
+      box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .rec-item.rec-book .rec-item-title {
+      font-weight: 600;
+    }
+
+    .rec-item.rec-book .rec-item-type {
+      color: var(--biology);
+    }
+
+    :root.dark .rec-item.rec-book .rec-item-type {
+      color: var(--biology-light);
+    }
+
+    /* Magazine styling - centered with badge label */
+    .rec-item.rec-magazine {
+      background: linear-gradient(135deg, rgba(74, 95, 141, 0.08) 0%, rgba(93, 118, 171, 0.04) 100%);
+      border-radius: 12px;
+      text-align: center;
+      padding: 1.25rem 1rem;
+    }
+
+    .rec-item.rec-magazine:hover {
+      background: linear-gradient(135deg, rgba(74, 95, 141, 0.15) 0%, rgba(93, 118, 171, 0.08) 100%);
+    }
+
+    .rec-item.rec-magazine .rec-item-title {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+
+    .rec-item.rec-magazine .rec-item-type {
+      color: #4a5f8d;
+      display: inline-block;
+      background: rgba(74, 95, 141, 0.12);
+      padding: 0.15rem 0.5rem;
+      border-radius: 10px;
+      margin-top: 0.25rem;
+    }
+
+    :root.dark .rec-item.rec-magazine .rec-item-type {
+      color: #8da3d4;
+      background: rgba(93, 118, 171, 0.2);
+    }
+
+    /* YouTube styling - red accent, play button feel */
+    .rec-item.rec-youtube {
+      background: linear-gradient(135deg, rgba(255, 0, 0, 0.06) 0%, rgba(200, 50, 50, 0.03) 100%);
+      border-radius: 8px;
+      padding-left: 2.5rem;
+      position: relative;
+    }
+
+    .rec-item.rec-youtube::before {
+      content: "▶";
+      position: absolute;
+      left: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #cc0000;
+      font-size: 0.9rem;
+    }
+
+    .rec-item.rec-youtube:hover {
+      background: linear-gradient(135deg, rgba(255, 0, 0, 0.12) 0%, rgba(200, 50, 50, 0.06) 100%);
+    }
+
+    .rec-item.rec-youtube .rec-item-type {
+      color: #cc0000;
+    }
+
+    :root.dark .rec-item.rec-youtube::before {
+      color: #ff4444;
+    }
+
+    :root.dark .rec-item.rec-youtube .rec-item-type {
+      color: #ff4444;
+    }
+
+    /* Category groups for recommendations */
+    .rec-category {
+      margin-bottom: 1.5rem;
+    }
+
+    .rec-category:last-child {
+      margin-bottom: 0;
+    }
+
+    .rec-category-label {
+      font-size: 0.8rem;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      margin-bottom: 0.75rem;
+      padding-bottom: 0.25rem;
+      border-bottom: 1px solid rgba(107, 103, 98, 0.2);
+    }
+
+    @media (max-width: 768px) {
+      .page-title {
+        font-size: 2.2rem;
+      }
+
+      .page-subtitle {
+        font-size: 1rem;
+      }
+
+      .content p {
+        font-size: 1rem;
+      }
+
+      .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+      }
+
+      .section-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+      }
+
+      .section-title {
+        font-size: 1.4rem;
+      }
+
+      .rec-list {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <nav class="header-nav">
+      <a href="/index.html">[home]</a> ·
+      <a href="/everything.html">[everything]</a> ·
+      <a href="/contact.html">[contact]</a> ·
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <span id="themeIcon">☾</span>
+      </button>
+    </nav>
+  </header>
+
+  <main>
+    <div class="page-hero">
+      <h1 class="page-title">Personal</h1>
+      <p class="page-subtitle">Personal writings and other miscellaneous projects.</p>
+    </div>
+
+    <div class="content">
+      <p>There are only so many things you can do in life. In fact, my real ambitions are to do things that cannot be linked on the internet. 
+        Although, I did at least <a href="https://accomattating.substack.com/p/arthur-aging-and-ambition">write about that very thing on the internet</a>. And a very <a href="https://substack.com/home/post/p-182607821">Jewish/religious essay</a> about publishing stuff online.
+        From the perspective of the internet, I'm just a random guy in the sea of billions. So, ideally, I intend to focus my efforts on doing things for the people to whom I'm not just a random guy.</p>
+      <p>On this page is also going to be whatever else I <em>am</em> interested in posting online, but doesn't fit into any of the other things I work on. </p>
+
+      <!-- Web Apps -->
+      <section class="section">
+      <div class="section-header">
+        <div class="section-icon">📱</div>
+        <h2 class="section-title">Web Apps</h2>
+      </div>
+      <p class="section-intro">For my own productivity, I build a few random browser 'apps' that do things I wanted to make happen. But be warned! These are kind of buggy!
+      </p>
+      <div class="link-list">
+        <a href="/task-calendar.html" class="link-card">
+          <div class="link-card-title">Task Breakdown Calendar</div>
+          <div class="link-card-description">
+            This is a mostly-functional calendar, with the main feature being that when you add a "task" due on some particular day, you can give the task a dozen subtasks, and the calendar will automatically distribute those subtasks to be due on days between today and the final due date. No other fancy plugins.
+          </div>
+        </a>
+      </div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = document.getElementById('themeIcon');
+    const html = document.documentElement;
+
+    const savedTheme = localStorage.getItem('theme');
+    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+    if (savedTheme === 'dark') {
+      html.classList.add('dark');
+      themeIcon.textContent = '☀';
+    } else if (savedTheme === 'light') {
+      html.classList.add('light');
+      themeIcon.textContent = '☾';
+    } else if (systemPrefersDark) {
+      themeIcon.textContent = '☀';
+    }
+
+    themeToggle.addEventListener('click', () => {
+      if (html.classList.contains('dark')) {
+        html.classList.remove('dark');
+        html.classList.add('light');
+        localStorage.setItem('theme', 'light');
+        themeIcon.textContent = '☾';
+      } else {
+        html.classList.remove('light');
+        html.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+        themeIcon.textContent = '☀';
+      }
+    });
+  </script>
+</body>
+</html>

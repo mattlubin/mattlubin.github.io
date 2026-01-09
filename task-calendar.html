@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+  <!-- Made with the help of Claude Code. Thanks, AI buddy!-->
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Task Calendar</title>
+  <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { min-height: 100vh; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); font-family: 'Crimson Pro', Georgia, serif; padding: 32px; }
+    .container { max-width: 1400px; margin: 0 auto; }
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; flex-wrap: wrap; gap: 20px; }
+    .title { color: #F8F4E3; font-size: 42px; font-weight: 300; letter-spacing: 4px; text-transform: uppercase; text-shadow: 0 4px 20px rgba(248, 244, 227, 0.2); }
+    .header-controls { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+    .nav-btn { background: rgba(248, 244, 227, 0.08); border: 1px solid rgba(248, 244, 227, 0.2); color: #F8F4E3; padding: 14px 24px; font-family: inherit; font-size: 15px; cursor: pointer; transition: all 0.3s ease; letter-spacing: 2px; }
+    .nav-btn:hover { background: rgba(248, 244, 227, 0.15); border-color: rgba(248, 244, 227, 0.4); transform: translateY(-2px); }
+    .add-task-btn { background: linear-gradient(135deg, #E8C547 0%, #F4A261 100%); border: none; color: #1a1a2e; padding: 16px 28px; font-family: inherit; font-size: 15px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 16px rgba(232, 197, 71, 0.3); }
+    .add-task-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(232, 197, 71, 0.4); }
+    .schedule-btn { background: linear-gradient(135deg, #48CAE4 0%, #0077B6 100%); border: none; color: white; padding: 16px 28px; font-family: inherit; font-size: 15px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 16px rgba(72, 202, 228, 0.3); }
+    .schedule-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(72, 202, 228, 0.4); }
+    .data-btn { background: rgba(248, 244, 227, 0.08); border: 1px solid rgba(248, 244, 227, 0.2); color: #F8F4E3; padding: 12px 18px; font-family: inherit; font-size: 13px; cursor: pointer; transition: all 0.3s ease; letter-spacing: 1px; }
+    .data-btn:hover { background: rgba(248, 244, 227, 0.15); border-color: rgba(248, 244, 227, 0.4); }
+    .days-header { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-bottom: 8px; }
+    .day-name { color: rgba(248, 244, 227, 0.5); font-size: 13px; text-align: center; padding: 16px 0; letter-spacing: 3px; text-transform: uppercase; font-weight: 500; }
+    .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
+    .calendar-day { aspect-ratio: 1; background: rgba(248, 244, 227, 0.03); border: 1px solid rgba(248, 244, 227, 0.08); padding: 10px; cursor: pointer; transition: all 0.3s ease; position: relative; overflow: hidden; display: flex; flex-direction: column; min-height: 100px; }
+    .calendar-day:hover { background: rgba(248, 244, 227, 0.08); border-color: rgba(248, 244, 227, 0.2); transform: scale(1.02); z-index: 10; }
+    .calendar-day.other-month { opacity: 0.3; }
+    .calendar-day.today { border: 2px solid #E8C547; background: rgba(232, 197, 71, 0.1); }
+    .calendar-day.today::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, #E8C547, #F4A261); }
+    .day-number { color: #F8F4E3; font-size: 18px; font-weight: 300; margin-bottom: 6px; }
+    .day-items { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 3px; }
+    .day-item { font-size: 11px; padding: 4px 6px; border-radius: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; transition: all 0.2s ease; }
+    .day-item:hover { transform: scale(1.02); }
+    .day-item.completed { opacity: 0.6; text-decoration: line-through; }
+    .day-item.event { border-left: 3px solid; padding-left: 5px; }
+    .event-time { font-size: 9px; opacity: 0.8; }
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(8px); z-index: 100; display: flex; justify-content: center; align-items: center; animation: fadeIn 0.3s ease; }
+    .modal-overlay.hidden { display: none; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .modal { background: linear-gradient(180deg, #1a1a2e 0%, #0f1419 100%); border: 1px solid rgba(248, 244, 227, 0.15); width: 560px; max-width: 95%; max-height: 90vh; overflow-y: auto; padding: 36px; animation: slideUp 0.4s ease; }
+    .modal-title { color: #F8F4E3; font-size: 28px; font-weight: 300; letter-spacing: 2px; margin-bottom: 32px; padding-bottom: 16px; border-bottom: 1px solid rgba(248, 244, 227, 0.1); }
+    .modal-title.schedule-title { border-bottom-color: rgba(72, 202, 228, 0.3); }
+    .form-group { margin-bottom: 24px; }
+    .form-label { color: rgba(248, 244, 227, 0.6); font-size: 12px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; display: block; }
+    .form-input { width: 100%; background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(248, 244, 227, 0.15); color: #F8F4E3; padding: 14px 16px; font-family: inherit; font-size: 16px; transition: border-color 0.3s ease; }
+    .form-input:focus { outline: none; border-color: rgba(248, 244, 227, 0.4); }
+    .form-input::placeholder { color: rgba(248, 244, 227, 0.3); }
+    .form-row { display: flex; gap: 16px; }
+    .form-row .form-group { flex: 1; }
+    .form-select { width: 100%; background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(248, 244, 227, 0.15); color: #F8F4E3; padding: 14px 16px; font-family: inherit; font-size: 16px; cursor: pointer; }
+    .form-select option { background: #1a1a2e; color: #F8F4E3; }
+    .checkbox-group { display: flex; align-items: center; gap: 12px; cursor: pointer; }
+    .checkbox-group input { width: 20px; height: 20px; cursor: pointer; }
+    .checkbox-label { color: rgba(248, 244, 227, 0.8); font-size: 15px; }
+    .date-input, .time-input { color-scheme: dark; }
+    .subtasks-container { display: flex; flex-direction: column; gap: 10px; }
+    .subtask-row { display: flex; gap: 10px; align-items: center; animation: fadeIn 0.3s ease; }
+    .subtask-number { color: rgba(248, 244, 227, 0.4); font-size: 14px; width: 24px; text-align: center; }
+    .subtask-input { flex: 1; background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(248, 244, 227, 0.1); color: #F8F4E3; padding: 12px 14px; font-family: inherit; font-size: 14px; transition: border-color 0.3s ease; }
+    .subtask-input:focus { outline: none; border-color: rgba(248, 244, 227, 0.3); }
+    .subtask-input::placeholder { color: rgba(248, 244, 227, 0.25); }
+    .remove-subtask-btn { background: rgba(231, 111, 81, 0.2); border: 1px solid rgba(231, 111, 81, 0.3); color: #E76F51; width: 36px; height: 36px; cursor: pointer; transition: all 0.3s ease; font-size: 18px; }
+    .remove-subtask-btn:hover { background: rgba(231, 111, 81, 0.3); }
+    .helper-text { color: rgba(248, 244, 227, 0.4); font-size: 13px; margin-top: 12px; font-style: italic; }
+    .modal-buttons { display: flex; gap: 12px; margin-top: 32px; }
+    .btn-cancel { flex: 1; background: rgba(248, 244, 227, 0.08); border: 1px solid rgba(248, 244, 227, 0.2); color: #F8F4E3; padding: 16px; font-family: inherit; font-size: 14px; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; transition: all 0.3s ease; }
+    .btn-cancel:hover { background: rgba(248, 244, 227, 0.15); }
+    .btn-save { flex: 2; background: linear-gradient(135deg, #E8C547 0%, #F4A261 100%); border: none; color: #1a1a2e; padding: 16px; font-family: inherit; font-size: 14px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; cursor: pointer; transition: all 0.3s ease; }
+    .btn-save:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(232, 197, 71, 0.3); }
+    .btn-save.schedule { background: linear-gradient(135deg, #48CAE4 0%, #0077B6 100%); }
+    .btn-save.schedule:hover { box-shadow: 0 8px 24px rgba(72, 202, 228, 0.3); }
+    .btn-delete { background: rgba(231, 111, 81, 0.2); border: 1px solid rgba(231, 111, 81, 0.3); color: #E76F51; padding: 16px; font-family: inherit; font-size: 14px; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; transition: all 0.3s ease; }
+    .btn-delete:hover { background: rgba(231, 111, 81, 0.3); }
+    .hidden { display: none !important; }
+    .panel-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(8px); z-index: 100; display: flex; justify-content: flex-end; animation: fadeIn 0.3s ease; }
+    .panel-overlay.hidden { display: none; }
+    @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+    .day-panel { width: 520px; max-width: 100%; height: 100%; background: linear-gradient(180deg, #1a1a2e 0%, #0f1419 100%); border-left: 1px solid rgba(248, 244, 227, 0.1); padding: 36px; overflow-y: auto; animation: slideIn 0.4s ease; }
+    .panel-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid rgba(248, 244, 227, 0.1); }
+    .panel-date { color: #F8F4E3; font-size: 28px; font-weight: 300; letter-spacing: 2px; }
+    .panel-date-sub { font-size: 14px; color: rgba(248, 244, 227, 0.5); margin-top: 4px; letter-spacing: 3px; text-transform: uppercase; }
+    .close-btn { background: none; border: 1px solid rgba(248, 244, 227, 0.2); color: #F8F4E3; width: 44px; height: 44px; font-size: 24px; cursor: pointer; transition: all 0.3s ease; }
+    .close-btn:hover { background: rgba(248, 244, 227, 0.1); border-color: rgba(248, 244, 227, 0.4); }
+    .panel-quick-actions { display: flex; gap: 10px; margin-bottom: 28px; }
+    .quick-action-btn { flex: 1; padding: 14px 12px; font-family: inherit; font-size: 12px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; transition: all 0.3s ease; border: none; }
+    .quick-action-btn.task { background: linear-gradient(135deg, #E8C547 0%, #F4A261 100%); color: #1a1a2e; }
+    .quick-action-btn.event { background: linear-gradient(135deg, #48CAE4 0%, #0077B6 100%); color: white; }
+    .quick-action-btn:hover { transform: translateY(-2px); }
+    .panel-section-title { color: rgba(248, 244, 227, 0.5); font-size: 11px; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 12px; margin-top: 24px; }
+    .panel-section-title:first-of-type { margin-top: 0; }
+    .panel-items { display: flex; flex-direction: column; gap: 12px; }
+    .panel-card { padding: 18px; border-left: 4px solid; transition: all 0.3s ease; cursor: pointer; }
+    .panel-card:hover { transform: translateX(4px); }
+    .panel-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
+    .panel-card-title { font-size: 16px; font-weight: 500; flex: 1; }
+    .panel-card-meta { font-size: 12px; opacity: 0.7; margin-top: 4px; }
+    .task-checkbox { width: 22px; height: 22px; border: 2px solid rgba(248, 244, 227, 0.3); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; flex-shrink: 0; margin-right: 12px; }
+    .task-checkbox:hover { border-color: rgba(248, 244, 227, 0.5); }
+    .task-checkbox.checked { background: #16A34A; border-color: #16A34A; color: white; }
+    .item-actions { display: flex; gap: 8px; }
+    .item-action-btn { background: none; border: none; color: rgba(248, 244, 227, 0.4); cursor: pointer; padding: 4px 8px; font-size: 12px; transition: color 0.3s ease; }
+    .item-action-btn:hover { color: rgba(248, 244, 227, 0.8); }
+    .item-action-btn.delete:hover { color: #E76F51; }
+    .item-action-btn.export:hover { color: #48CAE4; }
+    .item-action-btn.edit:hover { color: #E8C547; }
+    .deadline-badge { display: inline-block; font-size: 10px; padding: 3px 8px; background: rgba(232, 197, 71, 0.2); color: #E8C547; margin-left: 8px; letter-spacing: 1px; }
+    .recurring-badge { display: inline-block; font-size: 10px; padding: 3px 8px; background: rgba(72, 202, 228, 0.2); color: #48CAE4; margin-left: 8px; letter-spacing: 1px; }
+    .empty-section { text-align: center; padding: 32px 24px; color: rgba(248, 244, 227, 0.3); font-style: italic; }
+    .save-indicator { position: fixed; bottom: 24px; right: 24px; background: rgba(22, 163, 74, 0.9); color: white; padding: 12px 20px; font-size: 14px; letter-spacing: 1px; animation: fadeIn 0.3s ease; z-index: 200; }
+    .save-indicator.hidden { display: none; }
+    .hidden-input { display: none; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <h1 class="title" id="monthTitle"></h1>
+      <div class="header-controls">
+        <button class="nav-btn" onclick="prevMonth()">← Prev</button>
+        <button class="nav-btn" onclick="nextMonth()">Next →</button>
+        <button class="add-task-btn" onclick="openAddTaskModal()">+ Add Task</button>
+        <button class="schedule-btn" onclick="openScheduleModal()">📅 Schedule</button>
+        <button class="data-btn" onclick="exportData()">↓ Export</button>
+        <button class="data-btn" onclick="document.getElementById('importInput').click()">↑ Import</button>
+        <input type="file" id="importInput" class="hidden-input" accept=".json" onchange="importData(event)">
+      </div>
+    </header>
+    <div class="days-header"><div class="day-name">Sun</div><div class="day-name">Mon</div><div class="day-name">Tue</div><div class="day-name">Wed</div><div class="day-name">Thu</div><div class="day-name">Fri</div><div class="day-name">Sat</div></div>
+    <div class="calendar-grid" id="calendarGrid"></div>
+  </div>
+  <div class="modal-overlay hidden" id="addTaskModal" onclick="closeAddTaskModal(event)">
+    <div class="modal" onclick="event.stopPropagation()">
+      <h2 class="modal-title" id="taskModalTitle">Add New Task</h2>
+      <div class="form-group"><label class="form-label">Task Name</label><input type="text" class="form-input" id="taskName" placeholder="What's the main goal?"></div>
+      <div class="form-group"><label class="form-label">Due Date</label><input type="date" class="form-input date-input" id="taskDueDate"></div>
+      <div class="form-group"><label class="form-label">Break it into steps</label><div class="subtasks-container" id="subtasksContainer"></div><p class="helper-text">Press Enter to add next step • Paste multiple lines to create multiple steps • Steps auto-distribute to due date</p></div>
+      <div class="modal-buttons"><button class="btn-cancel" onclick="closeAddTaskModal()">Cancel</button><button class="btn-delete hidden" id="deleteTaskBtn" onclick="deleteEditingTask()">Delete</button><button class="btn-save" id="saveTaskBtn" onclick="saveTask()">Create Task</button></div>
+    </div>
+  </div>
+  <div class="modal-overlay hidden" id="scheduleModal" onclick="closeScheduleModal(event)">
+    <div class="modal" onclick="event.stopPropagation()">
+      <h2 class="modal-title schedule-title" id="eventModalTitle">📅 Schedule Event</h2>
+      <div class="form-group"><label class="form-label">Event Title</label><input type="text" class="form-input" id="eventTitle" placeholder="Meeting, appointment, etc."></div>
+      <div class="form-group"><label class="form-label">Description (optional)</label><input type="text" class="form-input" id="eventDescription" placeholder="Add details..."></div>
+      <div class="form-group"><label class="form-label">Location (optional)</label><input type="text" class="form-input" id="eventLocation" placeholder="Where?"></div>
+      <div class="form-row"><div class="form-group"><label class="form-label">Date</label><input type="date" class="form-input date-input" id="eventDate"></div><div class="form-group"><label class="form-label">Start Time</label><input type="time" class="form-input time-input" id="eventStartTime" value="09:00"></div><div class="form-group"><label class="form-label">End Time</label><input type="time" class="form-input time-input" id="eventEndTime" value="10:00"></div></div>
+      <div class="form-group"><label class="checkbox-group"><input type="checkbox" id="eventAllDay" onchange="toggleAllDay()"><span class="checkbox-label">All-day event</span></label></div>
+      <div class="form-group"><label class="form-label">Repeat</label><select class="form-select" id="eventRepeat" onchange="toggleRepeatEnd()"><option value="none">Does not repeat</option><option value="daily">Daily</option><option value="weekly">Weekly</option><option value="biweekly">Every 2 weeks</option><option value="monthly">Monthly</option><option value="yearly">Yearly</option></select></div>
+      <div class="form-group hidden" id="repeatEndGroup"><label class="form-label">Repeat Until</label><input type="date" class="form-input date-input" id="eventRepeatEnd"></div>
+      <div class="modal-buttons"><button class="btn-cancel" onclick="closeScheduleModal()">Cancel</button><button class="btn-delete hidden" id="deleteEventBtn" onclick="deleteEditingEvent()">Delete</button><button class="btn-save schedule" id="saveEventBtn" onclick="saveEvent()">Create Event</button></div>
+    </div>
+  </div>
+  <div class="panel-overlay hidden" id="dayPanel" onclick="closeDayPanel(event)">
+    <div class="day-panel" onclick="event.stopPropagation()">
+      <div class="panel-header"><div><div class="panel-date" id="panelDate"></div><div class="panel-date-sub" id="panelDateSub"></div></div><button class="close-btn" onclick="closeDayPanel()">×</button></div>
+      <div class="panel-quick-actions"><button class="quick-action-btn task" onclick="openAddTaskForDate()">+ Task Due This Day</button><button class="quick-action-btn event" onclick="openScheduleForDate()">📅 Schedule This Day</button></div>
+      <div id="panelContent"></div>
+    </div>
+  </div>
+  <div class="save-indicator hidden" id="saveIndicator">✓ Saved</div>
+  <script>
+    const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    const DAYS_FULL = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const TASK_COLORS = [{ bg: '#FEF3E2', text: '#9A3412', accent: '#E76F51' },{ bg: '#F0FDF4', text: '#166534', accent: '#16A34A' },{ bg: '#FDF4FF', text: '#86198F', accent: '#A855F7' },{ bg: '#FEF9C3', text: '#854D0E', accent: '#CA8A04' },{ bg: '#FFE4E6', text: '#9F1239', accent: '#E11D48' }];
+    const EVENT_COLOR = { bg: '#E8F4F8', text: '#0E7490', accent: '#0077B6' };
+    let currentDate = new Date(), tasks = {}, events = {}, subtaskInputs = [''], selectedPanelDate = null;
+    let editingTask = null, editingTaskDateKey = null, editingEvent = null, editingEventDateKey = null;
+    
+    function loadData() { const t = localStorage.getItem('taskCalendarTasks'), e = localStorage.getItem('taskCalendarEvents'); if (t) tasks = JSON.parse(t); if (e) events = JSON.parse(e); }
+    function saveData() { localStorage.setItem('taskCalendarTasks', JSON.stringify(tasks)); localStorage.setItem('taskCalendarEvents', JSON.stringify(events)); showSaveIndicator(); }
+    function showSaveIndicator() { const i = document.getElementById('saveIndicator'); i.classList.remove('hidden'); setTimeout(() => i.classList.add('hidden'), 1500); }
+    function exportData() { const d = { version: 1, exportedAt: new Date().toISOString(), tasks, events }; const b = new Blob([JSON.stringify(d, null, 2)], { type: 'application/json' }); const u = URL.createObjectURL(b); const a = document.createElement('a'); a.href = u; a.download = 'task-calendar-backup-' + new Date().toISOString().split('T')[0] + '.json'; a.click(); URL.revokeObjectURL(u); }
+    function importData(event) { const f = event.target.files[0]; if (!f) return; const r = new FileReader(); r.onload = (e) => { try { const d = JSON.parse(e.target.result); if (d.tasks) tasks = d.tasks; if (d.events) events = d.events; saveData(); renderCalendar(); alert('Data imported!'); } catch (err) { alert('Error importing.'); } }; r.readAsText(f); event.target.value = ''; }
+    function getDateKey(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+    function parseDate(k) { const [y, m, d] = k.split('-').map(Number); return new Date(y, m - 1, d); }
+    function formatTime(t) { const [h, m] = t.split(':'); const hr = parseInt(h); return (hr % 12 || 12) + ':' + m + ' ' + (hr >= 12 ? 'PM' : 'AM'); }
+    function isToday(d) { const t = new Date(); return d.getDate() === t.getDate() && d.getMonth() === t.getMonth() && d.getFullYear() === t.getFullYear(); }
+    function escapeHtml(t) { const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
+    function prevMonth() { currentDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1); renderCalendar(); }
+    function nextMonth() { currentDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1); renderCalendar(); }
+    
+    function renderCalendar() {
+      const year = currentDate.getFullYear(), month = currentDate.getMonth();
+      document.getElementById('monthTitle').textContent = MONTHS[month] + ' ' + year;
+      const firstDay = new Date(year, month, 1).getDay(), daysInMonth = new Date(year, month + 1, 0).getDate(), daysInPrevMonth = new Date(year, month, 0).getDate();
+      const grid = document.getElementById('calendarGrid'); grid.innerHTML = '';
+      for (let i = firstDay - 1; i >= 0; i--) grid.appendChild(createDayCell(new Date(year, month - 1, daysInPrevMonth - i), true));
+      for (let day = 1; day <= daysInMonth; day++) grid.appendChild(createDayCell(new Date(year, month, day), false));
+      const rem = 42 - grid.children.length; for (let day = 1; day <= rem; day++) grid.appendChild(createDayCell(new Date(year, month + 1, day), true));
+    }
+    
+    function createDayCell(date, isOther) {
+      const cell = document.createElement('div');
+      cell.className = 'calendar-day' + (isOther ? ' other-month' : '') + (isToday(date) ? ' today' : '');
+      const dk = getDateKey(date), dt = tasks[dk] || [], de = getEventsForDate(dk);
+      const all = [...de.map(e => ({...e, type: 'event'})), ...dt.map(t => ({...t, type: 'task'}))];
+      cell.innerHTML = '<span class="day-number">' + date.getDate() + '</span><div class="day-items">' + all.slice(0, 4).map(item => item.type === 'event' ? '<div class="day-item event" style="background:' + EVENT_COLOR.bg + ';color:' + EVENT_COLOR.text + ';border-color:' + EVENT_COLOR.accent + ';">' + (item.allDay ? '' : '<span class="event-time">' + formatTime(item.startTime) + '</span> ') + escapeHtml(item.title) + '</div>' : '<div class="day-item ' + (item.completed ? 'completed' : '') + '" style="background:' + item.color.bg + ';color:' + item.color.text + ';">' + (item.isDeadline ? '🎯 ' : '') + escapeHtml(item.title) + '</div>').join('') + (all.length > 4 ? '<div class="day-item" style="background:rgba(248,244,227,0.1);color:rgba(248,244,227,0.6);">+' + (all.length - 4) + ' more</div>' : '') + '</div>';
+      cell.onclick = () => openDayPanel(dk);
+      return cell;
+    }
+    
+    function getEventsForDate(dk) {
+      const result = [];
+      for (const [key, list] of Object.entries(events)) {
+        for (const ev of list) {
+          if (key === dk) result.push({...ev, originalDateKey: key});
+          else if (ev.repeat && ev.repeat !== 'none' && isEventOnDate(ev, key, dk)) result.push({...ev, originalDateKey: key});
+        }
+      }
+      return result;
+    }
+    
+    function isEventOnDate(ev, origKey, targetKey) {
+      const orig = parseDate(origKey), target = parseDate(targetKey);
+      if (target < orig) return false;
+      if (ev.repeatEnd && target > parseDate(ev.repeatEnd)) return false;
+      const diff = Math.floor((target - orig) / (1000 * 60 * 60 * 24));
+      switch (ev.repeat) {
+        case 'daily': return true;
+        case 'weekly': return diff % 7 === 0;
+        case 'biweekly': return diff % 14 === 0;
+        case 'monthly': return target.getDate() === orig.getDate();
+        case 'yearly': return target.getDate() === orig.getDate() && target.getMonth() === orig.getMonth();
+        default: return false;
+      }
+    }
+    
+    function openAddTaskModal(presetDate) {
+      editingTask = null; editingTaskDateKey = null;
+      document.getElementById('addTaskModal').classList.remove('hidden');
+      document.getElementById('taskModalTitle').textContent = 'Add New Task';
+      document.getElementById('taskName').value = '';
+      document.getElementById('taskDueDate').value = presetDate || '';
+      document.getElementById('deleteTaskBtn').classList.add('hidden');
+      document.getElementById('saveTaskBtn').textContent = 'Create Task';
+      subtaskInputs = ['']; renderSubtaskInputs();
+      document.getElementById('taskName').focus();
+    }
+    
+    function openEditTaskModal(taskData, dk) {
+      editingTask = taskData; editingTaskDateKey = dk;
+      document.getElementById('addTaskModal').classList.remove('hidden');
+      document.getElementById('taskModalTitle').textContent = 'Edit Task';
+      document.getElementById('taskName').value = taskData.parentTask || taskData.title;
+      document.getElementById('taskDueDate').value = taskData.dueDate || dk;
+      document.getElementById('deleteTaskBtn').classList.remove('hidden');
+      document.getElementById('saveTaskBtn').textContent = 'Save Changes';
+      if (taskData.parentId) {
+        const all = [];
+        for (const [d, list] of Object.entries(tasks)) for (const t of list) if (t.parentId === taskData.parentId) all.push({task: t, dk: d});
+        all.sort((a, b) => a.dk.localeCompare(b.dk));
+        subtaskInputs = all.map(s => s.task.title);
+      } else subtaskInputs = [''];
+      if (subtaskInputs.length === 0) subtaskInputs = [''];
+      renderSubtaskInputs();
+      document.getElementById('taskName').focus();
+    }
+    
+    function closeAddTaskModal(e) { if (!e || e.target === e.currentTarget) { document.getElementById('addTaskModal').classList.add('hidden'); editingTask = null; editingTaskDateKey = null; } }
+    
+    function renderSubtaskInputs() {
+      const c = document.getElementById('subtasksContainer');
+      c.innerHTML = subtaskInputs.map((v, i) => '<div class="subtask-row"><span class="subtask-number">' + (i+1) + '.</span><input type="text" class="subtask-input" value="' + escapeHtml(v) + '" placeholder="Step ' + (i+1) + '..." data-index="' + i + '">' + (subtaskInputs.length > 1 ? '<button class="remove-subtask-btn" onclick="removeSubtask(' + i + ')">−</button>' : '') + '</div>').join('');
+      c.querySelectorAll('.subtask-input').forEach(inp => { inp.addEventListener('input', handleSubtaskInput); inp.addEventListener('keydown', handleSubtaskKeydown); inp.addEventListener('paste', handleSubtaskPaste); });
+    }
+    
+    function handleSubtaskInput(e) {
+      const i = parseInt(e.target.dataset.index); subtaskInputs[i] = e.target.value;
+      if (i === subtaskInputs.length - 1 && e.target.value.trim() !== '') { subtaskInputs.push(''); renderSubtaskInputs(); const inps = document.querySelectorAll('.subtask-input'); inps[i].focus(); inps[i].setSelectionRange(e.target.value.length, e.target.value.length); }
+    }
+    
+    function handleSubtaskKeydown(e) {
+      if (e.key === 'Enter') { e.preventDefault(); const i = parseInt(e.target.dataset.index);
+        if (i === subtaskInputs.length - 1 && e.target.value.trim() !== '') { subtaskInputs.push(''); renderSubtaskInputs(); }
+        setTimeout(() => { const inps = document.querySelectorAll('.subtask-input'); if (inps[i + 1]) inps[i + 1].focus(); }, 10);
+      }
+    }
+    
+    function handleSubtaskPaste(e) {
+      const txt = e.clipboardData.getData('text'), lines = txt.split(/\r?\n/).filter(l => l.trim() !== '');
+      if (lines.length > 1) { e.preventDefault(); const i = parseInt(e.target.dataset.index);
+        subtaskInputs = [...subtaskInputs.slice(0, i), ...lines, ...subtaskInputs.slice(i + 1)];
+        if (subtaskInputs[subtaskInputs.length - 1].trim() !== '') subtaskInputs.push('');
+        renderSubtaskInputs();
+        setTimeout(() => { const inps = document.querySelectorAll('.subtask-input'); inps[Math.min(i + lines.length - 1, inps.length - 1)].focus(); }, 10);
+      }
+    }
+    
+    function removeSubtask(i) { subtaskInputs.splice(i, 1); if (subtaskInputs.length === 0) subtaskInputs = ['']; renderSubtaskInputs(); }
+    
+    function deleteEditingTask() {
+      if (!editingTask) return;
+      if (editingTask.parentId) { for (const d of Object.keys(tasks)) { tasks[d] = tasks[d].filter(t => t.parentId !== editingTask.parentId); if (tasks[d].length === 0) delete tasks[d]; } }
+      else { tasks[editingTaskDateKey] = tasks[editingTaskDateKey].filter(t => t.id !== editingTask.id); if (tasks[editingTaskDateKey].length === 0) delete tasks[editingTaskDateKey]; }
+      saveData(); closeAddTaskModal(); renderCalendar(); if (selectedPanelDate) renderPanelContent();
+    }
+    
+    function saveTask() {
+      const name = document.getElementById('taskName').value.trim(), due = document.getElementById('taskDueDate').value;
+      if (!name) { alert('Please enter a task name'); return; }
+      if (!due) { alert('Please select a due date'); return; }
+      const today = new Date(); today.setHours(0, 0, 0, 0);
+      const deadline = new Date(due + 'T00:00:00'), totalDays = Math.max(0, Math.ceil((deadline - today) / (1000 * 60 * 60 * 24)));
+      if (editingTask) {
+        if (editingTask.parentId) { for (const d of Object.keys(tasks)) { tasks[d] = tasks[d].filter(t => t.parentId !== editingTask.parentId); if (tasks[d].length === 0) delete tasks[d]; } }
+        else if (tasks[editingTaskDateKey]) { tasks[editingTaskDateKey] = tasks[editingTaskDateKey].filter(t => t.id !== editingTask.id); if (tasks[editingTaskDateKey].length === 0) delete tasks[editingTaskDateKey]; }
+      }
+      const color = editingTask?.color || TASK_COLORS[Math.floor(Math.random() * TASK_COLORS.length)];
+      const taskId = editingTask?.parentId || editingTask?.id || Date.now();
+      const valid = subtaskInputs.filter(s => s.trim() !== '');
+      if (valid.length === 0) {
+        const dk = getDateKey(deadline); if (!tasks[dk]) tasks[dk] = [];
+        tasks[dk].push({ id: taskId, title: name, completed: editingTask?.completed || false, isDeadline: true, color, dueDate: due });
+      } else {
+        valid.forEach((sub, i) => {
+          const isLast = i === valid.length - 1;
+          let subDate = deadline;
+          if (!isLast && totalDays > 0) { const interval = totalDays / valid.length; subDate = new Date(today); subDate.setDate(today.getDate() + Math.round(interval * (i + 1))); if (subDate > deadline) subDate = deadline; }
+          const dk = getDateKey(subDate); if (!tasks[dk]) tasks[dk] = [];
+          tasks[dk].push({ id: taskId + i + 1, parentId: taskId, parentTask: name, title: sub, completed: false, isDeadline: isLast, color, dueDate: due });
+        });
+      }
+      saveData(); closeAddTaskModal(); renderCalendar(); if (selectedPanelDate) renderPanelContent();
+    }
+    
+    function openScheduleModal(presetDate) {
+      editingEvent = null; editingEventDateKey = null;
+      document.getElementById('scheduleModal').classList.remove('hidden');
+      document.getElementById('eventModalTitle').textContent = '📅 Schedule Event';
+      document.getElementById('eventTitle').value = '';
+      document.getElementById('eventDescription').value = '';
+      document.getElementById('eventLocation').value = '';
+      document.getElementById('eventDate').value = presetDate || '';
+      document.getElementById('eventStartTime').value = '09:00';
+      document.getElementById('eventEndTime').value = '10:00';
+      document.getElementById('eventAllDay').checked = false;
+      document.getElementById('eventRepeat').value = 'none';
+      document.getElementById('eventRepeatEnd').value = '';
+      document.getElementById('repeatEndGroup').classList.add('hidden');
+      document.getElementById('deleteEventBtn').classList.add('hidden');
+      document.getElementById('saveEventBtn').textContent = 'Create Event';
+      toggleAllDay();
+      document.getElementById('eventTitle').focus();
+    }
+    
+    function openEditEventModal(ev, dk) {
+      editingEvent = ev; editingEventDateKey = ev.originalDateKey || dk;
+      document.getElementById('scheduleModal').classList.remove('hidden');
+      document.getElementById('eventModalTitle').textContent = '📅 Edit Event';
+      document.getElementById('eventTitle').value = ev.title;
+      document.getElementById('eventDescription').value = ev.description || '';
+      document.getElementById('eventLocation').value = ev.location || '';
+      document.getElementById('eventDate').value = editingEventDateKey;
+      document.getElementById('eventStartTime').value = ev.startTime || '09:00';
+      document.getElementById('eventEndTime').value = ev.endTime || '10:00';
+      document.getElementById('eventAllDay').checked = ev.allDay || false;
+      document.getElementById('eventRepeat').value = ev.repeat || 'none';
+      document.getElementById('eventRepeatEnd').value = ev.repeatEnd || '';
+      document.getElementById('deleteEventBtn').classList.remove('hidden');
+      document.getElementById('saveEventBtn').textContent = 'Save Changes';
+      toggleRepeatEnd(); toggleAllDay();
+      document.getElementById('eventTitle').focus();
+    }
+    
+    function closeScheduleModal(e) { if (!e || e.target === e.currentTarget) { document.getElementById('scheduleModal').classList.add('hidden'); editingEvent = null; editingEventDateKey = null; } }
+    function toggleAllDay() { const a = document.getElementById('eventAllDay').checked; document.getElementById('eventStartTime').disabled = a; document.getElementById('eventEndTime').disabled = a; document.getElementById('eventStartTime').style.opacity = a ? 0.5 : 1; document.getElementById('eventEndTime').style.opacity = a ? 0.5 : 1; }
+    function toggleRepeatEnd() { document.getElementById('repeatEndGroup').classList.toggle('hidden', document.getElementById('eventRepeat').value === 'none'); }
+    
+    function deleteEditingEvent() {
+      if (!editingEvent || !editingEventDateKey) return;
+      if (events[editingEventDateKey]) { events[editingEventDateKey] = events[editingEventDateKey].filter(e => e.id !== editingEvent.id); if (events[editingEventDateKey].length === 0) delete events[editingEventDateKey]; }
+      saveData(); closeScheduleModal(); renderCalendar(); if (selectedPanelDate) renderPanelContent();
+    }
+    
+    function saveEvent() {
+      const title = document.getElementById('eventTitle').value.trim(), date = document.getElementById('eventDate').value;
+      if (!title) { alert('Please enter an event title'); return; }
+      if (!date) { alert('Please select a date'); return; }
+      if (editingEvent && editingEventDateKey && events[editingEventDateKey]) { events[editingEventDateKey] = events[editingEventDateKey].filter(e => e.id !== editingEvent.id); if (events[editingEventDateKey].length === 0) delete events[editingEventDateKey]; }
+      const ev = { id: editingEvent?.id || Date.now(), title, description: document.getElementById('eventDescription').value.trim(), location: document.getElementById('eventLocation').value.trim(), allDay: document.getElementById('eventAllDay').checked, startTime: document.getElementById('eventStartTime').value, endTime: document.getElementById('eventEndTime').value, repeat: document.getElementById('eventRepeat').value, repeatEnd: document.getElementById('eventRepeatEnd').value || null, color: EVENT_COLOR };
+      if (!events[date]) events[date] = [];
+      events[date].push(ev);
+      saveData(); closeScheduleModal(); renderCalendar(); if (selectedPanelDate) renderPanelContent();
+    }
+    
+    function openDayPanel(dk) {
+      selectedPanelDate = dk;
+      document.getElementById('dayPanel').classList.remove('hidden');
+      const d = parseDate(dk);
+      document.getElementById('panelDate').textContent = DAYS_FULL[d.getDay()] + ', ' + MONTHS[d.getMonth()] + ' ' + d.getDate();
+      document.getElementById('panelDateSub').textContent = d.getFullYear();
+      renderPanelContent();
+    }
+    
+    function closeDayPanel(e) { if (!e || e.target === e.currentTarget) { document.getElementById('dayPanel').classList.add('hidden'); selectedPanelDate = null; } }
+    function openAddTaskForDate() { const d = selectedPanelDate; closeDayPanel(); openAddTaskModal(d); }
+    function openScheduleForDate() { const d = selectedPanelDate; closeDayPanel(); openScheduleModal(d); }
+    
+    function renderPanelContent() {
+      const c = document.getElementById('panelContent'), dt = tasks[selectedPanelDate] || [], de = getEventsForDate(selectedPanelDate);
+      let h = '<div class="panel-section-title">Events</div>';
+      if (de.length === 0) h += '<div class="empty-section">No events scheduled</div>';
+      else { h += '<div class="panel-items" id="eventsList">';
+        de.forEach((ev, i) => { h += '<div class="panel-card" style="background:' + EVENT_COLOR.bg + ';border-color:' + EVENT_COLOR.accent + ';" data-event-idx="' + i + '"><div class="panel-card-header"><div style="flex:1;"><div class="panel-card-title" style="color:' + EVENT_COLOR.text + ';">📅 ' + escapeHtml(ev.title) + (ev.repeat && ev.repeat !== 'none' ? '<span class="recurring-badge">RECURRING</span>' : '') + '</div><div class="panel-card-meta" style="color:' + EVENT_COLOR.text + ';">' + (ev.allDay ? 'All day' : formatTime(ev.startTime) + ' - ' + formatTime(ev.endTime)) + (ev.location ? ' · ' + escapeHtml(ev.location) : '') + '</div>' + (ev.description ? '<div class="panel-card-meta" style="color:' + EVENT_COLOR.text + ';margin-top:8px;">' + escapeHtml(ev.description) + '</div>' : '') + '</div><div class="item-actions"><button class="item-action-btn edit" data-event-idx="' + i + '">Edit</button><button class="item-action-btn export" data-event-id="' + ev.id + '" data-event-date="' + ev.originalDateKey + '">Export .ics</button><button class="item-action-btn delete" data-event-idx="' + i + '">Delete</button></div></div></div>'; });
+        h += '</div>';
+      }
+      h += '<div class="panel-section-title">Tasks</div>';
+      if (dt.length === 0) h += '<div class="empty-section">No tasks scheduled</div>';
+      else { h += '<div class="panel-items" id="tasksList">';
+        dt.forEach((t, i) => { h += '<div class="panel-card" style="background:' + t.color.bg + ';border-color:' + t.color.accent + ';" data-task-idx="' + i + '"><div class="panel-card-header"><div class="task-checkbox ' + (t.completed ? 'checked' : '') + '" data-task-idx="' + i + '">' + (t.completed ? '✓' : '') + '</div><div style="flex:1;"><div class="panel-card-title" style="color:' + t.color.text + ';' + (t.completed ? 'text-decoration:line-through;opacity:0.6;' : '') + '">' + (t.isDeadline ? '🎯 ' : '') + escapeHtml(t.title) + (t.isDeadline ? '<span class="deadline-badge">DEADLINE</span>' : '') + '</div>' + (t.parentTask ? '<div class="panel-card-meta" style="color:' + t.color.text + ';">Part of: ' + escapeHtml(t.parentTask) + '</div>' : '') + '</div><div class="item-actions"><button class="item-action-btn edit" data-task-idx="' + i + '">Edit</button><button class="item-action-btn delete" data-task-idx="' + i + '">Delete</button></div></div></div>'; });
+        h += '</div>';
+      }
+      c.innerHTML = h;
+      attachPanelListeners(de, dt);
+    }
+    
+    function attachPanelListeners(de, dt) {
+      document.querySelectorAll('#eventsList .panel-card').forEach(card => { card.addEventListener('click', (e) => { if (!e.target.closest('.item-actions')) { const d = selectedPanelDate; closeDayPanel(); openEditEventModal(de[parseInt(card.dataset.eventIdx)], d); } }); });
+      document.querySelectorAll('#eventsList .item-action-btn.edit').forEach(btn => { btn.addEventListener('click', (e) => { e.stopPropagation(); const d = selectedPanelDate; closeDayPanel(); openEditEventModal(de[parseInt(btn.dataset.eventIdx)], d); }); });
+      document.querySelectorAll('#eventsList .item-action-btn.export').forEach(btn => { btn.addEventListener('click', (e) => { e.stopPropagation(); exportEventToICS(btn.dataset.eventId, btn.dataset.eventDate); }); });
+      document.querySelectorAll('#eventsList .item-action-btn.delete').forEach(btn => { btn.addEventListener('click', (e) => { e.stopPropagation(); deleteEventDirect(de[parseInt(btn.dataset.eventIdx)]); }); });
+      document.querySelectorAll('#tasksList .task-checkbox').forEach(cb => { cb.addEventListener('click', (e) => { e.stopPropagation(); toggleTask(parseInt(cb.dataset.taskIdx)); }); });
+      document.querySelectorAll('#tasksList .panel-card').forEach(card => { card.addEventListener('click', (e) => { if (!e.target.closest('.item-actions') && !e.target.closest('.task-checkbox')) { const d = selectedPanelDate; closeDayPanel(); openEditTaskModal(dt[parseInt(card.dataset.taskIdx)], d); } }); });
+      document.querySelectorAll('#tasksList .item-action-btn.edit').forEach(btn => { btn.addEventListener('click', (e) => { e.stopPropagation(); const d = selectedPanelDate; closeDayPanel(); openEditTaskModal(dt[parseInt(btn.dataset.taskIdx)], d); }); });
+      document.querySelectorAll('#tasksList .item-action-btn.delete').forEach(btn => { btn.addEventListener('click', (e) => { e.stopPropagation(); deleteTaskDirect(parseInt(btn.dataset.taskIdx)); }); });
+    }
+    
+    function toggleTask(i) { tasks[selectedPanelDate][i].completed = !tasks[selectedPanelDate][i].completed; saveData(); renderPanelContent(); renderCalendar(); }
+    
+    function deleteTaskDirect(i) {
+      const t = tasks[selectedPanelDate][i];
+      if (t.parentId && confirm('Delete all subtasks for "' + t.parentTask + '"?\n\nOK = delete all, Cancel = delete just this one')) { for (const d of Object.keys(tasks)) { tasks[d] = tasks[d].filter(x => x.parentId !== t.parentId); if (tasks[d].length === 0) delete tasks[d]; } }
+      else { tasks[selectedPanelDate].splice(i, 1); if (tasks[selectedPanelDate].length === 0) delete tasks[selectedPanelDate]; }
+      saveData(); renderPanelContent(); renderCalendar();
+    }
+    
+    function deleteEventDirect(ev) { const dk = ev.originalDateKey || selectedPanelDate; if (events[dk]) { events[dk] = events[dk].filter(e => e.id !== ev.id); if (events[dk].length === 0) delete events[dk]; } saveData(); renderPanelContent(); renderCalendar(); }
+    
+    function exportEventToICS(eventId, dateKey) {
+      let ev = null, origKey = dateKey;
+      for (const [k, list] of Object.entries(events)) { const f = list.find(e => e.id == eventId); if (f) { ev = f; origKey = k; break; } }
+      if (!ev) return;
+      const ds = origKey.replace(/-/g, '');
+      let ics = 'BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//Task Calendar//EN\nBEGIN:VEVENT\nUID:' + ev.id + '@taskcalendar\nDTSTAMP:' + new Date().toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z\n';
+      if (ev.allDay) ics += 'DTSTART;VALUE=DATE:' + ds + '\nDTEND;VALUE=DATE:' + ds + '\n';
+      else ics += 'DTSTART:' + ds + 'T' + ev.startTime.replace(':', '') + '00\nDTEND:' + ds + 'T' + ev.endTime.replace(':', '') + '00\n';
+      ics += 'SUMMARY:' + ev.title + '\n';
+      if (ev.description) ics += 'DESCRIPTION:' + ev.description.replace(/\n/g, '\\n') + '\n';
+      if (ev.location) ics += 'LOCATION:' + ev.location + '\n';
+      if (ev.repeat && ev.repeat !== 'none') {
+        let rr = 'RRULE:';
+        switch (ev.repeat) { case 'daily': rr += 'FREQ=DAILY'; break; case 'weekly': rr += 'FREQ=WEEKLY'; break; case 'biweekly': rr += 'FREQ=WEEKLY;INTERVAL=2'; break; case 'monthly': rr += 'FREQ=MONTHLY'; break; case 'yearly': rr += 'FREQ=YEARLY'; break; }
+        if (ev.repeatEnd) rr += ';UNTIL=' + ev.repeatEnd.replace(/-/g, '') + 'T235959Z';
+        ics += rr + '\n';
+      }
+      ics += 'END:VEVENT\nEND:VCALENDAR';
+      const blob = new Blob([ics], { type: 'text/calendar' }), url = URL.createObjectURL(blob), a = document.createElement('a');
+      a.href = url; a.download = ev.title.replace(/[^a-z0-9]/gi, '_') + '.ics'; a.click(); URL.revokeObjectURL(url);
+    }
+    
+    loadData();
+    renderCalendar();
+  </script>
+</body>
+</html>

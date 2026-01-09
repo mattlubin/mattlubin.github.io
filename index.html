@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Matt Lubin</title>
-  <meta name="description" content="Biologist • Science Writer • Rabbi & Jewish Ethicist • AI Safety Researcher">
+  <meta name="description" content="Biologist • Science Writer • Rabbi • AI Safety Researcher">
   <style>
     /* Root variables for theming */
     :root {
@@ -44,13 +44,7 @@
     }
 
     /* Respect system preference if no manual selection */
-    @media (prefers-color-scheme: dark) {
-      :root:not(.light) {
-        --bg: var(--bg-dark);
-        --text: var(--text-dark);
-        --text-muted: var(--text-muted-dark);
-      }
-    }
+    /* Light mode is the default - dark mode only activates via toggle */
 
     * {
       margin: 0;
@@ -119,7 +113,7 @@
 
     /* Center button - personal */
     .flower-center {
-      position: absolute;
+      position: relative;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
@@ -381,9 +375,9 @@
 <body>
   <header class="site-header">
     <nav class="header-nav">
-      <a href="/about">about</a> ·
-      <a href="/writing">writing</a> ·
-      <a href="/contact">contact</a> ·
+      <a href="/index.html">[home]</a> ·
+      <a href="/everything.html">[everything]</a> ·
+      <a href="/contact.html">[contact]</a> ·
       <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
         <span id="themeIcon">☾</span>
       </button>
@@ -393,41 +387,39 @@
   <main>
     <div class="hero">
       <h1 class="hero-title">Matt Lubin</h1>
-      <p class="hero-subtitle">Biologist • Writer • Rabbi • AI Safety Advocate</p>
+      <p class="hero-subtitle">Judaism • Biology • AI Safety</p>
     </div>
 
     <div class="words">
-        <p> None of these links or buttons are currently working. 
-        But I hope that someday they will do something cool, because I will have done something cool.</p>
+        <p> Someday, I hope to do something cool and important in all of these areas. But here's what I got for now.</p>
     </div>
-
 
     <div class="flower-container">
       <div class="flower">
         <!-- Main petals: larger, distinct -->
-        <a href="/biology" class="petal petal-main petal-biology">
-          <span class="petal-text">BIOLOGY</span>
+        <a href="/judaism" class="petal petal-main petal-biology">
+          <span class="petal-text">JUDAISM</span>
         </a>
 
         <a href="/ai-safety" class="petal petal-main petal-ai">
           <span class="petal-text">AI SAFETY</span>
         </a>
 
-        <a href="/judaism" class="petal petal-main petal-judaism">
-          <span class="petal-text">JUDAISM</span>
+        <a href="/biology" class="petal petal-main petal-judaism">
+          <span class="petal-text">BIOLOGY</span>
         </a>
 
         <!-- Crossover petals: smaller, between main domains -->
         <a href="/bio-ai" class="petal petal-cross petal-bio-ai">
-          <span class="petal-text">BIO ×<br>AI SAFETY</span>
+          <span class="petal-text">AI ×<br>BIO</span>
         </a>
 
         <a href="/bio-judaism" class="petal petal-cross petal-bio-judaism">
           <span class="petal-text">BIO ×<br>JUDAISM</span>
         </a>
 
-        <a href="/ai-judaism" class="petal petal-cross petal-ai-judaism">
-          <span class="petal-text">AI SAFETY ×<br>JUDAISM</span>
+        <a href="https://jewishai.me" class="petal petal-cross petal-ai-judaism">
+          <span class="petal-text">AI ×<br>JUDAISM</span>
         </a>
 
         <!-- Center button -->

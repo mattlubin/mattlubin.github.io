@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Judaism - Matt Lubin</title>
+  <meta name="description" content="Exploring Jewish thought, history, and texts through podcasts, digital humanities, and essays">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    /* Root variables for theming */
+    :root {
+      --bg-light: #faf8f5;
+      --bg-dark: #1a1614;
+      --text-light: #2d2a26;
+      --text-dark: #e8e4df;
+      --text-muted-light: #6b6762;
+      --text-muted-dark: #9a9288;
+      --judaism: #4a5f8d;
+      --judaism-light: #5d76ab;
+    }
+
+    :root {
+      --bg: var(--bg-light);
+      --text: var(--text-light);
+      --text-muted: var(--text-muted-light);
+    }
+
+    :root.dark {
+      --bg: var(--bg-dark);
+      --text: var(--text-dark);
+      --text-muted: var(--text-muted-dark);
+    }
+
+    /* Light mode is the default - dark mode only activates via toggle */
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Iowan Old Style', 'Palatino Linotype', 'URW Palladio L', P052, serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      transition: background-color 0.3s ease, color 0.3s ease;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .site-header {
+      padding: 1.5rem 2rem;
+      text-align: center;
+    }
+
+    .header-nav {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    .header-nav a {
+      color: var(--text-muted);
+      text-decoration: none;
+      margin: 0 0.4rem;
+      transition: color 0.2s ease;
+    }
+
+    .header-nav a:hover {
+      color: var(--text);
+    }
+
+    .theme-toggle {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      padding: 0;
+      margin: 0 0.4rem;
+      transition: color 0.2s ease;
+    }
+
+    .theme-toggle:hover {
+      color: var(--text);
+    }
+
+    .page-hero {
+      text-align: center;
+      padding: 3rem 2rem 2rem;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .page-title {
+      font-size: 3rem;
+      font-weight: 400;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, var(--judaism) 0%, var(--judaism-light) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .page-subtitle {
+      font-size: 1.1rem;
+      color: var(--text-muted);
+      font-weight: 300;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .content {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 0 2rem 4rem;
+    }
+
+    .content p {
+      margin-bottom: 1.5rem;
+      font-size: 1.05rem;
+    }
+
+    .intro {
+      font-size: 1.1rem;
+      line-height: 1.8;
+      margin-bottom: 3rem;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid var(--text-muted);
+      opacity: 0.9;
+    }
+
+    .intro em {
+      font-style: italic;
+    }
+
+    /* Section styling */
+    .section {
+      margin-bottom: 4rem;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .section-icon {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, var(--judaism) 0%, var(--judaism-light) 100%);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+
+    .section-title {
+      font-size: 1.6rem;
+      font-weight: 400;
+      color: var(--judaism);
+    }
+
+    :root.dark .section-title {
+      color: var(--judaism-light);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root:not(.light) .section-title {
+        color: var(--judaism-light);
+      }
+    }
+
+    .section-intro {
+      font-size: 1rem;
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+      line-height: 1.7;
+      font-style: italic;
+    }
+
+    .section-intro a {
+      color: var(--judaism);
+    }
+
+    :root.dark .section-intro a {
+      color: var(--judaism-light);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root:not(.light) .section-intro a {
+        color: var(--judaism-light);
+      }
+    }
+
+    /* Link cards */
+    .link-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .link-card {
+      display: block;
+      padding: 1.25rem 1.5rem;
+      background: var(--bg);
+      border: 1px solid var(--text-muted);
+      border-left: 4px solid var(--judaism);
+      border-radius: 0 8px 8px 0;
+      text-decoration: none;
+      color: var(--text);
+      transition: all 0.2s ease;
+    }
+
+    .link-card:hover {
+      border-left-color: var(--judaism-light);
+      background: linear-gradient(90deg, rgba(74, 95, 141, 0.08) 0%, transparent 100%);
+      transform: translateX(4px);
+    }
+
+    :root.dark .link-card:hover {
+      background: linear-gradient(90deg, rgba(93, 118, 171, 0.12) 0%, transparent 100%);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root:not(.light) .link-card:hover {
+        background: linear-gradient(90deg, rgba(93, 118, 171, 0.12) 0%, transparent 100%);
+      }
+    }
+
+    .link-card-title {
+      font-size: 1.1rem;
+      font-weight: 500;
+      margin-bottom: 0.3rem;
+      color: var(--judaism);
+    }
+
+    :root.dark .link-card-title {
+      color: var(--judaism-light);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root:not(.light) .link-card-title {
+        color: var(--judaism-light);
+      }
+    }
+
+    .link-card-description {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    @media (max-width: 768px) {
+      .page-title {
+        font-size: 2.2rem;
+      }
+
+      .page-subtitle {
+        font-size: 1rem;
+      }
+
+      .content p {
+        font-size: 1rem;
+      }
+
+      .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+      }
+
+      .section-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+      }
+
+      .section-title {
+        font-size: 1.4rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <nav class="header-nav">
+      <a href="/index.html">[home]</a> ·
+      <a href="/everything.html">[everything]</a> ·
+      <a href="/contact.html">[contact]</a> ·
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <span id="themeIcon">☾</span>
+      </button>
+    </nav>
+  </header>
+
+  <main>
+    <div class="page-hero">
+      <h1 class="page-title">Judaism</h1>
+      <p class="page-subtitle">Exploring Jewish thought, history, and texts</p>
+    </div>
+
+    <div class="content">
+      <div class="intro">
+        <p>I'm interested in how Jewish ideas have developed over time, how different thinkers have interpreted that tradition, how modern tools help understand Jewish texts - and, from it all, how these texts can be made relevant (or not!) to our modern lives.</p>
+      </div>
+
+      <!-- Rishonim Podcast -->
+      <section class="section">
+        <div class="section-header">
+          <div class="section-icon">&#x1F399;</div>
+          <h2 class="section-title">Rishonim Podcast</h2>
+        </div>
+        <p class="section-intro">A podcast exploring the lives and ideas of the Rishonim—the medieval Jewish scholars who shaped how we understand the Torah today.</p>
+        <div class="link-list">
+          <a href="https://sites.google.com/view/rishonim/" class="link-card">
+            <div class="link-card-title">Podcast Website (including RSS feed)</div>
+            <div class="link-card-description">Episode archive, show notes, other supplemental content.</div>
+          </a>
+          <a href="https://open.spotify.com/show/2UCLvncn5feQiURgLupvRa" class="link-card">
+            <div class="link-card-title">🎧 Spotify: The Rishonim Podcast</div>
+            <div class="link-card-description">Main podcast link for listening and subscribing.</div>
+          </a>
+        </div>
+      </section>
+
+      <!-- Scholarship -->
+      <section class="section">
+        <div class="section-header">
+          <div class="section-icon">&#x1F4DC;</div>
+          <h2 class="section-title">Scholarship</h2>
+        </div>
+        <p class="section-intro">Serious investigations into Jewish thought and texts.</p>
+        <div class="link-list">
+          <a href="https://seforimblog.com/2024/08/will-the-real-shas-kattan-please-stand-up/" class="link-card">
+            <div class="link-card-title">Will the Real Shas Kattan Please Stand Up?</div>
+            <div class="link-card-description">A digital humanities investigation into the identity of the Shas Kattan. <em>Seforim Blog, 2024.</em></div>
+          </a>
+          <a href="https://traditiononline.org/maimonides-afterlife-and-the-ignorant-heretic/" class="link-card">
+            <div class="link-card-title">Maimonides' Afterlife and the Ignorant Heretic</div>
+            <div class="link-card-description">Re-examining a common interpretation of Maimonides' intellectual elitism. <em>Tradition, 2020.</em></div>
+          </a>
+          <a href="https://kolhamevaser.com/2015/05/where-have-all-the-theologians-gone-some-reflection-on-the-contemporary-state-of-orthodox-theology/" class="link-card">
+            <div class="link-card-title">(Where) Have All the Theologians Gone? Some Reflection on the Contemporary State of Orthodox Jewish Theology</div>
+            <div class="link-card-description">My very first published essay, which I think still holds up a decade later: are there any "theologians" around today? <em>Kol Hamevaser, 2015.</em></div>
+          </a>
+        </div>
+      </section>
+
+      <!-- Torah -->
+      <section class="section">
+        <div class="section-header">
+          <div class="section-icon"><i class="fas fa-torah"></i></div>
+          <h2 class="section-title">Torah</h2>
+        </div>
+        <p class="section-intro">Writing on Jewish thought and practice.</p>
+        <div class="link-list">
+          <a href="https://thelehrhaus.com/?s=lubin" class="link-card">
+            <div class="link-card-title">Articles at The Lehrhaus</div>
+            <div class="link-card-description">Essays on Jewish thought and textual analysis. <em>The Lehrhaus.</em></div>
+          </a>
+          <a href="https://rishonimpodcast.substack.com/" class="link-card">
+            <div class="link-card-title">Substack</div>
+            <div class="link-card-description">Less polished essays, shorter ideas, some books reviews, etc.</div>
+          </a>
+        </div>
+      </section>
+
+      <!-- Books & Thinkers -->
+      <section class="section">
+        <div class="section-header">
+          <div class="section-icon">&#x1F4DA;</div>
+          <h2 class="section-title">Books & Thinkers</h2>
+        </div>
+        <p class="section-intro">Book reviews and scholarship on Jewish thinkers.</p>
+        <div class="link-list">
+          <a href="https://thelehrhaus.com/holidays/the-light-at-the-end-of-the-night-rav-hutner-on-the-pesach-seder-and-the-problem-of-evil/" class="link-card">
+            <div class="link-card-title">R. Hutner on the Pesach Seder and the Problem of Evil</div>
+            <div class="link-card-description">An investigation into the theodicy of Rabbi Isaac Hutner and its context within his thought more generally. <em>Lehrhaus, 2025.</em></div>
+          </a>
+          <a href="https://seforimblog.com/2025/05/review-of-rav-zvi-hirsch-grodzinskys-taharas-yisroel/" class="link-card">
+            <div class="link-card-title">Review of Rav Zvi Hirsch Grodzinsky’s Taharas Yisroel</div>
+            <div class="link-card-description">Discussion of a newly published work from the 'Chief Rabbi of Omaha, Nebraska' at the turn of the 20th century. <em>Seforimblog, 2025.</em></div>
+          </a>
+          <a href="https://repository.yu.edu/server/api/core/bitstreams/f74bc7ee-269b-4b1d-8ba3-58dfcc60a109/content" class="link-card">
+            <div class="link-card-title">Review of "Judaism's Encounter with Other Cultures" ed. J.J. Schacter</div>
+            <div class="link-card-description">Consideration of Judaism, modern "culture" and the possible gap between communities and their intellectual leaders. <em>Kol Hamevaser, 2018.</em></div>
+          </a>
+          <a href="https://kolhamevaser.com/files/n-the-service-of-god_w4r4q8vt8udqzt457657r5/" class="link-card">
+            <div class="link-card-title">Halakhic Morality and the Halakhic Personality</div>
+            <div class="link-card-description">A somewhat personal review of a collection of essays by Rabbi Ahron Lichtenstein. <em>Kol Hamevaser, 2017.</em></div>
+          </a>
+          <a href="https://kolhamevaser.com/files/rn-age-by-rav-shagar_v0hgxs7owtocx7gwka2g7j/" class="link-card">
+            <div class="link-card-title">Review of “Faith Shattered and Restored: Judaism in the Postmodern Age,” by Rav Shagar</div>
+            <div class="link-card-description">On what postmodern thought has to offer contemporary religious life and thought, through the works of postmodern Judaism's major icons. <em>Kol Hamevaser, 2016.</em></div>
+          </a>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = document.getElementById('themeIcon');
+    const html = document.documentElement;
+
+    const savedTheme = localStorage.getItem('theme');
+    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+    if (savedTheme === 'dark') {
+      html.classList.add('dark');
+      themeIcon.textContent = '☀';
+    } else if (savedTheme === 'light') {
+      html.classList.add('light');
+      themeIcon.textContent = '☾';
+    } else if (systemPrefersDark) {
+      themeIcon.textContent = '☀';
+    }
+
+    themeToggle.addEventListener('click', () => {
+      if (html.classList.contains('dark')) {
+        html.classList.remove('dark');
+        html.classList.add('light');
+        localStorage.setItem('theme', 'light');
+        themeIcon.textContent = '☾';
+      } else {
+        html.classList.remove('light');
+        html.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+        themeIcon.textContent = '☀';
+      }
+    });
+  </script>
+</body>
+</html>
