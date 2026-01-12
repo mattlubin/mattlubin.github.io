@@ -25,8 +25,11 @@
 
       /* Crossover colors (blended) */
       --bio-ai: #4d6a4e;
+      --bio-ai-light: #5d7d5e;
       --bio-judaism: #3d6b76;
+      --bio-judaism-light: #4d7d8a;
       --ai-judaism: #6d5965;
+      --ai-judaism-light: #806775;
     }
 
     /* Default to light mode */
@@ -193,62 +196,65 @@
 
     /* Individual petal colors and positions */
 
-    /* BIOLOGY - top */
+    /* BIOLOGY - bottom right */
     .petal-biology {
       background: linear-gradient(135deg, var(--biology) 0%, var(--biology-light) 100%);
-      top: 5%;
-      left: 50%;
-      transform: translateX(-50%);
-    }
-    .petal-biology:hover {
-      transform: translateX(-50%) scale(1.05);
-    }
-
-    /* AI SAFETY - bottom right */
-    .petal-ai {
-      background: linear-gradient(135deg, var(--ai-safety) 0%, var(--ai-safety-light) 100%);
       bottom: 18%;
       right: 12%;
     }
+    .petal-biology:hover {
+      transform: scale(1.05);
+    }
 
-    /* JUDAISM - bottom left */
-    .petal-judaism {
-      background: linear-gradient(135deg, var(--judaism) 0%, var(--judaism-light) 100%);
+    /* AI SAFETY - bottom left */
+    .petal-ai {
+      background: linear-gradient(135deg, var(--ai-safety) 0%, var(--ai-safety-light) 100%);
       bottom: 18%;
       left: 12%;
     }
 
-    /* BIO × AI SAFETY - between biology and AI */
+    /* JUDAISM - top */
+    .petal-judaism {
+      background: linear-gradient(135deg, var(--judaism) 0%, var(--judaism-light) 100%);
+      top: 5%;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+    .petal-judaism:hover {
+      transform: translateX(-50%) scale(1.05);
+    }
+
+    /* BIO × AI SAFETY - between biology and AI (bottom) */
     .petal-bio-ai {
-      background: linear-gradient(135deg, var(--bio-ai) 0%, #5d7d5e 100%);
-      top: 28%;
-      right: 16%;
-      transform: rotate(15deg);
-    }
-    .petal-bio-ai:hover {
-      transform: rotate(15deg) scale(1.05);
-    }
-
-    /* BIO × JUDAISM - between biology and judaism */
-    .petal-bio-judaism {
-      background: linear-gradient(135deg, var(--bio-judaism) 0%, #4d7d8a 100%);
-      top: 28%;
-      left: 16%;
-      transform: rotate(-15deg);
-    }
-    .petal-bio-judaism:hover {
-      transform: rotate(-15deg) scale(1.05);
-    }
-
-    /* AI × JUDAISM - between AI and judaism */
-    .petal-ai-judaism {
-      background: linear-gradient(135deg, var(--ai-judaism) 0%, #806775 100%);
+      background: linear-gradient(135deg, var(--bio-ai) 0%, var(--bio-ai-light) 100%);
       bottom: 5%;
       left: 50%;
       transform: translateX(-50%);
     }
-    .petal-ai-judaism:hover {
+    .petal-bio-ai:hover {
       transform: translateX(-50%) scale(1.05);
+    }
+
+    /* BIO × JUDAISM - between biology and judaism (top right) */
+    .petal-bio-judaism {
+      background: linear-gradient(135deg, var(--bio-judaism) 0%, var(--bio-judaism-light) 100%);
+      top: 28%;
+      right: 16%;
+      transform: rotate(15deg);
+    }
+    .petal-bio-judaism:hover {
+      transform: rotate(15deg) scale(1.05);
+    }
+
+    /* AI × JUDAISM - between AI and judaism (top left) */
+    .petal-ai-judaism {
+      background: linear-gradient(135deg, var(--ai-judaism) 0%, var(--ai-judaism-light) 100%);
+      top: 28%;
+      left: 16%;
+      transform: rotate(-15deg);
+    }
+    .petal-ai-judaism:hover {
+      transform: rotate(-15deg) scale(1.05);
     }
 
     .petal-text {
@@ -397,7 +403,7 @@
     <div class="flower-container">
       <div class="flower">
         <!-- Main petals: larger, distinct -->
-        <a href="/judaism" class="petal petal-main petal-biology">
+        <a href="/judaism" class="petal petal-main petal-judaism">
           <span class="petal-text">JUDAISM</span>
         </a>
 
@@ -405,20 +411,20 @@
           <span class="petal-text">AI SAFETY</span>
         </a>
 
-        <a href="/biology" class="petal petal-main petal-judaism">
+        <a href="/biology" class="petal petal-main petal-biology">
           <span class="petal-text">BIOLOGY</span>
         </a>
 
         <!-- Crossover petals: smaller, between main domains -->
-        <a href="/ai-bio" class="petal petal-cross petal-bio-ai">
+        <a href="/bio-ai" class="petal petal-cross petal-bio-ai">
           <span class="petal-text">AI ×<br>BIO</span>
         </a>
 
-        <a href="/judaism-biology" class="petal petal-cross petal-bio-judaism">
+        <a href="/bio-judaism" class="petal petal-cross petal-bio-judaism">
           <span class="petal-text">BIO ×<br>JUDAISM</span>
         </a>
 
-        <a href="/ai-judaism" class="petal petal-cross petal-ai-judaism">
+        <a href="https://jewishai.me" class="petal petal-cross petal-ai-judaism">
           <span class="petal-text">AI ×<br>JUDAISM</span>
         </a>
 
