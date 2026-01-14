@@ -1,0 +1,1340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Partition Function - Matt Lubin</title>
+    <meta name="description" content="Interactive simulation of the partition function - how statistical mechanics determines probabilities">
+    <style>
+        /* Root variables for theming - matching biology.html */
+        :root {
+            --bg-light: #faf8f5;
+            --bg-dark: #1a1614;
+            --text-light: #2d2a26;
+            --text-dark: #e8e4df;
+            --text-muted-light: #6b6762;
+            --text-muted-dark: #9a9288;
+            --biology: #2d7a5e;
+            --biology-light: #3d9a78;
+        }
+
+        :root {
+            --bg: var(--bg-light);
+            --text: var(--text-light);
+            --text-muted: var(--text-muted-light);
+        }
+
+        :root.dark {
+            --bg: var(--bg-dark);
+            --text: var(--text-dark);
+            --text-muted: var(--text-muted-dark);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Iowan Old Style', 'Palatino Linotype', 'URW Palladio L', P052, serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .site-header {
+            padding: 1.5rem 2rem;
+            text-align: center;
+        }
+
+        .header-nav {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        .header-nav a {
+            color: var(--text-muted);
+            text-decoration: none;
+            margin: 0 0.4rem;
+            transition: color 0.2s ease;
+        }
+
+        .header-nav a:hover {
+            color: var(--text);
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            padding: 0;
+            margin: 0 0.4rem;
+            transition: color 0.2s ease;
+        }
+
+        .theme-toggle:hover {
+            color: var(--text);
+        }
+
+        .page-hero {
+            text-align: center;
+            padding: 2rem 2rem 1rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 400;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--biology) 0%, var(--biology-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .page-subtitle {
+            font-size: 1rem;
+            color: var(--text-muted);
+            font-weight: 300;
+            font-style: italic;
+        }
+
+        .intro {
+            max-width: 700px;
+            margin: 0 auto 2rem;
+            padding: 0 2rem;
+            font-size: 1.05rem;
+            line-height: 1.8;
+        }
+
+        .intro p {
+            margin-bottom: 1rem;
+        }
+
+        .intro a {
+            color: var(--biology);
+            text-decoration: none;
+            border-bottom: 1px solid var(--biology);
+            transition: color 0.2s ease;
+        }
+
+        :root.dark .intro a {
+            color: var(--biology-light);
+            border-bottom-color: var(--biology-light);
+        }
+
+        .intro a:hover {
+            color: var(--biology-light);
+        }
+
+        .container {
+            text-align: center;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 1rem 3rem;
+        }
+
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .simulation-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #latticeCanvasContainer {
+            display: inline-block;
+            cursor: pointer;
+            border-radius: 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .controls-section {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        canvas {
+            display: block;
+        }
+
+        .instructions {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-top: 8px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            padding: 15px 20px;
+            background: var(--bg);
+            border: 1px solid var(--text-muted);
+            border-left: 4px solid var(--biology);
+            border-radius: 0 12px 12px 0;
+            width: 100%;
+            transition: background-color 0.3s ease;
+        }
+
+        .control-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            color: var(--biology);
+            font-size: 14px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        :root.dark .control-header {
+            color: var(--biology-light);
+        }
+
+        .icon {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .icon svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .slider-container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .slider {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            outline: none;
+            -webkit-appearance: none;
+            background: var(--text-muted);
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--biology);
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .slider:hover::-webkit-slider-thumb {
+            transform: scale(1.3);
+        }
+
+        .slider::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--biology);
+            cursor: pointer;
+            border: none;
+            transition: transform 0.2s ease;
+        }
+
+        .slider:hover::-moz-range-thumb {
+            transform: scale(1.3);
+        }
+
+        .slider-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: var(--text-muted);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        .value-display {
+            font-size: 12px;
+            color: var(--text);
+            text-align: center;
+            font-weight: 500;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        .stats-display {
+            margin-top: 8px;
+            padding: 8px;
+            background: rgba(45, 122, 94, 0.08);
+            border-radius: 6px;
+            font-size: 11px;
+            color: var(--text);
+            text-align: center;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        .stats-label {
+            font-weight: 600;
+            margin-bottom: 3px;
+            color: var(--biology);
+        }
+
+        :root.dark .stats-label {
+            color: var(--biology-light);
+        }
+
+        .stats-value {
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .graph-container {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            width: 100%;
+        }
+
+        :root.dark .graph-container {
+            background: #2a2520;
+        }
+
+        .graph-canvas {
+            width: 100%;
+            height: auto;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            background: #f7fafc;
+        }
+
+        :root.dark .graph-canvas {
+            border-color: #4a4540;
+            background: #1a1614;
+        }
+
+        .graph-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--biology);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        :root.dark .graph-title {
+            color: var(--biology-light);
+        }
+
+        /* States and Weights Table */
+        .states-table {
+            width: 100%;
+            margin: 0.5rem 0;
+            border-collapse: collapse;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        .states-table th {
+            background: rgba(45, 122, 94, 0.1);
+            padding: 10px 8px;
+            text-align: center;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--biology);
+            border-bottom: 2px solid var(--biology);
+        }
+
+        :root.dark .states-table th {
+            color: var(--biology-light);
+            border-bottom-color: var(--biology-light);
+        }
+
+        .states-table td {
+            padding: 10px 8px;
+            text-align: center;
+            border-bottom: 1px solid var(--text-muted);
+            font-size: 12px;
+        }
+
+        .states-table .state-icon {
+            font-size: 18px;
+        }
+
+        .states-table .weight-value {
+            font-family: 'Courier New', monospace;
+            font-weight: 700;
+            color: var(--biology);
+        }
+
+        :root.dark .states-table .weight-value {
+            color: var(--biology-light);
+        }
+
+        .math-section {
+            max-width: 700px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .math-section h2 {
+            font-size: 1.4rem;
+            font-weight: 400;
+            color: var(--biology);
+            margin-bottom: 1rem;
+        }
+
+        :root.dark .math-section h2 {
+            color: var(--biology-light);
+        }
+
+        .math-section p {
+            font-size: 1rem;
+            line-height: 1.8;
+            margin-bottom: 1rem;
+        }
+
+        .math-box {
+            background: rgba(45, 122, 94, 0.08);
+            border-left: 3px solid var(--biology);
+            padding: 1rem 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0 8px 8px 0;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+        }
+
+        .math-box .equation {
+            font-size: 1.1rem;
+            margin: 0.5rem 0;
+            color: var(--text);
+        }
+
+        .math-box .label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin-top: 0.5rem;
+        }
+
+        .highlight-box {
+            background: rgba(45, 122, 94, 0.15);
+            border: 2px solid var(--biology);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            text-align: center;
+        }
+
+        .highlight-box .big-equation {
+            font-family: 'Courier New', monospace;
+            font-size: 1.3rem;
+            color: var(--biology);
+            margin: 0.5rem 0;
+        }
+
+        :root.dark .highlight-box .big-equation {
+            color: var(--biology-light);
+        }
+
+        .credit {
+            max-width: 700px;
+            margin: 2rem auto 0;
+            padding: 1rem 2rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-style: italic;
+            border-top: 1px solid var(--text-muted);
+        }
+
+        .credit a {
+            color: var(--text-muted);
+            text-decoration: none;
+            border-bottom: 1px solid var(--text-muted);
+        }
+
+        .credit a:hover {
+            color: var(--text);
+        }
+
+        /* Receptor visualization */
+        .receptor-display {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2rem;
+            margin: 1rem 0;
+            padding: 1rem;
+            background: rgba(45, 122, 94, 0.05);
+            border-radius: 12px;
+        }
+
+        .receptor-state {
+            text-align: center;
+        }
+
+        .receptor-visual {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 8px;
+            font-size: 24px;
+            transition: all 0.3s ease;
+        }
+
+        .receptor-empty {
+            background: #e8e4df;
+            border: 3px dashed var(--text-muted);
+        }
+
+        :root.dark .receptor-empty {
+            background: #2a2520;
+        }
+
+        .receptor-bound {
+            background: var(--biology);
+            border: 3px solid var(--biology);
+        }
+
+        .receptor-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 2rem;
+            }
+
+            .intro {
+                font-size: 1rem;
+            }
+
+            .receptor-display {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <nav class="header-nav">
+            <a href="/index.html">[home]</a> ·
+            <a href="/biology.html">[biology]</a> ·
+            <a href="/everything.html">[everything]</a> ·
+            <button type="button" class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+                <span id="themeIcon">&#9790;</span>
+            </button>
+        </nav>
+    </header>
+
+    <main>
+        <div class="page-hero">
+            <h1 class="page-title">Statistical Thermodynamics: The Partition Function</h1>
+            <p class="page-subtitle">How nature counts possibilities and decides probabilities</p>
+        </div>
+
+        <div class="intro">
+            <p>At the heart of statistical mechanics lies a deceptively simple idea: nature samples from all possible arrangements of a system, but not equally. Each arrangement (or "microstate") gets a weight based on its energy, and the <strong>partition function</strong> is simply the sum of all these weights.</p>
+            <p>In the simulation below, ligands float in solution near some receptors. Each receptor can be empty or occupied. Watch how changing the ligand concentration and binding energy shifts the balance between these two states. The partition function Z keeps track of the total "score" of all possibilities.</p>
+        </div>
+
+        <div class="container">
+            <div class="main-content">
+                <div class="simulation-section">
+                    <div id="latticeCanvasContainer"></div>
+                    <div class="instructions">Click to reshuffle the ligands</div>
+                </div>
+
+                <div class="controls-section">
+                    <!-- Concentration Control -->
+                    <div class="control-group">
+                        <div class="control-header">
+                            <div class="icon">
+                                <svg viewBox="0 0 24 24" fill="var(--biology)">
+                                    <circle cx="6" cy="12" r="3"/>
+                                    <circle cx="14" cy="8" r="2"/>
+                                    <circle cx="18" cy="16" r="2.5"/>
+                                    <circle cx="10" cy="17" r="2"/>
+                                </svg>
+                            </div>
+                            <span>Ligand Concentration (c/c<sub>0</sub>)</span>
+                        </div>
+                        <div class="slider-container">
+                            <input type="range" min="1" max="200" value="50" class="slider" id="concSlider" aria-label="Concentration control">
+                            <div class="slider-labels">
+                                <span>Dilute</span>
+                                <span>Concentrated</span>
+                            </div>
+                            <div class="value-display" id="concValue">50</div>
+                        </div>
+                    </div>
+
+                    <!-- Binding Energy Control -->
+                    <div class="control-group">
+                        <div class="control-header">
+                            <div class="icon">
+                                <svg viewBox="0 0 24 24" fill="var(--biology)">
+                                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                                </svg>
+                            </div>
+                            <span>Binding Energy (&#916;&#949; in k<sub>B</sub>T)</span>
+                        </div>
+                        <div class="slider-container">
+                            <input type="range" min="-10" max="2" value="-5" step="0.5" class="slider" id="energySlider" aria-label="Binding energy control">
+                            <div class="slider-labels">
+                                <span>Strong (-10)</span>
+                                <span>Weak (+2)</span>
+                            </div>
+                            <div class="value-display" id="energyValue">-5.0 k<sub>B</sub>T</div>
+                        </div>
+                        <div class="stats-display">
+                            <div class="stats-label">Boltzmann Factor e<sup>-&#916;&#949;/k<sub>B</sub>T</sup></div>
+                            <div class="stats-value" id="boltzmannFactor">148.4</div>
+                        </div>
+                    </div>
+
+                    <!-- Real-time Statistics -->
+                    <div class="graph-container">
+                        <div class="graph-title">
+                            <span>Receptor Occupancy Over Time</span>
+                        </div>
+                        <canvas id="occupancyGraph" class="graph-canvas"></canvas>
+                        <div style="display: flex; justify-content: space-between; margin-top: 10px; font-size: 11px; font-family: -apple-system, sans-serif;">
+                            <span style="color: var(--text-muted);">Observed: <strong id="observedOccupancy" style="color: var(--biology);">0.00</strong></span>
+                            <span style="color: var(--text-muted);">Theoretical: <strong id="theoreticalOccupancy" style="color: var(--biology);">0.00</strong></span>
+                        </div>
+                    </div>
+
+                    <!-- States and Weights Display -->
+                    <div class="graph-container">
+                        <div class="graph-title">
+                            <span>States and Weights</span>
+                        </div>
+                        <table class="states-table">
+                            <thead>
+                                <tr>
+                                    <th>State</th>
+                                    <th>Energy</th>
+                                    <th>Weight</th>
+                                    <th>Probability</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><span class="state-icon">&#9675;</span> Empty</td>
+                                    <td>0</td>
+                                    <td class="weight-value">1</td>
+                                    <td id="probEmpty">0.00</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="state-icon">&#9679;</span> Bound</td>
+                                    <td id="boundEnergy">&#916;&#949;</td>
+                                    <td class="weight-value" id="boundWeight">1</td>
+                                    <td id="probBound">0.00</td>
+                                </tr>
+                                <tr style="background: rgba(45, 122, 94, 0.1); font-weight: 600;">
+                                    <td colspan="2">Partition Function Z</td>
+                                    <td class="weight-value" id="partitionZ" colspan="2">2</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="math-section">
+            <h2>The Boltzmann Distribution</h2>
+            <p>Statistical mechanics tells us that nature assigns a probability to each microstate based on its energy. States with lower energy are more probable, but how much more? The answer is the <strong>Boltzmann distribution</strong>:</p>
+
+            <div class="highlight-box">
+                <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">Probability of microstate i</div>
+                <div class="big-equation">p(E<sub>i</sub>) = e<sup>-E<sub>i</sub>/k<sub>B</sub>T</sup> / Z</div>
+            </div>
+
+            <p>The key insight is the exponential dependence on energy. A state that is just 1 k<sub>B</sub>T lower in energy is e &#8776; 2.7 times more likely. A state 10 k<sub>B</sub>T lower? Over 22,000 times more likely!</p>
+
+            <h2>Building the Partition Function</h2>
+            <p>Consider a single receptor that can either be empty or have a ligand bound. Following the lattice model from <em>Physical Biology of the Cell</em>, we assign weights to each state:</p>
+
+            <div class="math-box">
+                <div class="equation">Weight(empty) = 1</div>
+                <div class="equation">Weight(bound) = (c/c<sub>0</sub>) &#215; e<sup>-&#916;&#949;/k<sub>B</sub>T</sup></div>
+                <div class="label">where c is concentration, c<sub>0</sub> is a reference concentration, and &#916;&#949; = &#949;<sub>bound</sub> - &#949;<sub>solution</sub></div>
+            </div>
+
+            <p>The partition function Z is the sum of all weights:</p>
+
+            <div class="highlight-box">
+                <div class="big-equation">Z = 1 + (c/c<sub>0</sub>) &#215; e<sup>-&#916;&#949;/k<sub>B</sub>T</sup></div>
+            </div>
+
+            <p>And the probability of the receptor being bound is simply the bound weight divided by Z:</p>
+
+            <div class="math-box">
+                <div class="equation">p<sub>bound</sub> = (c/c<sub>0</sub>) &#215; e<sup>-&#916;&#949;/k<sub>B</sub>T</sup> / Z</div>
+                <div class="label">This is the famous Langmuir adsorption isotherm (or Hill function with n=1)</div>
+            </div>
+
+            <h2>Energy vs. Entropy: The Great Competition</h2>
+            <p>Notice that p<sub>bound</sub> depends on two competing factors:</p>
+
+            <div class="receptor-display">
+                <div class="receptor-state">
+                    <div class="receptor-visual receptor-bound">&#128279;</div>
+                    <div class="receptor-label">ENERGY favors binding</div>
+                    <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Lower &#949; &#8594; stronger attraction</div>
+                </div>
+                <div style="font-size: 24px; color: var(--text-muted);">&#9878;</div>
+                <div class="receptor-state">
+                    <div class="receptor-visual receptor-empty">&#127754;</div>
+                    <div class="receptor-label">ENTROPY favors freedom</div>
+                    <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">More places to be in solution</div>
+                </div>
+            </div>
+
+            <p>At low concentrations, entropy wins&#8212;ligands prefer the vast ocean of solution. At high concentrations or with strong binding energy, the energetic payoff of binding overcomes the entropic cost of being "trapped" at the receptor.</p>
+
+            <p>The concentration where p<sub>bound</sub> = 0.5 is called the <strong>dissociation constant K<sub>d</sub></strong>. It occurs when the two terms in Z are equal, representing the perfect balance between energy and entropy.</p>
+
+            <div class="math-box">
+                <div class="equation">K<sub>d</sub> = c<sub>0</sub> &#215; e<sup>+&#916;&#949;/k<sub>B</sub>T</sup></div>
+                <div class="label">The concentration at which half the receptors are occupied</div>
+            </div>
+        </div>
+
+        <div class="credit">
+            Based on Chapter 6 of <a href="http://www.rpdata.caltech.edu/courses/PBoC_GIST_2016/files_2016/articles/Physical%20Biology%20of%20the%20Cell%20chapter%206.pdf">Physical Biology of the Cell</a> by Phillips, Kondev, Theriot, and Garcia.
+        </div>
+    </main>
+
+    <script type="module">
+        // ========== HELPERS ==========
+        const randomBetween = (min, max) => Math.random() * (max - min) + min;
+
+        const generateCanvas = ({ width, height, attachNode }) => {
+            const element = document.createElement("canvas");
+            const context = element.getContext("2d");
+
+            element.style.width = width + "px";
+            element.style.height = height + "px";
+
+            const scale = window.devicePixelRatio;
+            element.width = Math.floor(width * scale);
+            element.height = Math.floor(height * scale);
+            context.scale(scale, scale);
+
+            document.querySelector(attachNode).appendChild(element);
+
+            return [context, element];
+        };
+
+        // Squircle path for rounded corners
+        const make24pxCornerRadiusSquirclePath = (width, height) => `m 0 38.4
+c 0 -13.4413 0 -20.1619 2.6158 -25.2958
+c 2.301 -4.5159 5.9725 -8.1874 10.4884 -10.4884
+c 5.1339 -2.6158 11.8545 -2.6158 25.2958 -2.6158
+h ${width - 76.8}
+c 13.441 0 20.162 0 25.296 2.6158
+c 4.516 2.301 8.187 5.9725 10.488 10.4884
+c 2.616 5.1339 2.616 11.8545 2.616 25.2958
+v ${height - 76.8}
+c 0 13.4413 0 20.1619 -2.616 25.2958
+c -2.301 4.5159 -5.972 8.1874 -10.488 10.4884
+c -5.134 2.6158 -11.855 2.6158 -25.296 2.6158
+h ${-width + 76.8}
+c -13.4413 0 -20.1619 0 -25.2958 -2.6158
+c -4.5159 -2.301 -8.1874 -5.9725 -10.4884 -10.4884
+c -2.6158 -5.1339 -2.6158 -11.8545 -2.6158 -25.2958
+v ${-height + 76.8}
+z`;
+
+        // ========== SIMULATION SETUP ==========
+        const width = Math.min(500, window.innerWidth - 40);
+        const height = width;
+        const [CTX, canvasEl] = generateCanvas({
+            width,
+            height,
+            attachNode: "#latticeCanvasContainer",
+        });
+
+        const cornerRadiusPath = make24pxCornerRadiusSquirclePath(width, height);
+        canvasEl.style.clipPath = `path('${cornerRadiusPath}')`;
+
+        // ========== STATE ==========
+        let concentration = 50;  // c/c0 ratio
+        let bindingEnergy = -5;  // in kBT units
+        let ligands = [];
+        let occupancyHistory = [];
+        const maxHistoryPoints = 200;
+
+        // Protein configuration
+        const numProteins = 25;  // 5x5 grid
+        const proteins = [];
+        const proteinSize = 36;  // Display size for proteins (half-width/height)
+        const bindingPocketRadius = 14;  // Size of binding pocket (center of protein)
+
+        // Load protein images
+        const proteinBoundImg = new Image();
+        const proteinUnboundImg = new Image();
+        let imagesLoaded = 0;
+        let imgAspectRatio = 1;  // Will be calculated once image loads
+        proteinBoundImg.src = 'thermo-model/protein-bound.png';
+        proteinUnboundImg.src = 'thermo-model/protein-unbound.png';
+        proteinBoundImg.onload = () => {
+            imagesLoaded++;
+            // Calculate aspect ratio from the actual image
+            imgAspectRatio = proteinBoundImg.naturalWidth / proteinBoundImg.naturalHeight;
+        };
+        proteinUnboundImg.onload = () => imagesLoaded++;
+
+        // Initialize proteins in a 5x5 grid
+        const initProteins = () => {
+            proteins.length = 0;
+            const gridSize = 5;
+            const margin = 50;  // Margin from edges
+            const spacingX = (width - 2 * margin) / (gridSize - 1);
+            const spacingY = (height - 2 * margin) / (gridSize - 1);
+
+            for (let row = 0; row < gridSize; row++) {
+                for (let col = 0; col < gridSize; col++) {
+                    const x = margin + col * spacingX;
+                    const y = margin + row * spacingY;
+
+                    proteins.push({
+                        x,
+                        y,
+                        angle: 0,  // No rotation needed for grid layout
+                        bound: false,
+                        boundLigandIndex: -1,
+                        size: proteinSize
+                    });
+                }
+            }
+        };
+
+        // Initialize ligands
+        const initLigands = () => {
+            ligands = [];
+            const numLigands = Math.floor(concentration * 0.8);
+            const margin = 20;  // Small margin from edges
+            for (let i = 0; i < numLigands; i++) {
+                ligands.push({
+                    x: randomBetween(margin, width - margin),
+                    y: randomBetween(margin, height - margin),
+                    vx: randomBetween(-1.5, 1.5),
+                    vy: randomBetween(-1.5, 1.5),
+                    radius: 6,
+                    boundToProtein: -1  // Index of protein this ligand is bound to, -1 if free
+                });
+            }
+        };
+
+        initProteins();
+        initLigands();
+
+        // ========== PHYSICS ==========
+        // Reference concentration c₀ - the concentration at which entropic and energetic
+        // terms balance when Δε = 0. Set to slider midpoint for intuitive behavior.
+        const c0_physics = 50;
+
+        // Calculate theoretical equilibrium occupancy from the partition function
+        // p_bound = (c/c₀)e^(-Δε/kBT) / Z, where Z = 1 + (c/c₀)e^(-Δε/kBT)
+        const calculateProbability = () => {
+            const boltzmannFactor = Math.exp(-bindingEnergy); // e^(-Δε/kBT)
+            const weight = (concentration / c0_physics) * boltzmannFactor;
+            const Z = 1 + weight;
+            return weight / Z;
+        };
+
+        // Get the position of a protein's binding pocket (center of the protein image)
+        const getBindingPocketPosition = (protein) => {
+            // The binding pocket is at the center of the protein
+            return {
+                x: protein.x,
+                y: protein.y
+            };
+        };
+
+        // Check if a ligand is touching a protein's binding pocket
+        const isLigandTouchingPocket = (ligand, protein) => {
+            const pocket = getBindingPocketPosition(protein);
+            const dx = ligand.x - pocket.x;
+            const dy = ligand.y - pocket.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            return distance < (ligand.radius + bindingPocketRadius + 2);
+        };
+
+        const updateLigands = () => {
+            ligands.forEach((ligand, ligandIndex) => {
+                // If ligand is bound, keep it at the binding pocket
+                if (ligand.boundToProtein >= 0) {
+                    const protein = proteins[ligand.boundToProtein];
+                    const pocket = getBindingPocketPosition(protein);
+                    ligand.x = pocket.x;
+                    ligand.y = pocket.y;
+                    ligand.vx = 0;
+                    ligand.vy = 0;
+                    return;
+                }
+
+                // Update position
+                ligand.x += ligand.vx;
+                ligand.y += ligand.vy;
+
+                // Bounce off walls
+                if (ligand.x < ligand.radius || ligand.x > width - ligand.radius) {
+                    ligand.vx *= -1;
+                    ligand.x = Math.max(ligand.radius, Math.min(width - ligand.radius, ligand.x));
+                }
+                if (ligand.y < ligand.radius || ligand.y > height - ligand.radius) {
+                    ligand.vy *= -1;
+                    ligand.y = Math.max(ligand.radius, Math.min(height - ligand.radius, ligand.y));
+                }
+
+                // Add small random perturbation (Brownian motion)
+                ligand.vx += randomBetween(-0.1, 0.1);
+                ligand.vy += randomBetween(-0.1, 0.1);
+
+                // Damping to keep velocities reasonable
+                ligand.vx *= 0.99;
+                ligand.vy *= 0.99;
+            });
+        };
+
+        // Check for binding/unbinding using Glauber dynamics (Monte Carlo)
+        //
+        // From statistical mechanics (Physical Biology of the Cell, Ch. 6):
+        // At equilibrium: p_bound = K / (1 + K), where K = (c/c₀) × e^(-Δε/kBT)
+        //
+        // We use Glauber dynamics: each receptor has a probability to flip its state
+        // that satisfies detailed balance. This guarantees convergence to the correct
+        // equilibrium distribution regardless of collision geometry.
+        //
+        // For a two-state system, the transition rates are:
+        //   P(unbound → bound) = K / (1 + K) × flip_rate
+        //   P(bound → unbound) = 1 / (1 + K) × flip_rate
+        //
+        // This ensures detailed balance: the ratio of forward/backward rates equals K.
+
+        let lastBindingCheck = 0;
+        const bindingCheckInterval = 100; // ms
+        const flipAttemptRate = 0.12; // Base rate for attempting state changes
+
+        const checkBinding = (currentTime) => {
+            if (currentTime - lastBindingCheck > bindingCheckInterval) {
+                lastBindingCheck = currentTime;
+
+                // Calculate the equilibrium constant K = (c/c₀) × e^(-Δε/kBT)
+                const boltzmannFactor = Math.exp(-bindingEnergy); // e^(-Δε/kBT)
+                const concRatio = concentration / c0_physics; // c/c₀
+                const K_eq = concRatio * boltzmannFactor;
+
+                // Equilibrium probability of being bound: p_bound = K / (1 + K)
+                const p_eq_bound = K_eq / (1 + K_eq);
+
+                // Check each protein using Glauber dynamics
+                proteins.forEach((protein, proteinIndex) => {
+                    // Only attempt a flip with some probability (controls dynamics speed)
+                    if (Math.random() > flipAttemptRate) return;
+
+                    if (protein.bound) {
+                        // Bound state: probability to unbind = (1 - p_eq) = 1/(1+K)
+                        // We flip to unbound with probability proportional to unbound equilibrium weight
+                        const unbindProb = 1 / (1 + K_eq);
+                        if (Math.random() < unbindProb) {
+                            // Unbind
+                            const ligandIndex = protein.boundLigandIndex;
+                            if (ligandIndex >= 0 && ligands[ligandIndex]) {
+                                ligands[ligandIndex].boundToProtein = -1;
+                                // Give the ligand a kick away from the pocket
+                                ligands[ligandIndex].vx = randomBetween(-2, 2);
+                                ligands[ligandIndex].vy = randomBetween(-2, 2);
+                            }
+                            protein.bound = false;
+                            protein.boundLigandIndex = -1;
+                        }
+                    } else {
+                        // Unbound state: probability to bind = p_eq = K/(1+K)
+                        // We flip to bound with probability proportional to bound equilibrium weight
+                        const bindProb = K_eq / (1 + K_eq);
+                        if (Math.random() < bindProb) {
+                            // Find a free ligand to bind (visual effect only)
+                            const freeLigand = ligands.find(l => l.boundToProtein < 0);
+                            if (freeLigand) {
+                                protein.bound = true;
+                                protein.boundLigandIndex = ligands.indexOf(freeLigand);
+                                freeLigand.boundToProtein = proteinIndex;
+                            }
+                        }
+                    }
+                });
+
+                // Record occupancy history (fraction of bound proteins)
+                const boundCount = proteins.filter(p => p.bound).length;
+                occupancyHistory.push(boundCount / numProteins);
+                if (occupancyHistory.length > maxHistoryPoints) {
+                    occupancyHistory.shift();
+                }
+            }
+        };
+
+        // ========== DRAWING ==========
+        const isDark = () => document.documentElement.classList.contains('dark');
+
+        const drawBackground = () => {
+            // Light blue aqueous solution background
+            const gradient = CTX.createLinearGradient(0, 0, 0, height);
+            if (isDark()) {
+                gradient.addColorStop(0, '#1a2530');
+                gradient.addColorStop(1, '#0f1520');
+            } else {
+                gradient.addColorStop(0, '#e0f0ff');
+                gradient.addColorStop(1, '#c8e4f8');
+            }
+            CTX.fillStyle = gradient;
+            CTX.fillRect(0, 0, width, height);
+
+            // Draw "solution" label
+            CTX.fillStyle = isDark() ? '#4a5560' : '#7090a8';
+            CTX.font = '12px -apple-system, BlinkMacSystemFont, sans-serif';
+            CTX.textAlign = 'left';
+            CTX.fillText('Aqueous solution', 15, 25);
+        };
+
+        // Draw a protein using the loaded images
+        const drawProtein = (protein) => {
+            // Don't draw if images aren't loaded yet
+            if (imagesLoaded < 2) return;
+
+            CTX.save();
+            CTX.translate(protein.x, protein.y);
+            CTX.rotate(protein.angle);
+
+            const size = protein.size;
+            const img = protein.bound ? proteinBoundImg : proteinUnboundImg;
+
+            // Draw the protein image with correct aspect ratio
+            // The image is wider than tall, so adjust dimensions accordingly
+            const drawWidth = size * 2 * imgAspectRatio;
+            const drawHeight = size * 2;
+            CTX.drawImage(img, -drawWidth / 2, -drawHeight / 2, drawWidth, drawHeight);
+
+            CTX.restore();
+        };
+
+        // Draw all proteins
+        const drawProteins = () => {
+            proteins.forEach(protein => {
+                drawProtein(protein);
+            });
+        };
+
+        const drawLigands = () => {
+            CTX.save();
+
+            ligands.forEach(ligand => {
+                // Skip bound ligands - they're shown in the protein image
+                if (ligand.boundToProtein >= 0) return;
+
+                // Dark red colors (like oxygen/heme)
+                const ligandColor = '#cc0000';  // Red matching the protein image
+                const ligandDark = '#880000';   // Darker red for stroke
+                const ligandGlow = 'rgba(200, 0, 0, 0.3)';
+
+                // Ligand glow
+                const gradient = CTX.createRadialGradient(
+                    ligand.x, ligand.y, 0,
+                    ligand.x, ligand.y, ligand.radius * 2
+                );
+                gradient.addColorStop(0, ligandGlow);
+                gradient.addColorStop(1, 'rgba(200, 0, 0, 0)');
+                CTX.fillStyle = gradient;
+                CTX.beginPath();
+                CTX.arc(ligand.x, ligand.y, ligand.radius * 2, 0, Math.PI * 2);
+                CTX.fill();
+
+                // Ligand body
+                CTX.beginPath();
+                CTX.arc(ligand.x, ligand.y, ligand.radius, 0, Math.PI * 2);
+                CTX.fillStyle = ligandColor;
+                CTX.fill();
+                CTX.strokeStyle = ligandDark;
+                CTX.lineWidth = 1.5;
+                CTX.stroke();
+
+                // Small highlight for 3D effect
+                CTX.beginPath();
+                CTX.arc(ligand.x - 1.5, ligand.y - 1.5, ligand.radius * 0.4, 0, Math.PI * 2);
+                CTX.fillStyle = 'rgba(255, 150, 150, 0.5)';
+                CTX.fill();
+            });
+
+            CTX.restore();
+        };
+
+        const drawStats = () => {
+            CTX.save();
+
+            // Stats box
+            const boxX = 10;
+            const boxY = height - 35;
+            const boundCount = proteins.filter(p => p.bound).length;
+            const freeLigands = ligands.filter(l => l.boundToProtein < 0).length;
+
+            CTX.fillStyle = isDark() ? 'rgba(0,0,0,0.5)' : 'rgba(255,255,255,0.8)';
+            CTX.fillRect(boxX, boxY, 220, 25);
+            CTX.strokeStyle = 'rgba(100, 140, 180, 0.4)';
+            CTX.strokeRect(boxX, boxY, 220, 25);
+
+            CTX.fillStyle = isDark() ? '#e8e4df' : '#2d2a26';
+            CTX.font = '11px -apple-system, BlinkMacSystemFont, sans-serif';
+            CTX.textAlign = 'left';
+            CTX.fillText(`Bound: ${boundCount}/${numProteins} | Free ligands: ${freeLigands}`, boxX + 8, boxY + 17);
+
+            CTX.restore();
+        };
+
+        // ========== GRAPH DRAWING ==========
+        const graphCanvas = document.getElementById('occupancyGraph');
+        const graphCtx = graphCanvas.getContext('2d');
+        const graphWidth = Math.min(470, window.innerWidth - 70);
+        const graphHeight = 120;
+        const graphScale = window.devicePixelRatio;
+
+        graphCanvas.style.width = graphWidth + 'px';
+        graphCanvas.style.height = graphHeight + 'px';
+        graphCanvas.width = Math.floor(graphWidth * graphScale);
+        graphCanvas.height = Math.floor(graphHeight * graphScale);
+        graphCtx.scale(graphScale, graphScale);
+
+        const drawOccupancyGraph = () => {
+            const padding = 30;
+            const gWidth = graphWidth - padding * 2;
+            const gHeight = graphHeight - padding * 2;
+
+            // Clear
+            graphCtx.fillStyle = isDark() ? '#1a1614' : '#f7fafc';
+            graphCtx.fillRect(0, 0, graphWidth, graphHeight);
+
+            // Grid lines
+            graphCtx.strokeStyle = isDark() ? '#3a3530' : '#e2e8f0';
+            graphCtx.lineWidth = 1;
+            for (let i = 0; i <= 4; i++) {
+                const y = padding + (gHeight / 4) * i;
+                graphCtx.beginPath();
+                graphCtx.moveTo(padding, y);
+                graphCtx.lineTo(graphWidth - padding, y);
+                graphCtx.stroke();
+
+                // Y labels
+                const value = 1 - (i / 4);
+                graphCtx.fillStyle = isDark() ? '#9a9288' : '#718096';
+                graphCtx.font = '10px sans-serif';
+                graphCtx.textAlign = 'right';
+                graphCtx.fillText(value.toFixed(1), padding - 5, y + 3);
+            }
+
+            // Theoretical line
+            const prob = calculateProbability();
+            const theorY = padding + gHeight * (1 - prob);
+            graphCtx.strokeStyle = 'rgba(45, 122, 94, 0.4)';
+            graphCtx.setLineDash([5, 5]);
+            graphCtx.beginPath();
+            graphCtx.moveTo(padding, theorY);
+            graphCtx.lineTo(graphWidth - padding, theorY);
+            graphCtx.stroke();
+            graphCtx.setLineDash([]);
+
+            // Data line (rolling average)
+            if (occupancyHistory.length > 1) {
+                // Calculate rolling average
+                const windowSize = 10;
+                const smoothed = [];
+                for (let i = 0; i < occupancyHistory.length; i++) {
+                    const start = Math.max(0, i - windowSize + 1);
+                    const window = occupancyHistory.slice(start, i + 1);
+                    const avg = window.reduce((a, b) => a + b, 0) / window.length;
+                    smoothed.push(avg);
+                }
+
+                graphCtx.strokeStyle = '#2d7a5e';
+                graphCtx.lineWidth = 2;
+                graphCtx.beginPath();
+
+                smoothed.forEach((value, index) => {
+                    const x = padding + (index / (maxHistoryPoints - 1)) * gWidth;
+                    const y = padding + gHeight * (1 - value);
+                    if (index === 0) {
+                        graphCtx.moveTo(x, y);
+                    } else {
+                        graphCtx.lineTo(x, y);
+                    }
+                });
+                graphCtx.stroke();
+            }
+
+            // Axes
+            graphCtx.strokeStyle = isDark() ? '#6a6560' : '#4a5568';
+            graphCtx.lineWidth = 2;
+            graphCtx.beginPath();
+            graphCtx.moveTo(padding, padding);
+            graphCtx.lineTo(padding, graphHeight - padding);
+            graphCtx.lineTo(graphWidth - padding, graphHeight - padding);
+            graphCtx.stroke();
+        };
+
+        // ========== UI UPDATES ==========
+        const updateUI = () => {
+            const boltzmann = Math.exp(-bindingEnergy);
+            const weight = (concentration / 50) * boltzmann;
+            const Z = 1 + weight;
+            const prob = weight / Z;
+
+            // Update displays
+            document.getElementById('concValue').textContent = concentration;
+            document.getElementById('energyValue').innerHTML = `${bindingEnergy.toFixed(1)} k<sub>B</sub>T`;
+            document.getElementById('boltzmannFactor').textContent = boltzmann.toFixed(1);
+
+            // States table
+            document.getElementById('boundEnergy').textContent = `${bindingEnergy.toFixed(1)} kBT`;
+            document.getElementById('boundWeight').textContent = weight.toFixed(2);
+            document.getElementById('probEmpty').textContent = (1/Z).toFixed(3);
+            document.getElementById('probBound').textContent = prob.toFixed(3);
+            document.getElementById('partitionZ').textContent = Z.toFixed(2);
+
+            // Occupancy stats
+            document.getElementById('theoreticalOccupancy').textContent = prob.toFixed(3);
+
+            if (occupancyHistory.length > 0) {
+                const observed = occupancyHistory.reduce((a, b) => a + b, 0) / occupancyHistory.length;
+                document.getElementById('observedOccupancy').textContent = observed.toFixed(3);
+            }
+        };
+
+        // ========== EVENT LISTENERS ==========
+        const concSlider = document.getElementById('concSlider');
+        const energySlider = document.getElementById('energySlider');
+
+        concSlider.addEventListener('input', (e) => {
+            concentration = parseInt(e.target.value);
+            // Reset protein binding states
+            proteins.forEach(p => {
+                p.bound = false;
+                p.boundLigandIndex = -1;
+            });
+            initLigands();
+            occupancyHistory = [];
+            updateUI();
+        });
+
+        energySlider.addEventListener('input', (e) => {
+            bindingEnergy = parseFloat(e.target.value);
+            occupancyHistory = [];
+            updateUI();
+        });
+
+        canvasEl.addEventListener('click', () => {
+            // Reset protein binding states
+            proteins.forEach(p => {
+                p.bound = false;
+                p.boundLigandIndex = -1;
+            });
+            initLigands();
+            occupancyHistory = [];
+        });
+
+        // ========== ANIMATION LOOP ==========
+        let lastTime = 0;
+        const animate = (timestamp) => {
+            const deltaTime = timestamp - lastTime;
+            lastTime = timestamp;
+
+            updateLigands();
+            checkBinding(timestamp);
+
+            drawBackground();
+            drawLigands();
+            drawProteins();
+            drawStats();
+            drawOccupancyGraph();
+            updateUI();
+
+            requestAnimationFrame(animate);
+        };
+
+        // Initial setup
+        updateUI();
+        requestAnimationFrame(animate);
+
+        // Listen for theme changes
+        window.addEventListener('themeChanged', () => {
+            drawOccupancyGraph();
+        });
+    </script>
+
+    <script>
+        // Theme toggle
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = document.getElementById('themeIcon');
+        const html = document.documentElement;
+
+        const savedTheme = localStorage.getItem('theme');
+
+        if (savedTheme === 'dark') {
+            html.classList.add('dark');
+            themeIcon.textContent = '\u2600';
+        } else if (savedTheme === 'light') {
+            html.classList.add('light');
+            themeIcon.textContent = '\u263E';
+        }
+
+        themeToggle.addEventListener('click', () => {
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                html.classList.add('light');
+                localStorage.setItem('theme', 'light');
+                themeIcon.textContent = '\u263E';
+            } else {
+                html.classList.remove('light');
+                html.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+                themeIcon.textContent = '\u2600';
+            }
+            window.dispatchEvent(new Event('themeChanged'));
+        });
+    </script>
+</body>
+</html>

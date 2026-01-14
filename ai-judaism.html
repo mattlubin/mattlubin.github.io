@@ -123,6 +123,53 @@
       font-size: 1.05rem;
     }
 
+    /* Link cards */
+    .link-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    .link-card {
+      display: block;
+      padding: 1.25rem 1.5rem;
+      background: var(--bg);
+      border: 1px solid var(--text-muted);
+      border-left: 4px solid var(--ai-judaism);
+      border-radius: 0 8px 8px 0;
+      text-decoration: none;
+      color: var(--text);
+      transition: all 0.2s ease;
+    }
+
+    .link-card:hover {
+      border-left-color: var(--ai-judaism-light);
+      background: linear-gradient(90deg, rgba(109, 89, 101, 0.08) 0%, transparent 100%);
+      transform: translateX(4px);
+    }
+
+    :root.dark .link-card:hover {
+      background: linear-gradient(90deg, rgba(128, 103, 117, 0.12) 0%, transparent 100%);
+    }
+
+    .link-card-title {
+      font-size: 1.1rem;
+      font-weight: 500;
+      margin-bottom: 0.3rem;
+      color: var(--ai-judaism);
+    }
+
+    :root.dark .link-card-title {
+      color: var(--ai-judaism-light);
+    }
+
+    .link-card-description {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
     @media (max-width: 768px) {
       .page-title {
         font-size: 2.2rem;
@@ -158,10 +205,33 @@
 
     <div class="content">
       <p>Besides for a few small articles on Judaism and Artificial Intelligence, I am working on two substantial projects on the interaction of AI with the Jewish community and Jewish thought.
-        One of those is a secret! But I assure you my cabal of kabbalists are doing well.  
+        One of those is a secret! But I assure you my cabal of kabbalists are doing well.
       </p>
-      <p>My public project - and soon to be an actual book from a real publishing company! - is the <a href="https://jewishai.me"><strong> Jewish Handbook of AI Ethics</strong></a>. I'd love for help on developing the online resources associated with that book to make it into something actually useful!
+      <p>My public project - and soon to be an actual book from a real publishing company! - is the Jewish Handbook of AI Ethics. I'd love for help on developing the online resources associated with that book to make it into something actually useful!
       </p>
+
+      <div class="link-list">
+        <a href="https://jewishai.me" class="link-card">
+          <div class="link-card-title">🌐 Jewish Handbook of AI Ethics</div>
+          <div class="link-card-description">An online handbook exploring Jewish perspectives on artificial intelligence ethics.</div>
+        </a>
+      </div>
+      <div class="content">
+      <p>Here is some of the more informal writing (more like "thinking aloud") on the topic of AI from a Jewish lens:
+      </p>
+        <a href="https://rishonimpodcast.substack.com/p/ai-the-rabbi" class="link-card">
+          <div class="link-card-title">AI the Rabbi?</div>
+          <div class="link-card-description">How LLMs and rabbis don't think the same way, and that difference matters.</div>
+        </a>
+        <a href="https://rishonimpodcast.substack.com/p/rabbinic-discourse-on-artificial" class="link-card">
+          <div class="link-card-title">Rabbinic Discourse on AI is Upside-Down</div>
+          <div class="link-card-description">On how to ask the right questions (and mild complains about rabbinic discussions on AI).</div>
+        </a>
+        <a href="https://rishonimpodcast.substack.com/p/rabbinic-discourse-on-artificial-d26" class="link-card">
+          <div class="link-card-title">AI and Idolatry</div>
+          <div class="link-card-description">Jewish texts on idolatry may prove to have surprisingly useful insights on AI.</div>
+        </a>
+      </div>
     </div>
   </main>
 
