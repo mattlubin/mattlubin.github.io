@@ -14,8 +14,8 @@
       --text-dark: #e8e4df;
       --text-muted-light: #6b6762;
       --text-muted-dark: #9a9288;
-      --biology: #2d7a5e;
-      --biology-light: #3d9a78;
+      --personal: #6b6762;
+      --personal-light: #8a827a;
     }
 
     :root {
@@ -98,7 +98,7 @@
       font-size: 3rem;
       font-weight: 400;
       margin-bottom: 1rem;
-      background: linear-gradient(135deg, var(--biology) 0%, var(--biology-light) 100%);
+      background: linear-gradient(135deg, var(--personal) 0%, var(--personal-light) 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
@@ -151,7 +151,7 @@
     .section-icon {
       width: 48px;
       height: 48px;
-      background: linear-gradient(135deg, var(--biology) 0%, var(--biology-light) 100%);
+      background: linear-gradient(135deg, var(--personal) 0%, var(--personal-light) 100%);
       border-radius: 12px;
       display: flex;
       align-items: center;
@@ -163,11 +163,11 @@
     .section-title {
       font-size: 1.6rem;
       font-weight: 400;
-      color: var(--biology);
+      color: var(--personal);
     }
 
     :root.dark .section-title {
-      color: var(--biology-light);
+      color: var(--personal-light);
     }
 
     .section-intro {
@@ -190,7 +190,7 @@
       padding: 1.25rem 1.5rem;
       background: var(--bg);
       border: 1px solid var(--text-muted);
-      border-left: 4px solid var(--biology);
+      border-left: 4px solid var(--personal);
       border-radius: 0 8px 8px 0;
       text-decoration: none;
       color: var(--text);
@@ -198,24 +198,24 @@
     }
 
     .link-card:hover {
-      border-left-color: var(--biology-light);
-      background: linear-gradient(90deg, rgba(45, 122, 94, 0.08) 0%, transparent 100%);
+      border-left-color: var(--personal-light);
+      background: linear-gradient(90deg, rgba(107, 103, 98, 0.08) 0%, transparent 100%);
       transform: translateX(4px);
     }
 
     :root.dark .link-card:hover {
-      background: linear-gradient(90deg, rgba(61, 154, 120, 0.12) 0%, transparent 100%);
+      background: linear-gradient(90deg, rgba(138, 130, 122, 0.12) 0%, transparent 100%);
     }
 
     .link-card-title {
       font-size: 1.1rem;
       font-weight: 500;
       margin-bottom: 0.3rem;
-      color: var(--biology);
+      color: var(--personal);
     }
 
     :root.dark .link-card-title {
-      color: var(--biology-light);
+      color: var(--personal-light);
     }
 
     .link-card-description {
@@ -288,12 +288,12 @@
     .rec-item.rec-book {
       background: var(--bg);
       border: 1px solid var(--text-muted);
-      border-left: 6px solid var(--biology);
+      border-left: 6px solid var(--personal);
       padding-left: 1rem;
     }
 
     .rec-item.rec-book:hover {
-      border-left-color: var(--biology-light);
+      border-left-color: var(--personal-light);
       box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
     }
 
@@ -302,11 +302,11 @@
     }
 
     .rec-item.rec-book .rec-item-type {
-      color: var(--biology);
+      color: var(--personal);
     }
 
     :root.dark .rec-item.rec-book .rec-item-type {
-      color: var(--biology-light);
+      color: var(--personal-light);
     }
 
     /* Magazine styling - centered with badge label */
@@ -460,13 +460,19 @@
         <div class="section-icon">📱</div>
         <h2 class="section-title">Web Apps</h2>
       </div>
-      <p class="section-intro">For my own productivity, I build a few random browser 'apps' that do things I wanted to make happen. But be warned! These are kind of buggy!
+      <p class="section-intro">Random things I built for myself, with some help from Claude Code.
       </p>
       <div class="link-list">
         <a href="/task-calendar.html" class="link-card">
           <div class="link-card-title">Task Breakdown Calendar</div>
           <div class="link-card-description">
             This is a mostly-functional calendar, with the main feature being that when you add a "task" due on some particular day, you can give the task a dozen subtasks, and the calendar will automatically distribute those subtasks to be due on days between today and the final due date. No other fancy plugins.
+          </div>
+        </a>
+        <a href="/vitruvius-widgets/index.html" class="link-card">
+          <div class="link-card-title">Vitruvian Widgets</div>
+          <div class="link-card-description">
+            I asked Claude Code to imagine itself as Vitruvius who was comissioned to design a website for selling widgets. I was sufficiently happy with the results that I asked Claude-Vitruvius to help me with my own website (though I still ended up doing a lot myself).
           </div>
         </a>
       </div>
