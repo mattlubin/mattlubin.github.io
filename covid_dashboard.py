@@ -1,9 +1,3 @@
-# Note to graders: I got a lot of help from Claude Code (Opus 4.6):
-# First, I got a bit of help with streamlit syntax (and tools) because I wasn't familiar with it
-# Next, after I finished the whole thing, I asked Claude to help make a "normalize for population size" button
-# And all of that (REST Countries API, population data parsing, name mapping) was written by Claude
-# Hope that's ok!
-
 import streamlit as st
 import pandas as pd
 import plotly.express as px
