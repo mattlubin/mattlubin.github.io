@@ -310,24 +310,6 @@
             height: 100%;
         }
 
-        .graph-subtitle {
-            font-size: 11px;
-            color: var(--text-muted);
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            margin-bottom: 6px;
-        }
-
-        .control-description {
-            font-size: 12px;
-            color: var(--text-muted);
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            line-height: 1.4;
-            margin-top: -4px;
-            margin-bottom: 2px;
-            text-align: left;
-            width: 100%;
-        }
-
         .slider-container {
             width: 100%;
             display: flex;
@@ -582,8 +564,8 @@
             <p>Bacteria need to eat, and often, that means they need to get somewhere to find food. But they cannot see, they have no brains, and they are actually too small to even tell whether a tasty something is in front of them or behind them. 
                 Instead, they use a trick based on memory: bacteria such as <em>E. coli</em> just keep swimming, and compare the concentration of food <em>now</em> to the concentration that it was a moment ago. 
                 As Howard Berg put it, they have a nice philosophy of life: if life is getting better, keep going, and if life is getting worse, switch directions.</p>
-            <p>The new direction, though, is random, so the result is a "biased random walk." Considering the tiny size of most bacterial cells (a thousand of them could easily fit inside many of your human cells), this strategy still works out well overall.
-                In the simulation below, the <strong>orange triangle</strong> is chemotaxis-blind — it tumbles randomly with no memory of where it has been. The <strong>green oval</strong> uses chemotaxis, and you can adjust how sensitive it is.</p>
+            <p>The new direction, though, is random, so the result is a "biased random walk." Considering the tiny size of most bacterial cells (a thousand of them could easily fit inside many of your human cells), this strategy still works out well overall. 
+                In the simulation below, the triangle switches direction with 'medium' sensitivity, while the oval can be adjusted so that it changes directions more or less frequently</p>
         </div>
 
         <div class="container">
@@ -597,52 +579,37 @@
                     <div class="control-group">
                         <div class="control-header">
                             <div class="icon">
-                                <svg viewBox="0 0 24 24" fill="#ff6b6b">
-                                    <polygon points="12,4 20,19 4,19"/>
-                                </svg>
-                            </div>
-                            <span>Orange Triangle — chemotaxis blind</span>
-                        </div>
-                        <p class="control-description">No memory of concentration history. Tumbles at random intervals with no bias toward food. This is the baseline: a pure random walk.</p>
-                    </div>
-
-                    <div class="control-group">
-                        <div class="control-header">
-                            <div class="icon">
                                 <svg viewBox="0 0 24 24" fill="var(--biology)">
                                     <ellipse cx="12" cy="12" rx="8" ry="4"/>
                                 </svg>
                             </div>
-                            <span>Green Oval</span>
+                            <span>Sensitivity</span>
                         </div>
-                        <p class="control-description">How strongly it biases runs toward higher food concentration. Low = random walk; high = runs much longer up-gradient, shorter down-gradient.</p>
                         <div class="slider-container">
-                            <input type="range" min="0" max="100" value="90" class="slider" id="slider2" aria-label="Green oval sensitivity control">
+                            <input type="range" min="0" max="100" value="90" class="slider" id="slider2" aria-label="Sensitivity control">
                             <div class="slider-labels">
-                                <span>Blind (no bias)</span>
-                                <span>Max sensitivity</span>
+                                <span>Low</span>
+                                <span>High</span>
                             </div>
                             <div class="value-display" id="value2">Very High</div>
                         </div>
                         <div class="stats-display">
-                            <div class="stats-label">Avg run duration (green)</div>
+                            <div class="stats-label">Avg Run Length</div>
                             <div class="stats-value" id="stats2">0.0s</div>
                         </div>
                     </div>
 
                     <div class="graph-container">
                         <div class="graph-title">
-                            <span>Tumble fraction · green oval</span>
+                            <span>Tumble Fraction Over Time</span>
                         </div>
-                        <div class="graph-subtitle">0 = always running straight, 1 = always reorienting — lower means better navigation</div>
                         <canvas id="runLengthGraph" class="graph-canvas"></canvas>
                     </div>
 
                     <div class="graph-container">
                         <div class="graph-title">
-                            <span>Distance to food source · green oval</span>
+                            <span>Distance to Attractant Source</span>
                         </div>
-                        <div class="graph-subtitle">% of max possible distance — watch it fall as the bacterium homes in on the attractant</div>
                         <canvas id="distanceGraph" class="graph-canvas"></canvas>
                     </div>
                 </div>
@@ -651,54 +618,54 @@
 
         <div class="math-section">
             <h2>The Mathematical Model</h2>
-            <p>This version follows the teaching notebook's simple run-and-tumble loop. Bacteria alternate between run and tumble states, and use only one comparison: is concentration improving or worsening at the next step?</p>
+            <p>Each animation frame, the bacterium has a probability of tumbling. The sensitivity slider controls how much this probability changes based on whether the bacterium is swimming toward or away from the attractant.</p>
 
-            <p>Let <em>s</em> be sensitivity (0 to 1, controlled by the slider). We use a run-time bias factor:</p>
-
-            <div class="math-box">
-                <div class="equation">b<sub>up</sub> = 1 + s</div>
-                <div class="equation">b<sub>down</sub> = 1 / (1 + s)</div>
-                <div class="label">if concentration is increasing, use b<sub>up</sub>; otherwise use b<sub>down</sub></div>
-            </div>
-
-            <p>During runs, the countdown to next switch is updated as:</p>
+            <p>Let <em>s</em> be the sensitivity (0 to 1, controlled by the slider), and let <em>p</em><sub>base</sub> = 0.05 be the baseline tumble probability per frame. We define a multiplier:</p>
 
             <div class="math-box">
-                <div class="equation">&Delta;t<sub>switch</sub> = &Delta;t / b</div>
-                <div class="label">larger b means longer runs; smaller b means shorter runs</div>
+                <div class="equation">m = 200<sup>s</sup></div>
+                <div class="label">where s ranges from 0 (slider left) to 1 (slider right)</div>
             </div>
 
-            <p>So at max sensitivity, favorable motion makes runs about 2x longer and unfavorable motion makes runs about 2x shorter, matching the notebook logic.</p>
+            <p>The actual tumble probability depends on whether conditions are improving (swimming toward attractant) or worsening (swimming away):</p>
+
+            <div class="math-box">
+                <div class="equation">p<sub>tumble</sub> = p<sub>base</sub> / m &nbsp;&nbsp;(when improving)</div>
+                <div class="equation">p<sub>tumble</sub> = p<sub>base</sub> &times; m &nbsp;&nbsp;(when worsening)</div>
+                <div class="label">clamped to range [0.001, 0.5]</div>
+            </div>
+
+            <p>At maximum sensitivity, there is a 40,000-fold difference in tumble probability between improving and worsening conditions:</p>
 
             <table class="math-table">
                 <tr>
                     <th>Sensitivity</th>
-                    <th>b<sub>up</sub></th>
-                    <th>b<sub>down</sub></th>
-                    <th>Behavior</th>
+                    <th>Multiplier (m)</th>
+                    <th>P(tumble) improving</th>
+                    <th>P(tumble) worsening</th>
                 </tr>
                 <tr>
                     <td>0% (blind)</td>
                     <td>1</td>
-                    <td>1</td>
-                    <td>No bias</td>
+                    <td>0.050</td>
+                    <td>0.050</td>
                 </tr>
                 <tr>
                     <td>50%</td>
-                    <td>1.5</td>
-                    <td>0.67</td>
-                    <td>Moderate bias</td>
+                    <td>14.1</td>
+                    <td>0.0035</td>
+                    <td>0.500*</td>
                 </tr>
                 <tr>
                     <td>100% (max)</td>
-                    <td>2</td>
-                    <td>0.5</td>
-                    <td>Strong bias</td>
+                    <td>200</td>
+                    <td>0.00025</td>
+                    <td>0.500*</td>
                 </tr>
             </table>
-            <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: -0.5rem;">Run and tumble durations are still sampled from exponential distributions, as in the notebook.</p>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: -0.5rem;">* clamped to maximum of 0.5</p>
 
-            <p>The graph below shows the two run-time bias factors versus sensitivity.</p>
+            <p>The graph below shows how tumble probability varies with sensitivity. Note the logarithmic y-axis: the two curves diverge exponentially as sensitivity increases.</p>
 
             <div class="graph-container" style="max-width: 500px; margin: 1.5rem auto;">
                 <canvas id="theoreticalGraph" class="graph-canvas"></canvas>
@@ -708,7 +675,7 @@
                 </div>
             </div>
 
-            <p>Because this model is intentionally simple, it emphasizes the core idea: "if things get better, keep going; if things get worse, reorient sooner."</p>
+            <p>At maximum sensitivity, a bacterium heading away from the attractant tumbles within ~2 frames on average (traveling only ~8 pixels before reorienting), while one heading toward it can run for thousands of frames without tumbling.</p>
 
             <p>This is a simplified model. Real <em>E. coli</em> chemotaxis involves a few more bells and whistles. See <a href="https://www.pnas.org/doi/10.1073/pnas.83.23.8987">Segall, Block, and Berg (1986)</a> and <a href="https://link.springer.com/chapter/10.1007/0-387-22438-6_5">Murray (2006)</a>.</p>
         </div>
@@ -810,46 +777,46 @@ z`;
         canvasEl.style.clipPath = `path('${cornerRadiusPathTumble}')`;
 
         const backgroundColor = "#d6e9ff";
-        const speed = 350; // px/s
+        const speed = 4;
         const size = 14;
-        const dtMax = 0.05; // cap large frame gaps to keep dynamics stable
-
-        const createBacterium = (color, trackColor, sensitivity) => ({
-            heading: randomBetween(0, 359),
-            position: { x: randomBetween(0, width - size), y: randomBetween(0, height - size) },
-            isRunning: true,
-            stateTimeLeft: 0.1, // seconds until next switch
-            currentPositionHistory: [],
-            pastPositions: new Array(6).fill([]),
-            color,
-            trackColor,
-            sensitivity,
-            runLengths: [], // seconds
-            runStartTimestamp: performance.now(),
-            maxRunLengthSamples: 20,
-            tumbleTargetHeading: 0,
-            tumbleDuration: 0,
-            tumbleElapsed: 0,
-            tumbleStartHeading: 0,
-            tumbleStateHistory: [],
-            tumbleFractionHistory: [],
-            distanceHistory: []
-        });
-
-        const sensitivity1 = 0; // orange triangle is always chemotaxis-blind
-        let sensitivity2 = 0.9;
 
         // Bacterium 1 (Triangle)
         let bacteria1 = {
-            ...createBacterium("#ff6b6b", "#ff6b6b", sensitivity1),
-            tumbleStateHistory: undefined,
-            tumbleFractionHistory: undefined,
-            distanceHistory: undefined
+            heading: 0,
+            position: { x: 0, y: 0 },
+            isRunning: true,
+            timeSinceLastRunBegan: 0,
+            timeSinceLastTumbleBegan: 0,
+            currentRunDuration: 2000,  // Duration decided at run start
+            previousDistance: 0,  // Track distance at start of run
+            currentPositionHistory: [],
+            pastPositions: new Array(6).fill([]),
+            color: "#ff6b6b",
+            trackColor: "#ff6b6b",
+            sensitivity: 0.5,  // 0 = low sensitivity, 1 = high sensitivity
+            runLengths: [],  // Track run durations
+            maxRunLengthSamples: 20  // Rolling average of last 20 runs
         };
 
         // Bacterium 2 (Oval/Stadium)
         let bacteria2 = {
-            ...createBacterium("#00746d", "#00746d", 0.9)
+            heading: 0,
+            position: { x: 0, y: 0 },
+            isRunning: true,
+            timeSinceLastRunBegan: 0,
+            timeSinceLastTumbleBegan: 0,
+            currentRunDuration: 2000,  // Duration decided at run start
+            previousDistance: 0,  // Track distance at start of run
+            currentPositionHistory: [],
+            pastPositions: new Array(6).fill([]),
+            color: "#00746d",
+            trackColor: "#00746d",
+            sensitivity: 0.9,  // 0 = low sensitivity, 1 = high sensitivity
+            runLengths: [],  // Track run durations
+            maxRunLengthSamples: 20,  // Rolling average of last 20 runs
+            tumbleStateHistory: [],  // Rolling window of tumble states (true/false)
+            tumbleFractionHistory: [],  // Time series of tumble fraction for graphing
+            distanceHistory: []  // Time series data for distance to attractant
         };
 
         const attractant = [
@@ -857,13 +824,38 @@ z`;
         ];
 
         const reset = () => {
-            bacteria1 = {
-                ...createBacterium("#ff6b6b", "#ff6b6b", sensitivity1),
-                tumbleStateHistory: undefined,
-                tumbleFractionHistory: undefined,
-                distanceHistory: undefined
+            // Reset bacterium 1
+            bacteria1.heading = randomBetween(0, 359);
+            bacteria1.position = {
+                x: randomBetween(0, width - size),
+                y: randomBetween(0, height - size),
             };
-            bacteria2 = createBacterium("#00746d", "#00746d", sensitivity2);
+            bacteria1.isRunning = true;
+            bacteria1.timeSinceLastRunBegan = 0;
+            bacteria1.timeSinceLastTumbleBegan = 0;
+            bacteria1.currentPositionHistory = [];
+            bacteria1.pastPositions = new Array(6).fill([]);
+            bacteria1.runLengths = [];
+            bacteria1.currentRunDuration = 2000;
+            bacteria1.previousDistance = 0;
+
+            // Reset bacterium 2
+            bacteria2.heading = randomBetween(0, 359);
+            bacteria2.position = {
+                x: randomBetween(0, width - size),
+                y: randomBetween(0, height - size),
+            };
+            bacteria2.isRunning = true;
+            bacteria2.timeSinceLastRunBegan = 0;
+            bacteria2.timeSinceLastTumbleBegan = 0;
+            bacteria2.currentPositionHistory = [];
+            bacteria2.pastPositions = new Array(6).fill([]);
+            bacteria2.runLengths = [];
+            bacteria2.tumbleStateHistory = [];
+            bacteria2.tumbleFractionHistory = [];
+            bacteria2.distanceHistory = [];
+            bacteria2.currentRunDuration = 2000;
+            bacteria2.previousDistance = 0;
         };
 
         reset();
@@ -1084,72 +1076,78 @@ z`;
             return [prospectiveNewLocation, _positionWasReset];
         };
 
-        const concentrationAt = (x, y) => {
+        const updateBacterium = (bacterium, getTimeElapsed) => {
+            // Calculate distance to attractant center (gradient sensing)
             const a = attractant[0];
             const aCenter = { x: a.x + a.size / 2, y: a.y + a.size / 2 };
-            const r = calculateDistance({ x, y }, aCenter);
-            const scale = a.size / 2;
-            return 100 / (1 + r / scale);
-        };
 
-        const expSample = (meanSec) => -Math.log(1 - Math.random()) * meanSec;
-        const baseRunTimeSec = 0.12;
-        const meanTumbleTimeSec = 0.08;
+            const distBeforeMove = calculateDistance(bacterium.position, aCenter);
 
-        const updateBacterium = (bacterium, dtSec, nowMs) => {
-            const a = attractant[0];
-            const aCenter = { x: a.x + a.size / 2, y: a.y + a.size / 2 };
-            let positionWasReset = false;
+            let positionWasReset;
+            [bacterium.position, positionWasReset] = getNewLocation(
+                bacterium.heading,
+                speed,
+                bacterium.position
+            );
+
+            const distAfterMove = calculateDistance(bacterium.position, aCenter);
+
+            // Check if inside attractant visual area (for display only)
+            const isOnAttractant = distAfterMove < a.size / 2;
+
+            // CHEMOTAXIS: Only information available is gradient direction
+            // Compare current distance to distance from previous frame
+            const isImproving = !positionWasReset && (distAfterMove < distBeforeMove);
+
+            // Fixed tumble duration - long enough to be visually noticeable
+            const tumbleDuration = 500;
 
             if (bacterium.isRunning) {
-                bacterium.heading += randomBetween(-8, 8); // slight drift for visual smoothness
-                const oldConc = concentrationAt(bacterium.position.x, bacterium.position.y);
-                let next;
-                [next, positionWasReset] = getNewLocation(
-                    bacterium.heading,
-                    speed * dtSec,
-                    bacterium.position
-                );
+                bacterium.heading += randomBetween(-10, 10);
 
-                const newConc = concentrationAt(next.x, next.y);
-                const improving = !positionWasReset && newConc > oldConc;
-                const biasUp = 1 + bacterium.sensitivity;
-                const biasDown = 1 / (1 + bacterium.sensitivity);
-                const biasFactor = improving ? biasUp : biasDown;
+                // Per-frame tumble probability - this is the core of chemotaxis
+                // Use logarithmic scaling for sensitivity (models real receptor response)
+                // sensitivity 0->1 maps to multiplier using log scale
 
-                bacterium.position = next;
-                bacterium.stateTimeLeft -= dtSec / biasFactor;
+                const baseTumbleProb = 0.05; // ~3 tumbles per second at 60fps baseline
 
-                if (bacterium.stateTimeLeft <= 0) {
-                    const runLengthSec = (nowMs - bacterium.runStartTimestamp) / 1000;
-                    bacterium.runLengths.push(runLengthSec);
+                // Log-scaled sensitivity: 1 at sens=0, up to 200 at sens=1
+                const logMultiplier = Math.pow(200, bacterium.sensitivity);
+
+                let tumbleProb;
+                if (isImproving) {
+                    // Suppress tumbling strongly when heading toward attractant
+                    // Divide by logMultiplier: at max sensitivity, prob drops to 1/20th
+                    tumbleProb = baseTumbleProb / logMultiplier;
+                } else {
+                    // Increase tumbling when heading away
+                    // Multiply by logMultiplier: at max sensitivity, prob increases 20x
+                    tumbleProb = baseTumbleProb * logMultiplier;
+                }
+
+                // Clamp to reasonable range
+                tumbleProb = Math.min(0.5, Math.max(0.001, tumbleProb));
+
+                if (Math.random() < tumbleProb) {
+                    // Record run length before switching to tumble
+                    const runLength = getTimeElapsed() - bacterium.timeSinceLastRunBegan;
+                    bacterium.runLengths.push(runLength);
+
+                    // Keep only the last N samples for rolling average
                     if (bacterium.runLengths.length > bacterium.maxRunLengthSamples) {
                         bacterium.runLengths.shift();
                     }
+
                     bacterium.isRunning = false;
-                    const tumbleDur = expSample(meanTumbleTimeSec);
-                    bacterium.stateTimeLeft = tumbleDur;
-                    bacterium.tumbleDuration = tumbleDur;
-                    bacterium.tumbleElapsed = 0;
-                    bacterium.tumbleStartHeading = bacterium.heading;
-                    bacterium.tumbleTargetHeading = randomBetween(0, 360);
+                    bacterium.timeSinceLastTumbleBegan = getTimeElapsed();
                 }
             } else {
-                // Tumbling: stay in place, spin toward new heading
-                bacterium.tumbleElapsed += dtSec;
-                const t = Math.min(1, bacterium.tumbleElapsed / bacterium.tumbleDuration);
-                // Shortest-arc interpolation
-                let diff = bacterium.tumbleTargetHeading - bacterium.tumbleStartHeading;
-                if (diff > 180) diff -= 360;
-                if (diff < -180) diff += 360;
-                bacterium.heading = bacterium.tumbleStartHeading + diff * t;
+                bacterium.heading += randomBetween(-30, 30); // Tumble rotation
 
-                bacterium.stateTimeLeft -= dtSec;
-                if (bacterium.stateTimeLeft <= 0) {
+                if (getTimeElapsed() - bacterium.timeSinceLastTumbleBegan > tumbleDuration) {
+                    bacterium.heading = randomBetween(0, 360); // Pick new random direction
                     bacterium.isRunning = true;
-                    bacterium.heading = bacterium.tumbleTargetHeading;
-                    bacterium.stateTimeLeft = expSample(baseRunTimeSec);
-                    bacterium.runStartTimestamp = nowMs;
+                    bacterium.timeSinceLastRunBegan = getTimeElapsed();
                 }
             }
 
@@ -1162,8 +1160,7 @@ z`;
             }
             bacterium.currentPositionHistory.push({...bacterium.position});
 
-            const dist = calculateDistance(bacterium.position, aCenter);
-            return dist < a.size / 2;
+            return isOnAttractant;
         };
 
         canvasEl.addEventListener("click", reset);
@@ -1180,9 +1177,6 @@ z`;
             if (value < 75) return 'High';
             return 'Very High';
         };
-        value2.textContent = getSensitivityLabel(slider2.value);
-        sensitivity2 = slider2.value / 100;
-        bacteria2.sensitivity = sensitivity2;
 
         let lastGraphUpdate = 0;
         const graphUpdateInterval = 100; // Update graphs every 100ms
@@ -1193,7 +1187,7 @@ z`;
             // Update bacteria 2 stats display
             if (bacteria2.runLengths.length > 0) {
                 const avg2 = bacteria2.runLengths.reduce((a, b) => a + b, 0) / bacteria2.runLengths.length;
-                stats2.textContent = avg2.toFixed(2) + 's';
+                stats2.textContent = (avg2 / 1000).toFixed(2) + 's';
             }
 
             // Update graphs at intervals
@@ -1218,8 +1212,7 @@ z`;
                     const dist = calculateDistance(bacteria2.position, attractantCenter);
                     minDistance = Math.min(minDistance, dist);
                 });
-                const maxDistance = Math.sqrt(width * width + height * height);
-                bacteria2.distanceHistory.push(minDistance / maxDistance * 100);
+                bacteria2.distanceHistory.push(minDistance);
 
                 // Keep only recent data for graphs
                 if (bacteria2.tumbleFractionHistory.length > maxGraphPoints * 2) {
@@ -1233,8 +1226,9 @@ z`;
                 const graphColor = getComputedStyle(document.documentElement).getPropertyValue('--biology').trim() || '#2d7a5e';
                 // Tumble fraction graph: 0 to 1 (percentage of time tumbling)
                 drawGraph(runLengthCtx, runLengthCanvas, bacteria2.tumbleFractionHistory, graphColor, 'Tumble Fraction', 0, 1);
-                // Distance graph: 0 to 100% of max canvas dimension
-                drawGraph(distanceCtx, distanceCanvas, bacteria2.distanceHistory, graphColor, 'Distance (%)', 0, 100);
+                // Distance graph: 0 to max canvas dimension
+                const maxDistance = Math.sqrt(width * width + height * height);
+                drawGraph(distanceCtx, distanceCanvas, bacteria2.distanceHistory, graphColor, 'Distance (px)', 0, maxDistance);
 
                 lastGraphUpdate = currentTime;
             }
@@ -1243,13 +1237,9 @@ z`;
         // Animation loop with stats updates
         let lastStatsUpdate = 0;
         const statsUpdateInterval = 100;
-        let lastFrameTime = performance.now();
 
-        animate(() => {
+        animate((getTimeElapsed) => {
             const currentTime = Date.now();
-            const nowMs = performance.now();
-            const dtSec = Math.min((nowMs - lastFrameTime) / 1000, dtMax);
-            lastFrameTime = nowMs;
 
             if (currentTime - lastStatsUpdate > statsUpdateInterval) {
                 updateStats(currentTime);
@@ -1262,19 +1252,18 @@ z`;
             drawAttractant();
 
             // Update and draw bacterium 1 (triangle)
-            const isOnAttractant1 = updateBacterium(bacteria1, dtSec, nowMs);
+            const isOnAttractant1 = updateBacterium(bacteria1, getTimeElapsed);
             drawPositionHistory(bacteria1);
             drawTriangle(bacteria1, isOnAttractant1);
 
             // Update and draw bacterium 2 (oval)
-            const isOnAttractant2 = updateBacterium(bacteria2, dtSec, nowMs);
+            const isOnAttractant2 = updateBacterium(bacteria2, getTimeElapsed);
             drawPositionHistory(bacteria2);
             drawOval(bacteria2, isOnAttractant2);
         });
 
         slider2.addEventListener('input', (e) => {
-            sensitivity2 = e.target.value / 100;
-            bacteria2.sensitivity = sensitivity2;
+            bacteria2.sensitivity = e.target.value / 100;
             value2.textContent = getSensitivityLabel(e.target.value);
         });
 
@@ -1307,17 +1296,18 @@ z`;
             ctx.fillStyle = isDark ? '#1a1614' : '#f7fafc';
             ctx.fillRect(0, 0, cssWidth, cssHeight);
 
-            // Grid lines (linear scale)
-            const yValues = [0.5, 1.0, 1.5, 2.0];
+            // Grid lines (log scale: 0.001, 0.01, 0.1, 1)
+            const logValues = [0.001, 0.01, 0.1, 0.5];
             ctx.strokeStyle = isDark ? '#3a3530' : '#e2e8f0';
             ctx.lineWidth = 1;
 
-            const yMin = 0.5;
-            const yMax = 2.0;
-            const yRange = yMax - yMin;
+            const minLog = Math.log10(0.0001);
+            const maxLog = Math.log10(1);
+            const logRange = maxLog - minLog;
 
-            yValues.forEach(val => {
-                const y = padding.top + gHeight - ((val - yMin) / yRange) * gHeight;
+            logValues.forEach(val => {
+                const logVal = Math.log10(val);
+                const y = padding.top + gHeight - ((logVal - minLog) / logRange) * gHeight;
                 ctx.beginPath();
                 ctx.moveTo(padding.left, y);
                 ctx.lineTo(cssWidth - padding.right, y);
@@ -1346,7 +1336,7 @@ z`;
             ctx.save();
             ctx.translate(15, padding.top + gHeight / 2);
             ctx.rotate(-Math.PI / 2);
-            ctx.fillText('Run-time bias factor', 0, 0);
+            ctx.fillText('P(tumble)', 0, 0);
             ctx.restore();
 
             // Draw axes
@@ -1359,6 +1349,7 @@ z`;
             ctx.stroke();
 
             // Calculate and draw curves
+            const baseTumbleProb = 0.05;
             const numPoints = 100;
 
             // Worsening curve (red)
@@ -1367,10 +1358,13 @@ z`;
             ctx.beginPath();
             for (let i = 0; i <= numPoints; i++) {
                 const s = i / numPoints;
-                const factor = 1 / (1 + s);
+                const m = Math.pow(200, s);
+                let prob = baseTumbleProb * m;
+                prob = Math.min(0.5, Math.max(0.0001, prob));
 
                 const x = padding.left + s * gWidth;
-                const y = padding.top + gHeight - ((factor - yMin) / yRange) * gHeight;
+                const logProb = Math.log10(prob);
+                const y = padding.top + gHeight - ((logProb - minLog) / logRange) * gHeight;
 
                 if (i === 0) ctx.moveTo(x, y);
                 else ctx.lineTo(x, y);
@@ -1383,10 +1377,13 @@ z`;
             ctx.beginPath();
             for (let i = 0; i <= numPoints; i++) {
                 const s = i / numPoints;
-                const factor = 1 + s;
+                const m = Math.pow(200, s);
+                let prob = baseTumbleProb / m;
+                prob = Math.min(0.5, Math.max(0.0001, prob));
 
                 const x = padding.left + s * gWidth;
-                const y = padding.top + gHeight - ((factor - yMin) / yRange) * gHeight;
+                const logProb = Math.log10(prob);
+                const y = padding.top + gHeight - ((logProb - minLog) / logRange) * gHeight;
 
                 if (i === 0) ctx.moveTo(x, y);
                 else ctx.lineTo(x, y);
@@ -1396,7 +1393,7 @@ z`;
             // Mark baseline at s=0
             ctx.fillStyle = isDark ? '#9a9288' : '#718096';
             ctx.beginPath();
-            const baseY = padding.top + gHeight - ((1 - yMin) / yRange) * gHeight;
+            const baseY = padding.top + gHeight - ((Math.log10(0.05) - minLog) / logRange) * gHeight;
             ctx.arc(padding.left, baseY, 4, 0, 2 * Math.PI);
             ctx.fill();
         };

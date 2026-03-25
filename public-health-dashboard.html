@@ -1,0 +1,1349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Lives We Can Save — Global Health Interventions</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<script>
+// Generate a PNG favicon via Canvas so it works on file://, Safari, and all browsers.
+(function () {
+  var SVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">'
+    + '<rect width="512" height="512" rx="96" ry="96" fill="#f7f5f1"/>'
+    + '<path fill="#1a6b4a" transform="translate(40,40) scale(0.844)" d="'
+    + 'M57.7 193l9.4 16.4c8.3 14.5 21.9 25.2 38 29.8L163 255.7'
+    + 'c17.2 4.9 29 20.6 29 38.5l0 39.9c0 11 6.2 21 16 25.9'
+    + 's16 14.9 16 25.9l0 39c0 15.6 14.9 26.9 29.9 22.6'
+    + 'c16.1-4.6 28.6-17.5 32.7-33.8l2.8-11.2'
+    + 'c4.2-16.9 15.2-31.4 30.3-40l8.1-4.6'
+    + 'c15-8.5 24.2-24.5 24.2-41.7l0-8.3'
+    + 'c0-12.7-5.1-24.9-14.1-33.9l-3.9-3.9'
+    + 'c-9-9-21.2-14.1-33.9-14.1L257 256'
+    + 'c-11.1 0-22.1-2.9-31.8-8.4l-34.5-19.7'
+    + 'c-4.3-2.5-7.6-6.5-9.2-11.2c-3.2-9.6 1.1-20 10.2-24.5l5.9-3'
+    + 'c6.6-3.3 14.3-3.9 21.3-1.5l23.2 7.7'
+    + 'c8.2 2.7 17.2-.4 21.9-7.5c4.7-7 4.2-16.3-1.2-22.8l-13.6-16.3'
+    + 'c-10-12-9.9-29.5 .3-41.3l15.7-18.3'
+    + 'c8.8-10.3 10.2-25 3.5-36.7l-2.4-4.2'
+    + 'c-3.5-.2-6.9-.3-10.4-.3C163.1 48 84.4 108.9 57.7 193z'
+    + 'M464 256c0-36.8-9.6-71.4-26.4-101.5L412 164.8'
+    + 'c-15.7 6.3-23.8 23.8-18.5 39.8l16.9 50.7'
+    + 'c3.5 10.4 12 18.3 22.6 20.9l29.1 7.3'
+    + 'c1.2-9 1.8-18.2 1.8-27.5z'
+    + 'M0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256z"/>'
+    + '</svg>';
+  var canvas = document.createElement('canvas');
+  canvas.width = canvas.height = 64;
+  var ctx = canvas.getContext('2d');
+  var img = new Image();
+  img.onload = function () {
+    ctx.drawImage(img, 0, 0, 64, 64);
+    var link = document.querySelector("link[rel~='icon']") || document.createElement('link');
+    link.rel = 'icon';
+    link.type = 'image/png';
+    link.href = canvas.toDataURL('image/png');
+    document.head.appendChild(link);
+  };
+  img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(SVG);
+}());
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+<style>
+:root {
+  --bg:       #f7f5f1;
+  --surface:  #ffffff;
+  --surface2: #f0ece4;
+  --text:     #1a1714;
+  --muted:    #6a6560;
+  --faint:    #9e9890;
+  --green:    #1a6b4a;
+  --green-lt: #e6f2ec;
+  --amber:    #b85c14;
+  --amber-lt: #fdf0e4;
+  --border:   rgba(0,0,0,.07);
+  --border2:  rgba(0,0,0,.13);
+  --r:        10px;
+  --shadow:   0 1px 2px rgba(0,0,0,.04), 0 8px 28px rgba(0,0,0,.06);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 18px; scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Instrument Sans', system-ui, -apple-system, sans-serif;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Layout ── */
+.wrap { max-width: 1060px; margin: 0 auto; padding: 0 36px; }
+
+/* ── Nav ── */
+nav {
+  position: sticky; top: 0; z-index: 200;
+  background: rgba(247,245,241,.93);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border2);
+}
+.nav-row {
+  max-width: 1060px; margin: 0 auto; padding: 0 36px;
+  display: flex; align-items: center; gap: 0; height: 52px;
+}
+.nav-brand {
+  font-size: .82rem; font-weight: 700; color: var(--text);
+  text-decoration: none; white-space: nowrap; margin-right: 20px;
+}
+.nav-sep { width: 1px; height: 18px; background: var(--border2); margin: 0 14px; flex-shrink: 0; }
+.nav-links { display: flex; gap: 2px; flex-wrap: nowrap; list-style: none; }
+.nav-links a {
+  font-size: .78rem; font-weight: 500; color: var(--muted);
+  text-decoration: none; padding: 4px 10px; border-radius: 20px; white-space: nowrap;
+  transition: background .12s, color .12s;
+}
+.nav-links a:hover { background: var(--surface2); color: var(--text); }
+
+/* ── Typography ── */
+h1 { font-size: 3.8rem; font-weight: 700; line-height: 1.04; letter-spacing: -.035em; }
+h2 { font-size: 2.1rem; font-weight: 700; line-height: 1.1;  letter-spacing: -.025em; }
+h3 { font-size: 1.35rem; font-weight: 600; line-height: 1.2; letter-spacing: -.015em; }
+p  { line-height: 1.75; }
+a  { color: var(--green); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* ── Hero ── */
+.hero { padding: 90px 0 72px; }
+.eyebrow {
+  display: inline-block; font-size: .72rem; font-weight: 700;
+  letter-spacing: .14em; text-transform: uppercase;
+  color: var(--green); margin-bottom: 18px;
+}
+.hero h1 { max-width: 720px; margin-bottom: 22px; }
+.hero-sub {
+  font-size: 1.1rem; line-height: 1.78; color: var(--muted);
+  max-width: 600px; margin-bottom: 44px;
+}
+.callout {
+  background: var(--green-lt); border-left: 3px solid var(--green);
+  border-radius: 0 var(--r) var(--r) 0; padding: 16px 22px;
+  margin: 0 0 44px; font-size: .92rem; line-height: 1.72; max-width: 680px;
+}
+.hero-stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; max-width: 680px; }
+.hstat {
+  background: var(--surface); border: 1px solid var(--border2);
+  border-radius: var(--r); padding: 22px 24px;
+}
+.hstat-num {
+  font-size: 2.4rem; font-weight: 700; line-height: 1;
+  letter-spacing: -.03em; margin-bottom: 7px;
+}
+.hstat-label {
+  font-size: .72rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: .08em; color: var(--muted);
+}
+
+/* ── Section shell ── */
+.section-shell { padding: 72px 0; }
+.section-shell + .section-shell,
+.surface-shell + .section-shell,
+.section-shell + .surface-shell { border-top: 1px solid var(--border2); }
+.surface-shell { background: var(--surface); padding: 72px 0; border-top: 1px solid var(--border2); }
+
+.block-title {
+  font-size: 3rem; font-weight: 700; line-height: 1.05;
+  letter-spacing: -.03em; margin-bottom: 18px;
+}
+.block-sub {
+  font-size: 1.05rem; line-height: 1.78; color: var(--muted);
+  max-width: 620px; margin-bottom: 44px;
+}
+
+/* ── Chart card ── */
+.chart-card {
+  background: var(--surface); border: 1px solid var(--border2);
+  border-radius: var(--r); padding: 28px 32px; margin-bottom: 16px;
+}
+.chart-card-title { font-size: .92rem; font-weight: 600; margin-bottom: 3px; }
+.chart-card-sub   { font-size: .8rem; color: var(--muted); margin-bottom: 20px; }
+.source { font-size: .72rem; color: var(--faint); margin-top: 10px; }
+
+.mode-btns { display: flex; gap: 4px; margin-bottom: 18px; flex-wrap: wrap; }
+.mbtn {
+  font-size: .78rem; font-weight: 500; font-family: inherit;
+  padding: 5px 13px; border-radius: 20px;
+  border: 1.5px solid var(--border2); background: transparent;
+  color: var(--muted); cursor: pointer; transition: all .12s;
+}
+.mbtn.on { background: var(--text); color: var(--bg); border-color: var(--text); }
+
+/* ── Progress ── */
+.prog-global-track {
+  height: 7px; background: var(--border2); border-radius: 4px;
+  overflow: hidden; margin-bottom: 5px;
+}
+.prog-global-fill { height: 100%; background: linear-gradient(90deg,var(--green),#2d9068); border-radius: 4px; }
+.prog-global-label { font-size: .76rem; color: var(--muted); text-align: right; margin-bottom: 22px; }
+.prog-rows { display: flex; flex-direction: column; gap: 13px; }
+.prog-row { display: grid; grid-template-columns: 22px 160px 1fr 130px; align-items: center; gap: 12px; }
+.prog-icon { font-size: .95rem; text-align: center; }
+.prog-name { font-size: .85rem; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.prog-track { height: 5px; background: var(--border2); border-radius: 3px; overflow: hidden; }
+.prog-fill  { height: 100%; border-radius: 3px; opacity: .8; }
+.prog-stats { font-size: .75rem; color: var(--muted); text-align: right; white-space: nowrap; }
+
+/* ── Calculator ── */
+.calc-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: start; }
+.form-stack { display: flex; flex-direction: column; gap: 20px; }
+.flabel {
+  font-size: .72rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .08em; color: var(--muted); margin-bottom: 6px; display: block;
+}
+.fselect-wrap { position: relative; }
+.fselect-wrap::after {
+  content: '▾'; position: absolute; right: 12px; top: 50%;
+  transform: translateY(-50%); pointer-events: none; color: var(--muted); font-size: .8rem;
+}
+select, input[type=number] {
+  width: 100%; padding: 11px 14px; font-size: .95rem; font-family: inherit;
+  color: var(--text); background: var(--surface); border: 1.5px solid var(--border2);
+  border-radius: 8px; outline: none; transition: border-color .12s;
+  -webkit-appearance: none; appearance: none;
+}
+select:focus, input:focus { border-color: var(--green); }
+.calc-result {
+  background: var(--surface); border: 1px solid var(--border2);
+  border-radius: var(--r); padding: 28px 32px;
+  border-left: 4px solid var(--green);
+}
+.calc-result-tag {
+  font-size: .7rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .1em; color: var(--muted); margin-bottom: 12px;
+}
+.calc-lives {
+  font-size: 2.6rem; font-weight: 700; letter-spacing: -.03em;
+  line-height: 1; margin-bottom: 5px;
+}
+.calc-range { font-size: .8rem; color: var(--muted); margin-bottom: 18px; }
+.calc-hdiv { border: none; border-top: 1px solid var(--border2); margin: 14px 0; }
+.calc-dalys { font-size: 1.5rem; font-weight: 600; letter-spacing: -.02em; color: var(--green); margin-bottom: 4px; }
+.calc-dalys-range { font-size: .8rem; color: var(--muted); }
+.calc-note { font-size: .78rem; color: var(--muted); line-height: 1.6; margin-top: 14px; }
+
+/* ── Calculator charity links ── */
+.calc-orgs { margin-top: 4px; }
+.calc-org-label {
+  font-size: .68rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .08em; color: var(--muted); margin-bottom: 7px; display: block;
+}
+.calc-org-list { display: flex; flex-direction: column; gap: 5px; }
+.calc-org-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.calc-org-row-name {
+  font-size: .82rem; font-weight: 600; color: var(--text);
+  text-decoration: none;
+}
+.calc-org-row-name:hover { text-decoration: underline; }
+.calc-org-badge {
+  font-size: .67rem; font-weight: 700; padding: 2px 8px; border-radius: 10px;
+  text-decoration: none !important; transition: opacity .12s;
+}
+.calc-org-badge:hover { opacity: .8; }
+.badge-givewell { background: #DBEAFE; color: #1E40AF; }
+.badge-tlycs    { background: var(--green-lt); color: var(--green); }
+.badge-org      { background: #F3F4F6; border: 1px solid var(--border2); color: var(--muted); }
+
+/* ── Intervention cards ── */
+.int-nav-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 36px; }
+.int-nav-pill {
+  font-size: .8rem; font-weight: 600; color: #fff;
+  text-decoration: none; padding: 5px 13px; border-radius: 20px;
+  opacity: .82; transition: opacity .12s;
+}
+.int-nav-pill:hover { opacity: 1; text-decoration: none; }
+
+.int-grid { display: flex; flex-direction: column; gap: 10px; }
+.icard {
+  background: var(--surface); border: 1px solid var(--border2);
+  border-radius: var(--r); overflow: hidden;
+  transition: box-shadow .18s;
+}
+.icard:hover { box-shadow: var(--shadow); }
+.icard-hdr {
+  display: grid; grid-template-columns: 46px 1fr auto;
+  align-items: center; gap: 16px; padding: 18px 22px;
+  cursor: pointer; user-select: none; transition: background .12s;
+}
+.icard-hdr:hover { background: var(--surface2); }
+.icard-icon {
+  width: 42px; height: 42px; border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.25rem; flex-shrink: 0;
+}
+.icard-name { font-size: 1.1rem; font-weight: 600; letter-spacing: -.01em; }
+.icard-hl   { font-size: .8rem; color: var(--muted); margin-top: 2px; }
+.icard-right { display: flex; align-items: center; gap: 20px; flex-shrink: 0; }
+.ichip { text-align: right; }
+.ichip-num   { font-size: 1.05rem; font-weight: 700; letter-spacing: -.02em; }
+.ichip-label { font-size: .66rem; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); }
+.ichevron { color: var(--faint); font-size: .75rem; transition: transform .18s; margin-left: 6px; }
+.icard.open .ichevron { transform: rotate(180deg); }
+
+.icard-body {
+  display: none; padding: 0 22px 22px;
+  border-top: 1px solid var(--border2);
+}
+.icard.open .icard-body { display: block; }
+.icard-desc { font-size: .92rem; line-height: 1.75; padding: 18px 0 14px; max-width: 700px; }
+.icard-stats {
+  display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 14px;
+}
+.istat { background: var(--surface2); border-radius: 8px; padding: 13px 15px; }
+.istat-num   { font-size: 1.3rem; font-weight: 700; letter-spacing: -.02em; }
+.istat-label { font-size: .68rem; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); margin-top: 3px; }
+
+/* ── Trend chart inside card ── */
+.itrend-wrap {
+  background: var(--surface2); border-radius: 8px; padding: 16px 18px;
+  margin: 12px 0 12px;
+}
+.itrend-title {
+  font-size: .75rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .07em; color: var(--muted); margin-bottom: 10px;
+}
+
+.ilinks { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 10px; }
+.ilink {
+  font-size: .78rem; font-weight: 500; color: var(--green);
+  border: 1px solid rgba(26,107,74,.3); border-radius: 20px;
+  padding: 4px 11px; text-decoration: none; transition: background .12s;
+}
+.ilink:hover { background: var(--green-lt); text-decoration: none; }
+
+/* ── Chart pediatric checkbox ── */
+.chart-ped-label {
+  display: inline-flex; align-items: center; gap: 7px; margin-bottom: 16px;
+  font-size: .8rem; font-weight: 500; color: var(--muted); cursor: pointer;
+  user-select: none;
+}
+.chart-ped-label input[type=checkbox] {
+  width: 15px; height: 15px; padding: 0; border: none;
+  accent-color: var(--green); cursor: pointer;
+}
+
+/* ── Table ── */
+.tbl-wrap { overflow-x: auto; border: 1px solid var(--border2); border-radius: var(--r); background: var(--surface); }
+table { width: 100%; border-collapse: collapse; font-size: .85rem; }
+thead th {
+  background: var(--surface2); padding: 11px 15px; text-align: left;
+  font-size: .68rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .08em; color: var(--muted); border-bottom: 1px solid var(--border2);
+  white-space: nowrap; cursor: pointer; user-select: none;
+}
+thead th:hover { background: #e8e3da; }
+tbody td { padding: 13px 15px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover td { background: var(--surface2); }
+.dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; vertical-align: middle; }
+
+/* ── Footer ── */
+footer { border-top: 1px solid var(--border2); padding: 40px 0; }
+.footer-inner { max-width: 1060px; margin: 0 auto; padding: 0 36px; font-size: .8rem; color: var(--muted); line-height: 1.75; }
+
+/* ── GiveWell evaluation note ── */
+.gw-note {
+  font-size: .72rem; color: var(--muted); line-height: 1.55;
+  margin-top: 5px; padding: 6px 9px;
+  background: var(--surface2); border-radius: 5px;
+  border-left: 2px solid var(--border2);
+}
+
+/* ── Charity flares in intervention cards ── */
+.icard-charities { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border2); }
+.icard-charity-label {
+  font-size: .68rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .08em; color: var(--muted); margin-bottom: 9px; display: block;
+}
+.icard-charity-list { display: flex; flex-direction: column; gap: 7px; }
+.icard-charity-item {
+  display: flex; flex-direction: column; gap: 3px;
+  padding: 9px 12px; background: var(--surface2); border-radius: 7px;
+}
+.icard-charity-name { font-size: .82rem; font-weight: 600; }
+.icard-charity-badges { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 3px; }
+.icard-charity-note {
+  font-size: .71rem; color: var(--muted); line-height: 1.55;
+  margin-top: 5px; padding: 5px 8px;
+  background: var(--bg); border-radius: 4px;
+  border-left: 2px solid var(--border2);
+}
+
+/* ── Sources & Methods section ── */
+.sources-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 36px 48px;
+  margin-top: 36px;
+}
+.source-block h4 {
+  font-size: .75rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .1em; color: var(--muted); margin-bottom: 12px;
+  padding-bottom: 6px; border-bottom: 1px solid var(--border2);
+}
+.source-block ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.source-block li { font-size: .83rem; line-height: 1.65; }
+.method-note {
+  font-size: .85rem; line-height: 1.78; color: var(--muted);
+  max-width: 860px; margin-top: 32px; padding: 18px 22px;
+  background: var(--surface2); border-radius: var(--r);
+}
+
+/* ── Responsive ── */
+@media (max-width: 720px) {
+  h1 { font-size: 2.5rem; }
+  h2 { font-size: 1.6rem; }
+  .block-title { font-size: 2.1rem; }
+  .hero-stats { grid-template-columns: 1fr 1fr; }
+  .calc-layout { grid-template-columns: 1fr; }
+  .icard-stats { grid-template-columns: 1fr 1fr; }
+  .icard-right { display: none; }
+  .prog-row { grid-template-columns: 22px 1fr 2fr 90px; }
+  .prog-name { display: none; }
+  .sources-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- ── NAV ─────────────────────────────────────────────────────────────── -->
+<nav>
+  <div class="nav-row">
+    <a href="#hero" class="nav-brand">🌍 The Lives We Can Save</a>
+    <div class="nav-sep"></div>
+    <ul class="nav-links">
+      <li><a href="#block-past">Lives have been saved</a></li>
+      <li><a href="#block-future">We can still do better</a></li>
+      <li><a href="#calculator">Calculator</a></li>
+      <li><a href="#interventions">Interventions</a></li>
+      <li><a href="#sources">Sources</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- ── HERO ─────────────────────────────────────────────────────────────── -->
+<div id="hero">
+  <div class="wrap">
+    <div class="hero">
+      <span class="eyebrow">Global Public Health · 10 Interventions</span>
+      <h1>The Lives<br>We Can Save</h1>
+      <p class="hero-sub">The world has made extraordinary progress against premature death. But millions more people are still dying from causes we know how to prevent, at costs far lower than we spend on almost anything else.</p>
+      <p class="hero-sub" style="margin-top:-28px">This site focuses on the <strong>ten best-documented mortality-reducing</strong> public health interventions. In many of these cases, a dollar can be directly traced to a life saved. It does not cover the broader landscape of quality-of-life improvements, mental health, disability, or non-communicable disease management: only interventions where mortality impact has been rigorously quantified.</p>
+      <div class="callout">
+        <strong>📖 What is a DALY?</strong>&ensp;A <a href="https://en.wikipedia.org/wiki/Disability-adjusted_life_year" target="_blank">Disability-Adjusted Life Year</a> measures years of healthy life lost — one DALY equals one year of healthy life lost to disease or premature death. The WHO considers interventions below <strong>$1,000/DALY</strong> highly cost-effective in low-income settings. Several interventions here cost as little as <strong>$2–6/DALY</strong>.
+      </div>
+      <div class="hero-stats" id="hero-stats"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── BLOCK I ────────────────────────────────────────────────────────────── -->
+<div id="block-past" class="surface-shell">
+  <div class="wrap">
+    <div class="block-title">The world world is much better.</div>
+    <p class="block-sub">Ten public health measures, including vaccines, oral rehydration therapy, antiretroviral treatment, and clean water have collectively transformed human survival. The ten interventions tracked here now save an estimated <strong id="stat-current"></strong> every year.</p>
+
+    <div class="chart-card">
+      <div class="chart-card-title">Impact of 10 Life-Saving Public Health Interventions</div>
+      <p class="chart-card-sub">Toggle between annual impact, cumulative lives saved, and cost-effectiveness.</p>
+      <div class="mode-btns">
+        <button class="mbtn on" onclick="setMode('lives_yr',this)">Lives saved / year</button>
+        <button class="mbtn"    onclick="setMode('lives_tot',this)">Total lives saved</button>
+        <button class="mbtn"    onclick="setMode('cost_daly',this)">Cost per DALY (USD)</button>
+      </div>
+      <label class="chart-ped-label">
+        <input type="checkbox" class="ped-chart-cb" onchange="setPedMode(this)">
+        Show pediatric share within bars (children under 5)
+      </label>
+      <canvas id="chart1" style="max-height:380px"></canvas>
+      <p class="source">Source: WHO · Lancet 2024 · GiveWell 2024 · DCP3 · Our World in Data</p>
+    </div>
+  </div>
+</div>
+
+<!-- ── BLOCK II ───────────────────────────────────────────────────────────── -->
+<div id="block-future" class="surface-shell">
+  <div class="wrap">
+    <div class="block-title" style="color:var(--amber)">The world can be made much better.</div>
+    <p class="block-sub">The same interventions that have already saved millions are still not reaching everyone who needs them. An estimated <strong id="stat-additional"></strong> per year are within reach at current coverage targets.</p>
+
+    <div class="chart-card">
+      <div class="chart-card-title">Coverage Progress — Current vs. Full Potential</div>
+      <p class="chart-card-sub">Each bar shows what fraction of the achievable impact is currently being realised.</p>
+      <div id="prog-global-wrap" style="margin-bottom:8px"></div>
+      <div class="prog-rows" id="prog-rows"></div>
+      <p class="source" style="margin-top:18px">Source: WHO · Our World in Data · GiveWell 2024</p>
+    </div>
+
+    <div class="chart-card">
+      <div class="chart-card-title">Additional Lives Saveable per $1 Million Invested</div>
+      <p class="chart-card-sub">Where can additional dollars save the most lives? Central estimate = $1M ÷ √(cost_low × cost_high).</p>
+      <label class="chart-ped-label">
+        <input type="checkbox" class="ped-chart-cb" onchange="setPedMode(this)">
+        Show pediatric share within bars (children under 5)
+      </label>
+      <canvas id="chart2" style="max-height:360px"></canvas>
+      <p class="source">Source: GiveWell 2024 · DCP3 · Geometric mean of published cost-per-life bounds</p>
+    </div>
+  </div>
+</div>
+
+<!-- ── CALCULATOR ─────────────────────────────────────────────────────────── -->
+<div id="calculator" class="section-shell">
+  <div class="wrap">
+    <h2 style="margin-bottom:10px">💰 How Much Impact Can You Have?</h2>
+    <p style="color:var(--muted); font-size:1rem; max-width:580px; margin-bottom:40px">Enter a donation amount and choose an intervention to see your estimated impact, with cost-effectiveness data from <a href="https://www.givewell.org" target="_blank">GiveWell</a>, <a href="https://www.dcp-3.org" target="_blank">DCP3</a>, and <a href="https://www.thelifeyoucansave.org" target="_blank">The Life You Can Save</a>.</p>
+
+    <div class="calc-layout">
+      <div class="form-stack">
+        <div>
+          <label class="flabel" for="ci">Intervention</label>
+          <div class="fselect-wrap">
+            <select id="ci" onchange="calc()"></select>
+          </div>
+        </div>
+        <div>
+          <label class="flabel" for="ca">Donation amount (USD)</label>
+          <input type="number" id="ca" value="100" min="1" max="10000000" step="10" oninput="calc()">
+        </div>
+        <p class="calc-note">The central estimate uses the <strong>geometric mean</strong> of published low/high cost-per-life bounds — appropriate because cost-effectiveness ranges span multiplicative uncertainty.</p>
+      </div>
+      <div class="calc-result" id="calc-result"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── INTERVENTIONS ──────────────────────────────────────────────────────── -->
+<div id="interventions" class="surface-shell">
+  <div class="wrap">
+    <h2 style="margin-bottom:10px">Ten Interventions in Detail</h2>
+    <p style="color:var(--muted); font-size:1rem; margin-bottom:32px">Click any card to expand its full description, statistics, historical trend, and source links.</p>
+    <div class="int-nav-pills" id="int-pills"></div>
+    <div class="int-grid" id="int-grid"></div>
+  </div>
+</div>
+
+<!-- ── SUMMARY TABLE ──────────────────────────────────────────────────────── -->
+<div class="section-shell">
+  <div class="wrap">
+    <h2 style="margin-bottom:10px">All Ten Interventions at a Glance</h2>
+    <p style="color:var(--muted); font-size:1rem; margin-bottom:28px">Click column headers to sort.</p>
+    <div class="tbl-wrap">
+      <table id="summary-table">
+        <thead>
+          <tr>
+            <th onclick="sortTable(0)"></th>
+            <th onclick="sortTable(1)">Intervention ↕</th>
+            <th onclick="sortTable(2)">Lives / Year ↕</th>
+            <th onclick="sortTable(3)">Total Saved ↕</th>
+            <th onclick="sortTable(4)">Additional / Year ↕</th>
+            <th onclick="sortTable(5)">Pediatric % ↕</th>
+            <th onclick="sortTable(6)">Cost / DALY ↕</th>
+            <th onclick="sortTable(7)">Cost / Life ↕</th>
+            <th onclick="sortTable(8)">Period</th>
+          </tr>
+        </thead>
+        <tbody id="tbl-body"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ── SOURCES & METHODS ──────────────────────────────────────────────────── -->
+<div id="sources" class="surface-shell">
+  <div class="wrap">
+    <h2 style="margin-bottom:10px">Sources &amp; Methods</h2>
+    <p style="color:var(--muted); font-size:1rem; max-width:700px; margin-bottom:4px">All numbers on this page are drawn from peer-reviewed literature, international health agency databases, and the published evaluations of GiveWell and The Life You Can Save. Where multiple estimates exist, we report the range and note uncertainties. This section documents primary sources and key methodological choices.</p>
+
+    <div class="sources-grid">
+
+      <div class="source-block">
+        <h4>Mortality &amp; Disease Burden</h4>
+        <ul>
+          <li><strong>Immunization (50 years):</strong> Hollingsworth et al. (2024). "Vaccine-preventable deaths averted, 1974–2024." <em>The Lancet.</em> <a href="https://www.thelancet.com/journals/lancet/article/PIIS0140-6736(24)00850-X/fulltext" target="_blank">Full text ↗</a><br><span style="color:var(--faint);font-size:.78rem">154 million lives saved over 50 years of EPI. Measles alone: 93.7M of total.</span></li>
+          <li><strong>Immunization (modelled, 2000–2030):</strong> Toor et al. / Vaccine Impact Modelling Consortium (2021). "Lives saved with vaccination for 10 pathogens across 112 countries." <em>eLife.</em> <a href="https://elifesciences.org/articles/67635" target="_blank">Full text ↗</a><br><span style="color:var(--faint);font-size:.78rem">50 million deaths averted 2000–2019; 97 million projected by 2030 (80–120M 95% CI). 21 mathematical models using standardised demographic and coverage inputs.</span></li>
+          <li><strong>Malaria:</strong> WHO World Malaria Report 2024. <a href="https://www.who.int/teams/global-malaria-programme/reports/world-malaria-report-2024" target="_blank">↗</a><br><span style="color:var(--faint);font-size:.78rem">597,000 deaths in 2023; 76% children under 5. 11.7M lives saved since 2000 through scale-up of ITNs, ACTs, and IRS.</span></li>
+          <li><strong>HIV/AIDS:</strong> UNAIDS Global AIDS Update 2024. <a href="https://www.unaids.org/en/resources/documents/2024/global-aids-update-2024" target="_blank">↗</a><br><span style="color:var(--faint);font-size:.78rem">630,000 AIDS-related deaths in 2023; 77% of PLHIV on ART globally. PEPFAR: 25M+ lives saved (State Dept. estimate).</span></li>
+          <li><strong>Water &amp; Sanitation:</strong> WHO/UNICEF Joint Monitoring Programme (JMP). <a href="https://washdata.org/" target="_blank">↗</a><br><span style="color:var(--faint);font-size:.78rem">829,000 deaths/year from unsafe drinking water; 1.4M/year from poor sanitation and hygiene.</span></li>
+          <li><strong>Tuberculosis:</strong> WHO Global TB Report 2024. <a href="https://www.who.int/teams/global-tuberculosis-programme/tb-reports/global-tuberculosis-report-2024" target="_blank">↗</a><br><span style="color:var(--faint);font-size:.78rem">1.25M deaths in 2023; WHO estimates 75M lives saved since 2000 through DOTS and related programs.</span></li>
+          <li><strong>Oral Rehydration Therapy:</strong> GBD / WHO / UNICEF diarrheal disease estimates; Nalin et al. (1978). <em>The Lancet.</em><br><span style="color:var(--faint);font-size:.78rem">438,000 under-5 diarrheal deaths in 2021 (GBD). ORS reduces diarrheal mortality by up to 93% (Lancet 1978).</span></li>
+          <li><strong>Tobacco:</strong> WHO Global Health Observatory / IHME Global Burden of Disease.<br><span style="color:var(--faint);font-size:.78rem">8M+ deaths/year attributable to tobacco. 22M deaths averted 2008–2014 by MPOWER policies (WHO estimate).</span></li>
+        </ul>
+      </div>
+
+      <div class="source-block">
+        <h4>Cost-Effectiveness Estimates</h4>
+        <ul>
+          <li><strong>Primary framework:</strong> Disease Control Priorities, 3rd edition (DCP3). <a href="https://www.dcp-3.org/" target="_blank">↗</a><br><span style="color:var(--faint);font-size:.78rem">Authoritative synthesis of cost-per-DALY and cost-per-life estimates. TB DOTS cited as ~$2–8/DALY — among the most cost-effective medical interventions documented.</span></li>
+          <li><strong>GiveWell cost-effectiveness models (2023–2024):</strong> <a href="https://www.givewell.org/how-we-work/our-criteria/cost-effectiveness" target="_blank">↗</a><br><span style="color:var(--faint);font-size:.78rem">Used for AMF (nets), Malaria Consortium (SMC), HKI (Vitamin A), New Incentives (vaccination incentives). GiveWell publishes full models with assumptions.</span></li>
+          <li><strong>Vitamin A (VAS):</strong> Imdad et al. (2022). Cochrane Review. <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8925277/" target="_blank">↗</a><br><span style="color:var(--faint);font-size:.78rem">12–24% all-cause child mortality reduction from semi-annual supplementation. GiveWell estimates 9–59× WHO cost-effectiveness threshold.</span></li>
+          <li><strong>Water chlorination (historical):</strong> Cutler &amp; Miller (2005). <em>Journal of Health Economics.</em> <a href="https://scholar.harvard.edu/files/cutler/files/cutler_miller_cities.pdf" target="_blank">↗</a><br><span style="color:var(--faint);font-size:.78rem">~50% of 20th-century US urban mortality decline attributable to municipal water chlorination and filtration.</span></li>
+          <li><strong>Water chlorination (RCT):</strong> Kremer et al. (2022). NBER Working Paper 29447. <a href="https://www.nber.org/papers/w29447" target="_blank">↗</a><br><span style="color:var(--faint);font-size:.78rem">Kenya RCT: chlorine dispensers reduced child mortality by 63–67%.</span></li>
+          <li><strong>Tobacco tax:</strong> Ngo et al. (2021). <em>Nature Medicine.</em> <a href="https://www.nature.com/articles/s41591-020-01210-8" target="_blank">↗</a><br><span style="color:var(--faint);font-size:.78rem">A universal $1/pack tax increase could prevent 15M deaths over 10 years and reduce global smokers by 66 million.</span></li>
+          <li><strong>AMR mortality:</strong> Murray et al. (2022). <em>The Lancet.</em><br><span style="color:var(--faint);font-size:.78rem">1.27M deaths directly attributable to drug-resistant infections in 2019; 10M/year projected by 2050 without action.</span></li>
+        </ul>
+      </div>
+
+      <div class="source-block">
+        <h4>Charity Evaluator Notes</h4>
+        <ul>
+          <li><strong>GiveWell Top Charities (2024):</strong> Against Malaria Foundation, Malaria Consortium, Helen Keller International, New Incentives. These are the only four currently recommended organisations. GiveWell discontinued its "Standout Charity" tier in October 2021. <a href="https://www.givewell.org/charities/top-charities" target="_blank">↗</a></li>
+          <li><strong>The Life You Can Save (TLYCS):</strong> Recommends ~23 charities across health, education, and economic empowerment. All four GiveWell top charities are also TLYCS-recommended. TLYCS has a broader mandate and does not apply GiveWell's strict cost-per-DALY filter. <a href="https://www.thelifeyoucansave.org/best-charities/" target="_blank">↗</a></li>
+          <li><strong>Gavi, the Vaccine Alliance:</strong> GiveWell reviewed Gavi in 2011–2018 and concluded that private donations would not produce additional impact because institutional donors (governments, Gates Foundation) already fully fund Gavi's programs. GiveWell explicitly notes their analysis predates COVID-19 and the funding landscape may have changed. <a href="https://www.givewell.org/international/top-charities/Gavi" target="_blank">↗</a></li>
+          <li><strong>Evidence Action — Dispensers for Safe Water:</strong> GiveWell committed $64.7M in 2022 but declined to renew Kenya funding in August 2024 after independent surveys found actual program reach (~2M people) was ~40% below projections (~4.7M), and the program fell below GiveWell's rising cost-effectiveness threshold (~10× cash benchmark). This case led GiveWell to invest more heavily in independent data verification across all grants.</li>
+          <li><strong>Stop TB Partnership:</strong> Was a GiveWell top charity in 2009 (praised for coverage requirements, spot-check audits, public non-compliance disclosures). No longer recommended: GiveWell found that marginal private funding would flow to MDR-TB programs rather than first-line DOTS treatment, with uncertain cost-effectiveness.</li>
+          <li><strong>MSF (Médecins Sans Frontières):</strong> Not a GiveWell top charity. GiveWell previously awarded "Special Recognition" for MSF's exceptional transparency — unusually, MSF published honest accounts of underperforming programs including a failed China TB effort. That recognition page is now marked outdated.</li>
+        </ul>
+      </div>
+
+      <div class="source-block">
+        <h4>Methodology</h4>
+        <ul>
+          <li><strong>Cost-per-life calculator:</strong> Uses the <strong>geometric mean</strong> of published low/high cost-per-life bounds. This is appropriate because cost-effectiveness ranges span multiplicative uncertainty (e.g., $500–$5,000) rather than additive uncertainty — the geometric mean ($1,581) is less biased than the arithmetic mean ($2,750).</li>
+          <li><strong>"Additional lives reachable":</strong> Difference between lives saved at current coverage and lives that would be saved at full (or WHO target) coverage, holding all other variables constant. A rough approximation — real-world marginal costs typically increase as coverage approaches 100%.</li>
+          <li><strong>Pediatric shares:</strong> Derived from intervention-specific literature. Immunization: WHO/UNICEF data + Lancet 2024. Malaria: WHO Malaria Report (76% U5). HIV: UNAIDS data (~8% of deaths are children under 15). Vitamin A: 100% (programme targets children under 5 by definition).</li>
+          <li><strong>Historical trend data:</strong> Global aggregates from WHO GHO, UNAIDS, WHO/UNICEF JMP, IHME Global Burden of Disease. Values are estimates; methodologies have changed over time (interpret long-run trends as directional, not precise).</li>
+          <li><strong>DALYs:</strong> Disability-Adjusted Life Years from DCP3 and WHO cost-effectiveness databases. The WHO defines interventions below $1,000/DALY as highly cost-effective in low-income settings; several interventions here are $2–8/DALY.</li>
+          <li><strong>Framing:</strong> Based on Max Roser's essay <a href="https://ourworldindata.org/much-better-awful-can-be-better" target="_blank">"The world is awful. The world is much better. The world can be much better."</a></li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div class="method-note">
+      <strong>Important caveats:</strong> Numbers on this page aggregate across geographies, time periods, and methodologies with different assumptions. Cost-effectiveness estimates can vary 10–100× depending on country, implementation quality, and counterfactual assumptions. Lives-saved estimates involve substantial modelling uncertainty — note the 95% credible intervals where cited (e.g., the VIMC immunization estimate of 97M has a CI of 80–120M). This page is best interpreted as indicating <em>orders of magnitude</em> of impact, not precise accounting. Consult primary sources before making significant decisions.
+    </div>
+  </div>
+</div>
+
+<!-- ── FOOTER ─────────────────────────────────────────────────────────────── -->
+<footer>
+  <div class="footer-inner">
+    <p><strong>Primary sources:</strong>
+      <a href="https://elifesciences.org/articles/67635" target="_blank">VIMC/eLife 2021</a> ·
+      <a href="https://www.thelancet.com/journals/lancet/article/PIIS0140-6736(24)00850-X/fulltext" target="_blank">Lancet 2024 (EPI)</a> ·
+      <a href="https://www.who.int/data/gho" target="_blank">WHO GHO</a> ·
+      <a href="https://www.givewell.org" target="_blank">GiveWell</a> ·
+      <a href="https://www.dcp-3.org" target="_blank">DCP3</a> ·
+      <a href="https://www.thelifeyoucansave.org" target="_blank">The Life You Can Save</a> ·
+      <a href="https://www.unaids.org" target="_blank">UNAIDS</a> ·
+      <a href="https://washdata.org" target="_blank">WHO/UNICEF JMP</a> ·
+      <a href="https://ourworldindata.org" target="_blank">Our World in Data</a>
+    </p>
+    <p style="margin-top:8px">Framing based on Max Roser's essay <a href="https://ourworldindata.org/much-better-awful-can-be-better" target="_blank">"The world is awful. The world is much better. The world can be much better."</a> · Full citations and methodological notes: <a href="#sources">Sources &amp; Methods ↑</a></p>
+    <p style="margin-top:8px; color:var(--faint)">Historical trend data: WHO GHO, UNAIDS, WHO/UNICEF JMP, IHME GBD. Trend values are global aggregates with changing methodologies; interpret directionally. Cost-effectiveness calculator uses geometric mean of published low/high bounds. All estimates involve substantial uncertainty — see Sources &amp; Methods for caveats.</p>
+  </div>
+</footer>
+
+<!-- ── SCRIPT ─────────────────────────────────────────────────────────────── -->
+<script>
+// ── Intervention data ───────────────────────────────────────────────────────
+const IV = [
+  { id:'immunization', name:'Immunization', full:'Childhood Immunization (EPI Vaccines)', icon:'💉', color:'#1565C0',
+    lpy:4_400_000, ltot:154_000_000, dpy:204_000_000, add:1_600_000,
+    cov:85, tgt:95, cplLo:1_000, cplHi:3_000, cpdLo:6, cpdHi:100, ped:.948, period:'1974–2024',
+    hl:'154 million lives saved over 50 years',
+    desc:'~1.6 million additional lives per year could be saved by closing the global vaccination gap — bringing DTP3 coverage from 85% to universal. The WHO Expanded Programme on Immunization (EPI), launched in 1974, has already saved an estimated <strong>154 million lives</strong> — the single greatest public health achievement in recorded history (<a href="https://www.thelancet.com/journals/lancet/article/PIIS0140-6736(24)00850-X/fulltext" target="_blank">Lancet 2024</a>). The measles vaccine alone accounts for 93.7 million of those lives. A landmark modelling study by the <a href="https://www.vaccineimpact.org/" target="_blank">Vaccine Impact Modelling Consortium</a> (VIMC) estimated that vaccination against 10 pathogens averted <strong>50 million deaths</strong> across 112 countries from 2000 to 2019, with 97 million deaths projected to be averted by 2030 (80–120M 95% credible interval) using 21 standardised mathematical models (<a href="https://elifesciences.org/articles/67635" target="_blank">Toor et al., eLife 2021</a>). At 85% DTP3 coverage, 4.4 million deaths are averted every year — but 15% of the world\'s children remain unvaccinated, concentrated in sub-Saharan Africa and South Asia.',
+    links:{ 'Wikipedia':'https://en.wikipedia.org/wiki/Vaccination', 'WHO EPI':'https://www.who.int/teams/immunization-vaccines-and-biologicals/essential-programme-on-immunization', 'OWID':'https://ourworldindata.org/vaccination', 'Lancet 2024':'https://www.thelancet.com/journals/lancet/article/PIIS0140-6736(24)00850-X/fulltext', 'VIMC/eLife 2021':'https://elifesciences.org/articles/67635' },
+    trend:{ label:'DTP3 coverage (%)', unit:'%', src:'WHO/UNICEF Immunization Coverage Estimates', dir:'up',
+      years:[1980,1985,1990,1995,2000,2005,2010,2015,2019,2021,2022,2023],
+      values:[22,43,71,72,72,79,84,86,85,81,83,84] }
+  },
+  { id:'malaria', name:'Malaria Control', full:'Malaria Control (ITNs, ACTs, IRS, Vaccines)', icon:'🦟', color:'#E65100',
+    lpy:1_000_000, ltot:11_700_000, dpy:37_200_000, add:300_000,
+    cov:59, tgt:80, cplLo:3_000, cplHi:8_000, cpdLo:37, cpdHi:296, ped:.78, period:'2000–2024',
+    hl:'11.7 million lives saved since 2000',
+    desc:'Malaria is almost entirely preventable — yet it killed <strong>597,000 people in 2023</strong>, 76% of them children under five. Scaling insecticide-treated nets (ITNs) to full coverage could prevent 300,000+ additional deaths per year. Since 2000, the scale-up of ITNs, <a href="https://en.wikipedia.org/wiki/Artemisinin" target="_blank">artemisinin combination therapies</a>, and indoor residual spraying has already saved 11.7 million lives — but coverage has plateaued, and 480 million people at risk still sleep without a net. The new <a href="https://en.wikipedia.org/wiki/R21/Matrix-M" target="_blank">R21/Matrix-M vaccine</a>, WHO-approved in 2023, offers 77% efficacy at $5–15/dose.',
+    links:{ 'Wikipedia':'https://en.wikipedia.org/wiki/Malaria', 'WHO Fact Sheet':'https://www.who.int/news-room/fact-sheets/detail/malaria', 'OWID':'https://ourworldindata.org/malaria', 'GiveWell':'https://www.givewell.org/cause-area/malaria' },
+    trend:{ label:'Deaths (thousands/year)', unit:'K deaths', src:'WHO World Malaria Report', dir:'down',
+      years:[2000,2004,2008,2010,2012,2015,2017,2019,2020,2021,2022,2023],
+      values:[896,840,755,660,628,438,453,558,625,619,593,597] }
+  },
+  { id:'hiv_aids', name:'HIV/AIDS Treatment', full:'HIV/AIDS Treatment (Antiretroviral Therapy)', icon:'🔴', color:'#B71C1C',
+    lpy:2_000_000, ltot:25_000_000, dpy:null, add:540_000,
+    cov:77, tgt:95, cplLo:5_000, cplHi:20_000, cpdLo:131, cpdHi:1691, ped:.08, period:'2003–2024',
+    hl:'25+ million lives saved by PEPFAR',
+    desc:'~540,000 additional lives per year could be saved by reaching the 23% of people living with HIV who are not yet on antiretroviral therapy. <a href="https://www.state.gov/pepfar/" target="_blank">PEPFAR</a>, launched in 2003, has already saved over 25 million lives and supported 7.8 million HIV-free births. The <a href="https://www.unaids.org/" target="_blank">UNAIDS 95-95-95 target</a> — 95% diagnosed, 95% on treatment, 95% virally suppressed — is achievable with existing tools. Only 57% of HIV-positive children (vs 77% of adults) currently receive treatment.',
+    links:{ 'Wikipedia':'https://en.wikipedia.org/wiki/HIV/AIDS', 'UNAIDS':'https://www.unaids.org/', 'PEPFAR':'https://www.state.gov/pepfar/', 'OWID':'https://ourworldindata.org/hiv-aids' },
+    trend:{ label:'AIDS-related deaths (thousands/year)', unit:'K deaths', src:'UNAIDS Global AIDS Update', dir:'down',
+      years:[2000,2002,2005,2007,2010,2012,2015,2018,2020,2021,2022,2023],
+      values:[1460,1640,2000,2100,1500,1300,1200,770,680,650,630,630] }
+  },
+  { id:'water', name:'Water Chlorination', full:'Clean Water & Chlorination', icon:'💧', color:'#0288D1',
+    lpy:829_000, ltot:null, dpy:null, add:200_000,
+    cov:74, tgt:100, cplLo:3_000, cplHi:10_000, cpdLo:25, cpdHi:65, ped:.65, period:'1900–present',
+    hl:'~50% of 20th-century US urban mortality decline',
+    desc:'~829,000 lives per year are lost to unsafe-water diseases — and the solution costs just <strong>$2 per person per year</strong>. 2.1 billion people still lack safely managed drinking water. A landmark <a href="https://scholar.harvard.edu/files/cutler/files/cutler_miller_cities.pdf" target="_blank">Harvard study (Cutler & Miller 2005)</a> found US municipal chlorination accounted for ~50% of the urban mortality decline of the 20th century. A <a href="https://www.nber.org/papers/w29447" target="_blank">Kenya RCT (NBER 2022)</a> found chlorine dispensers reduced child mortality by 63–67%.',
+    links:{ 'Wikipedia':'https://en.wikipedia.org/wiki/Water_chlorination', 'WHO':'https://www.who.int/news-room/fact-sheets/detail/drinking-water', 'OWID':'https://ourworldindata.org/water-access', 'JMP Data':'https://washdata.org/' },
+    trend:{ label:'Population with basic drinking water (%)', unit:'%', src:'WHO/UNICEF JMP (Joint Monitoring Programme)', dir:'up',
+      years:[2000,2005,2010,2015,2017,2019,2020,2022],
+      values:[74.8,79.5,83.6,87.0,88.2,89.0,89.3,90.0] }
+  },
+  { id:'sanitation', name:'Sanitation', full:'Wastewater & Sanitation Infrastructure', icon:'🚽', color:'#558B2F',
+    lpy:1_400_000, ltot:null, dpy:74_000_000, add:500_000,
+    cov:57, tgt:100, cplLo:2_000, cplHi:15_000, cpdLo:5, cpdHi:2800, ped:.32, period:'ongoing',
+    hl:'1.4 million deaths/year from poor WASH',
+    desc:'<strong>1.4 million lives per year</strong> are lost to poor sanitation — nearly all preventable with proven, affordable interventions. 3.4 billion people still lack safely managed sanitation, and progress toward SDG 6 is badly off-track. <a href="https://en.wikipedia.org/wiki/WASH" target="_blank">Hygiene promotion</a> costs just <strong>$5 per DALY averted</strong>, making it among the cheapest effective health interventions that exist.',
+    links:{ 'Wikipedia':'https://en.wikipedia.org/wiki/WASH', 'WHO':'https://www.who.int/news-room/fact-sheets/detail/sanitation', 'OWID':'https://ourworldindata.org/sanitation', 'JMP Data':'https://washdata.org/' },
+    trend:{ label:'Population with basic sanitation (%)', unit:'%', src:'WHO/UNICEF JMP (Joint Monitoring Programme)', dir:'up',
+      years:[2000,2005,2010,2015,2017,2019,2020,2022],
+      values:[45,48,52,57,59,60,61,62] }
+  },
+  { id:'tuberculosis', name:'Tuberculosis', full:'Tuberculosis Treatment (DOTS)', icon:'🫁', color:'#6A1B9A',
+    lpy:1_100_000, ltot:75_000_000, dpy:null, add:270_000,
+    cov:78, tgt:90, cplLo:300, cplHi:500, cpdLo:2, cpdHi:8, ped:.17, period:'1995–2024',
+    hl:'75 million lives saved since 2000 (WHO Global TB Report 2023)',
+    desc:'~270,000 additional TB deaths per year are preventable right now — people who have TB but go undiagnosed or untreated. <a href="https://en.wikipedia.org/wiki/Directly_observed_therapy,_short_course" target="_blank">DOTS treatment</a> costs just <strong>$2–8 per DALY averted</strong> — the most cost-effective medical intervention ever documented (DCP3). At $300–500 per life saved, TB treatment is cheaper than almost any other life-saving intervention in global health. 2.7 million cases remain undiagnosed annually.',
+    links:{ 'Wikipedia':'https://en.wikipedia.org/wiki/Tuberculosis', 'WHO TB':'https://www.who.int/news-room/fact-sheets/detail/tuberculosis', 'OWID':'https://ourworldindata.org/tuberculosis', 'DCP3':'https://www.dcp-3.org/' },
+    trend:{ label:'TB deaths (thousands/year)', unit:'K deaths', src:'WHO Global TB Report', dir:'down',
+      years:[2000,2003,2005,2008,2010,2012,2015,2017,2019,2020,2021,2022,2023],
+      values:[1830,1750,1600,1520,1430,1370,1280,1210,1180,1340,1360,1300,1250] }
+  },
+  { id:'antibiotics', name:'Antibiotics', full:'Access to Essential Antibiotics', icon:'💊', color:'#AD1457',
+    lpy:4_000_000, ltot:350_000_000, dpy:null, add:500_000,
+    cov:55, tgt:95, cplLo:500, cplHi:5_000, cpdLo:100, cpdHi:1160, ped:.35, period:'1942–present',
+    hl:'200–500 million lives saved since 1942',
+    desc:'~1.27 million people died last year from drug-resistant infections. Without urgent action, <a href="https://en.wikipedia.org/wiki/Antimicrobial_resistance" target="_blank">antimicrobial resistance (AMR)</a> could kill 10 million people per year by 2050, surpassing cancer as a leading cause of death. Antibiotics have already saved an estimated 200–500 million lives since <a href="https://en.wikipedia.org/wiki/Penicillin" target="_blank">penicillin\'s clinical introduction in 1942</a>, adding 5–10 years to life expectancy at birth.',
+    links:{ 'Wikipedia':'https://en.wikipedia.org/wiki/Antibiotic', 'WHO AMR':'https://www.who.int/health-topics/antimicrobial-resistance', 'OWID':'https://ourworldindata.org/antibiotics', 'World Bank AMR':'https://www.worldbank.org/en/topic/health/brief/antimicrobial-resistance-amr' },
+    trend:{ label:'Under-5 pneumonia deaths (thousands/year)', unit:'K deaths', src:'WHO/UNICEF Child Causes of Death Estimates', dir:'down',
+      years:[2000,2005,2010,2012,2015,2016,2017,2018,2019,2020,2021],
+      values:[1890,1520,1190,1020,880,840,810,770,740,708,672] }
+  },
+  { id:'ort', name:'Oral Rehydration Therapy', full:'Oral Rehydration Therapy (ORS)', icon:'🥤', color:'#00838F',
+    lpy:1_500_000, ltot:70_000_000, dpy:30_000_000, add:975_000,
+    cov:35, tgt:90, cplLo:200, cplHi:3_000, cpdLo:4, cpdHi:50, ped:.52, period:'1978–present',
+    hl:'~70 million lives saved since 1978',
+    desc:'~975,000 additional lives per year could be saved simply by ensuring every child with diarrhea receives oral rehydration therapy. Only 35% of children currently receive ORS — yet it is a mixture of water, salt, and sugar costing under <strong>$1</strong>, reducing diarrheal mortality by up to 93% (<a href="https://www.thelancet.com/journals/lancet/article/PIIS0140-6736(78)90357-9/fulltext" target="_blank">Lancet 1978</a>). Since its introduction, ORS has saved an estimated 70 million lives — earning the title <em>"greatest medical advance of the 20th century."</em>',
+    links:{ 'Wikipedia':'https://en.wikipedia.org/wiki/Oral_rehydration_therapy', 'WHO':'https://www.who.int/news-room/fact-sheets/detail/diarrhoeal-disease', 'OWID':'https://ourworldindata.org/oral-rehydration-therapy', 'Lancet 1978':'https://www.thelancet.com/journals/lancet/article/PIIS0140-6736(78)90357-9/fulltext' },
+    trend:{ label:'Under-5 diarrheal deaths (thousands/year)', unit:'K deaths', src:'GBD / WHO / UNICEF estimates', dir:'down',
+      years:[1990,1995,2000,2005,2010,2012,2015,2017,2019,2021],
+      values:[1260,1100,1050,780,590,530,499,480,460,438] }
+  },
+  { id:'vitamin_a', name:'Vitamin A', full:'Vitamin A Supplementation (VAS)', icon:'🟠', color:'#D4A017',
+    lpy:1_500_000, ltot:null, dpy:null, add:375_000,
+    cov:75, tgt:100, cplLo:1_000, cplHi:8_500, cpdLo:18, cpdHi:50, ped:1.0, period:'1980s–present',
+    hl:'12–24% reduction in child mortality',
+    desc:'~375,000 additional lives per year could be saved by closing the 25% gap in vitamin A supplementation coverage. <a href="https://en.wikipedia.org/wiki/Vitamin_A_deficiency" target="_blank">Vitamin A deficiency</a> affects 190 million children under 5. Semi-annual supplementation — two capsules costing just <strong>$1–2 per child per year</strong> — reduces all-cause child mortality by 12–24% (<a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8925277/" target="_blank">Cochrane 2022</a>). GiveWell estimates VAS is 9–59× more cost-effective than the WHO threshold.',
+    links:{ 'Wikipedia':'https://en.wikipedia.org/wiki/Vitamin_A_deficiency', 'WHO ELENA':'https://www.who.int/tools/elena/interventions/vitamina-children', 'GiveWell':'https://www.givewell.org/international/technical/programs/vitamin-A', 'Cochrane 2022':'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8925277/' },
+    trend:{ label:'VAS coverage in at-risk countries (%)', unit:'%', src:'UNICEF / WHO Vitamin A Supplementation Reports', dir:'up',
+      years:[1999,2002,2005,2007,2009,2011,2013,2015,2017,2019,2021],
+      values:[31,46,63,68,73,75,75,73,71,68,68] }
+  },
+  { id:'tobacco_control', name:'Tobacco Control', full:'Tobacco Control (Taxation & Regulation)', icon:'🚭', color:'#37474F',
+    lpy:3_700_000, ltot:22_000_000, dpy:null, add:2_000_000,
+    cov:22, tgt:10, cplLo:500, cplHi:5_000, cpdLo:5, cpdHi:200, ped:.05, period:'1999–present',
+    hl:'22 million deaths averted (2008–2014)',
+    desc:'<strong>Tobacco kills 8+ million people per year</strong> — more than HIV, malaria, and TB combined — and more than half those deaths occur in low- and middle-income countries. A universal <a href="https://www.nature.com/articles/s41591-020-01210-8" target="_blank">$1/pack tax increase (Nature Medicine 2021)</a> could reduce global smokers by 66 million and prevent 15 million deaths over the next decade. The WHO\'s <a href="https://en.wikipedia.org/wiki/MPOWER" target="_blank">MPOWER framework</a> now covers 5.6 billion people with at least one evidence-based policy.',
+    links:{ 'Wikipedia':'https://en.wikipedia.org/wiki/Tobacco_control', 'WHO FCTC':'https://fctc.who.int/', 'OWID':'https://ourworldindata.org/smoking', 'Nature Medicine 2021':'https://www.nature.com/articles/s41591-020-01210-8' },
+    trend:{ label:'Global smoking prevalence (%)', unit:'%', src:'WHO GHO / IHME Global Burden of Disease', dir:'down',
+      years:[2000,2005,2007,2010,2012,2015,2017,2019,2020,2021,2022],
+      values:[32.7,29.8,28.5,25.7,24.1,22.1,21.0,19.8,19.3,18.8,18.2] }
+  },
+];
+
+// ── Utils ──────────────────────────────────────────────────────────────────
+const geo = (a,b) => Math.sqrt(a*b);
+const fmt = n => {
+  if (n == null) return '—';
+  if (n >= 1e9) return (n/1e9).toFixed(1).replace(/\.0$/,'') + 'B';
+  if (n >= 1e6) return (n/1e6).toFixed(1).replace(/\.0$/,'') + 'M';
+  if (n >= 1e3) return Math.round(n/1e3) + 'K';
+  return n.toLocaleString();
+};
+const fmtUSD = n => n >= 1000 ? '$' + Math.round(n/1000) + 'K' : '$' + n;
+const livesPhrase = n => {
+  if (n >= 10)  return n.toFixed(1) + ' lives';
+  if (n >= 1)   return n.toFixed(2) + ' lives';
+  if (n >= 0.5) return '½ a life (~' + n.toFixed(2) + ')';
+  if (n >= 0.01)return '1/' + Math.round(1/n) + ' of a life';
+  return '1 life per $' + Math.round(1/n).toLocaleString() + ' donated';
+};
+const dalysPhrase = d => {
+  if (d >= 365)  return (d/365).toFixed(1) + ' person-lifetimes';
+  if (d >= 2)    return d.toFixed(1) + ' healthy years';
+  if (d >= 1/12) return (d*12).toFixed(1) + ' months of healthy life';
+  return (d*365).toFixed(0) + ' days of healthy life';
+};
+
+const totalCurrent    = IV.reduce((s,i) => s + i.lpy, 0);
+const totalAdditional = IV.reduce((s,i) => s + i.add, 0);
+const globalPct       = Math.round(100 * totalCurrent / (totalCurrent + totalAdditional));
+
+// ── Hero stats ─────────────────────────────────────────────────────────────
+document.getElementById('stat-current').textContent    = fmt(totalCurrent) + ' lives per year';
+document.getElementById('stat-additional').textContent = fmt(totalAdditional) + ' additional lives per year';
+document.getElementById('hero-stats').innerHTML = `
+  <div class="hstat">
+    <div class="hstat-num" style="color:var(--green)">${fmt(totalCurrent)}</div>
+    <div class="hstat-label">lives saved per year</div>
+  </div>
+  <div class="hstat">
+    <div class="hstat-num" style="color:var(--amber)">${fmt(totalAdditional)}</div>
+    <div class="hstat-label">additional lives within reach</div>
+  </div>
+  <div class="hstat">
+    <div class="hstat-num">$2–6</div>
+    <div class="hstat-label">minimum cost per DALY averted</div>
+  </div>`;
+
+// ── Charity links ──────────────────────────────────────────────────────────
+// gw: GiveWell Top Charity page URL (present = currently recommended)
+// tl: TLYCS Best Charities page URL (present = currently recommended)
+// gwNote: GiveWell evaluation note shown when NOT a top charity
+const CL = {
+  immunization: [
+    { name:'New Incentives', tag:'GiveWell Top Charity · TLYCS Recommended',
+      gw:'https://www.givewell.org/charities/new-incentives',
+      tl:'https://www.thelifeyoucansave.org/best-charities/new-incentives/',
+      org:'https://www.newincentives.org' },
+    { name:'Gavi, the Vaccine Alliance', tag:'WHO/UNICEF co-sponsored · largest global vaccine funder',
+      org:'https://www.gavi.org',
+      gwNote:'Not recommended by GiveWell. Their 2018 analysis concluded that private donations would not translate to additional impact because Gavi\'s programs are already fully funded by institutional donors. GiveWell explicitly notes this analysis predates COVID-19 and may no longer reflect current funding gaps.' },
+    { name:'Living Goods', tag:'TLYCS Recommended',
+      tl:'https://www.thelifeyoucansave.org/best-charities/living-goods/',
+      org:'https://livinggoods.org',
+      gwNote:'Not a current GiveWell top charity. GiveWell discontinued its "Standout Charity" designation in October 2021 (Living Goods had previously held that status) and has not conducted a full re-evaluation under their current methodology.' },
+  ],
+  malaria: [
+    { name:'Against Malaria Foundation (AMF)', tag:'GiveWell Top Charity · TLYCS Recommended',
+      gw:'https://www.givewell.org/charities/against-malaria-foundation',
+      tl:'https://www.thelifeyoucansave.org/best-charities/against-malaria-foundation/',
+      org:'https://www.againstmalaria.com' },
+    { name:'Malaria Consortium (SMC)', tag:'GiveWell Top Charity · TLYCS Recommended',
+      gw:'https://www.givewell.org/charities/malaria-consortium',
+      tl:'https://www.thelifeyoucansave.org/best-charities/malaria-consortium/',
+      org:'https://www.malariaconsortium.org' },
+  ],
+  hiv_aids: [
+    { name:'Partners in Health', tag:'Charity Navigator 4-star · comprehensive care model',
+      org:'https://www.pih.org',
+      gwNote:'Not recommended by GiveWell. Their cost-effectiveness is difficult to verify because PIH does not share program-specific budgets, and their comprehensive care model is not structured around cost-per-outcome measurement. GiveWell notes PIH does important work but cannot assess it under their standard methodology.' },
+    { name:'UNAIDS', tag:'UN Joint Programme on HIV/AIDS',
+      org:'https://www.unaids.org',
+      gwNote:'Not reviewed by GiveWell as a donation destination. UNAIDS is a UN coordinating body rather than a direct implementer; GiveWell focuses on organisations where donations have a clear, traceable marginal impact on program delivery.' },
+  ],
+  water: [
+    { name:'Evidence Action — Dispensers for Safe Water', tag:'TLYCS Recommended',
+      tl:'https://www.thelifeyoucansave.org/best-charities/evidence-action/',
+      org:'https://www.evidenceaction.org/dispensers-for-safe-water/',
+      gwNote:'GiveWell made a major $64.7M grant to this program in 2022 but declined to renew Kenya funding in August 2024. Independent surveys found actual program reach (~2M people) was substantially below projections (~4.7M people), dropping the program below their cost-effectiveness threshold. TLYCS continues to recommend Evidence Action.' },
+  ],
+  sanitation: [
+    { name:'WaterAid', tag:'Charity Navigator 4-star · 34 countries',
+      org:'https://www.wateraid.org',
+      gwNote:'Not recommended by GiveWell. Their review of 43 water charities found insufficient published data on actual water quality improvements and questions about long-term infrastructure maintenance. GiveWell has not conducted a formal re-evaluation under their current methodology.' },
+  ],
+  tuberculosis: [
+    { name:'Stop TB Partnership', tag:'WHO co-sponsored · 2009 GiveWell top charity',
+      org:'https://www.stoptb.org',
+      gwNote:'No longer recommended by GiveWell, despite previously being a 2009 top-rated charity. GiveWell concluded they could not identify a compelling funding gap: additional private donations would fund MDR-TB programs (uncertain cost-effectiveness) rather than first-line DOTS treatment (highly cost-effective but already funded).' },
+    { name:'Partners in Health — TB programs', tag:'Charity Navigator 4-star · comprehensive care model',
+      org:'https://www.pih.org',
+      gwNote:'Not recommended by GiveWell. See Partners in Health note above.' },
+  ],
+  antibiotics: [
+    { name:'Médecins Sans Frontières (MSF)', tag:'Nobel Peace Prize 1999 · humanitarian emergency focus',
+      org:'https://www.msf.org',
+      gwNote:'Not a GiveWell top charity. GiveWell has praised MSF for exceptional transparency (they publicly documented a failed TB program in China), but their diverse emergency operations do not fit GiveWell\'s cost-per-DALY optimization framework. GiveWell previously gave MSF "special recognition" for this transparency, though that designation has since lapsed.' },
+    { name:'GARDP — Global Antibiotic R&D Partnership', tag:'WHO/DNDi non-profit research consortium',
+      org:'https://www.gardp.org',
+      gwNote:'Not reviewed by GiveWell. GARDP focuses on antibiotic R&D — a longer-horizon intervention that GiveWell\'s current methodology, which emphasises near-term, measurable mortality impact, does not cover.' },
+  ],
+  ort: [
+    { name:'UNICEF', tag:'UN Agency · largest child-focused UN body',
+      org:'https://www.unicef.org',
+      gwNote:'Not recommended by GiveWell as a donation destination. UNICEF declined to participate in GiveWell\'s review process, and GiveWell has concerns about the fungibility of earmarked donations at large UN agencies and opacity of program-level spending data. Note: GiveWell does use UNICEF as an implementing partner in some funded programs.' },
+    { name:'Development Media International', tag:'TLYCS Recommended',
+      tl:'https://www.thelifeyoucansave.org/best-charities/development-media-international/',
+      org:'https://www.developmentmedia.net',
+      gwNote:'Not a current GiveWell top charity. DMI was previously a GiveWell Standout Charity. GiveWell discontinued that designation in October 2021 and has not re-evaluated DMI under their current methodology.' },
+  ],
+  vitamin_a: [
+    { name:'Helen Keller International', tag:'GiveWell Top Charity · TLYCS Recommended',
+      gw:'https://www.givewell.org/charities/helen-keller-international',
+      tl:'https://www.thelifeyoucansave.org/best-charities/helen-keller-international/',
+      org:'https://www.hki.org' },
+  ],
+  tobacco_control: [
+    { name:'Campaign for Tobacco-Free Kids', tag:'Bloomberg Initiative partner · US & international advocacy',
+      org:'https://www.tobaccofreekids.org',
+      gwNote:'Not reviewed by GiveWell. GiveWell explored tobacco control policy advocacy but has not published a formal evaluation of this organisation. Their general view is that the tobacco advocacy space is relatively well-resourced compared to other policy areas they prioritise (e.g., alcohol, lead exposure, pesticide self-harm).' },
+  ],
+};
+
+// ── Chart 1 (summary bar) ──────────────────────────────────────────────────
+const CHART1_MODES = {
+  lives_yr:  { data: iv => iv.lpy,  label:'Lives saved per year',    log:false },
+  lives_tot: { data: iv => iv.ltot, label:'Total lives saved',        log:false },
+  cost_daly: { data: iv => (iv.cpdLo+iv.cpdHi)/2, label:'Cost per DALY averted (USD, mid estimate)', log:true },
+};
+let c1mode = 'lives_yr';
+const sorted1 = () => {
+  const m = CHART1_MODES[c1mode];
+  return [...IV].filter(iv => m.data(iv) != null).sort((a,b) => m.data(a) - m.data(b));
+};
+
+const c1 = new Chart(document.getElementById('chart1'), {
+  type: 'bar',
+  data: { labels:[], datasets:[{ data:[], backgroundColor:[], borderRadius:4, borderSkipped:false }] },
+  options: {
+    indexAxis: 'y', responsive: true, animation: { duration: 320 },
+    plugins: { legend:{ display:false }, tooltip:{
+      callbacks:{ label: ctx => ' ' + (ctx.raw >= 1e6 ? fmt(ctx.raw) : ctx.raw.toLocaleString()) }
+    }},
+    scales: {
+      x: { grid:{ color:'rgba(0,0,0,.05)' }, ticks:{ font:{ family:"'Instrument Sans',sans-serif", size:12 } } },
+      y: { grid:{ display:false }, ticks:{ font:{ family:"'Instrument Sans',sans-serif", size:13 } } }
+    }
+  }
+});
+
+function setMode(mode, btn) {
+  c1mode = mode;
+  document.querySelectorAll('.mode-btns .mbtn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  refreshChart1();
+}
+const FONT = "'Instrument Sans', sans-serif";
+
+// ── Pediatric chart mode ────────────────────────────────────────────────────
+let pedChartMode = false;
+function setPedMode(cb) {
+  pedChartMode = cb.checked;
+  document.querySelectorAll('.ped-chart-cb').forEach(c => c.checked = pedChartMode);
+  refreshChart1();
+  refreshChart2();
+}
+
+function refreshChart1() {
+  const m = CHART1_MODES[c1mode];
+  const ivs = sorted1();
+  const showPed = pedChartMode && c1mode !== 'cost_daly';
+
+  c1.data.labels = ivs.map(iv => iv.icon + ' ' + iv.name);
+
+  if (showPed) {
+    const pedVals   = ivs.map(iv => { const v = m.data(iv); return v != null ? Math.round(v * iv.ped) : 0; });
+    const adultVals = ivs.map(iv => { const v = m.data(iv); return v != null ? Math.round(v * (1 - iv.ped)) : 0; });
+    c1.data.datasets = [
+      { label:'👶 Pediatric (under 5)', data:pedVals,   backgroundColor:ivs.map(iv => iv.color),        borderRadius:0, borderSkipped:false, stack:'s' },
+      { label:'Adults & general',        data:adultVals, backgroundColor:ivs.map(iv => iv.color + '40'), borderRadius:4, borderSkipped:false, stack:'s' },
+    ];
+    c1.options.scales.x.stacked = true;
+    c1.options.scales.y.stacked = true;
+    c1.options.plugins.legend.display = true;
+    c1.options.plugins.legend.labels  = { font:{ family:FONT, size:11 }, boxWidth:12, boxHeight:12 };
+    c1.options.plugins.tooltip.callbacks.label = ctx => {
+      const iv = ivs[ctx.dataIndex];
+      if (ctx.datasetIndex === 0) return ` 👶 Pediatric (${Math.round(iv.ped*100)}%): ${fmt(ctx.raw)}`;
+      return ` Adults & general: ${fmt(ctx.raw)}`;
+    };
+  } else {
+    c1.data.datasets = [{
+      data: ivs.map(m.data),
+      backgroundColor: ivs.map(iv => iv.color + 'cc'),
+      borderRadius: 4, borderSkipped: false,
+    }];
+    c1.options.scales.x.stacked = false;
+    c1.options.scales.y.stacked = false;
+    c1.options.plugins.legend.display = false;
+    c1.options.plugins.tooltip.callbacks.label = ctx => ' ' + (ctx.raw >= 1e6 ? fmt(ctx.raw) : ctx.raw.toLocaleString());
+  }
+
+  c1.options.scales.x.type  = c1mode === 'cost_daly' ? 'logarithmic' : 'linear';
+  c1.options.scales.x.title = { display:true, text: m.label, font:{ size:12, family:FONT }, color:'#6a6560' };
+  c1.update();
+}
+refreshChart1();
+
+// ── Progress bars ──────────────────────────────────────────────────────────
+document.getElementById('prog-global-wrap').innerHTML = `
+  <div class="prog-global-track"><div class="prog-global-fill" style="width:${globalPct}%"></div></div>
+  <div class="prog-global-label">${globalPct}% of potential reached · ${fmt(totalAdditional)} lives still within reach</div>`;
+
+const progRows = document.getElementById('prog-rows');
+IV.forEach(iv => {
+  const pot = iv.lpy + iv.add;
+  const pct = Math.round(100 * iv.lpy / pot);
+  const row = document.createElement('div');
+  row.className = 'prog-row';
+  row.innerHTML = `
+    <span class="prog-icon">${iv.icon}</span>
+    <span class="prog-name">${iv.name}</span>
+    <div class="prog-track"><div class="prog-fill" style="width:${pct}%;background:${iv.color}"></div></div>
+    <span class="prog-stats">${fmt(iv.lpy)} of ${fmt(pot)}/yr</span>`;
+  progRows.appendChild(row);
+});
+
+// ── Chart 2 (lives per $1M) ────────────────────────────────────────────────
+const iv2sorted = [...IV].sort((a,b) => (1e6/geo(a.cplLo,a.cplHi)) - (1e6/geo(b.cplLo,b.cplHi)));
+const c2 = new Chart(document.getElementById('chart2'), {
+  type: 'bar',
+  data: { labels: [], datasets: [{ data:[], backgroundColor:[], borderRadius:4, borderSkipped:false }] },
+  options: {
+    indexAxis: 'y', responsive: true,
+    plugins: { legend:{ display:false }, tooltip:{ callbacks:{ label: ctx => ' ' + fmt(ctx.raw) + ' lives per $1M' } } },
+    scales: {
+      x: { grid:{ color:'rgba(0,0,0,.05)' }, title:{ display:true, text:'Lives saved per $1M (central estimate)', font:{size:12,family:FONT}, color:'#6a6560' }, ticks:{ font:{family:FONT,size:12} } },
+      y: { grid:{ display:false }, ticks:{ font:{family:FONT,size:13} } }
+    }
+  }
+});
+
+function refreshChart2() {
+  const values   = iv2sorted.map(iv => Math.round(1e6 / geo(iv.cplLo, iv.cplHi)));
+  c2.data.labels = iv2sorted.map(iv => iv.icon + ' ' + iv.name);
+
+  if (pedChartMode) {
+    const pedVals   = iv2sorted.map((iv, i) => Math.round(values[i] * iv.ped));
+    const adultVals = iv2sorted.map((iv, i) => values[i] - pedVals[i]);
+    c2.data.datasets = [
+      { label:'👶 Pediatric (under 5)', data:pedVals,   backgroundColor:iv2sorted.map(iv => iv.color),        borderRadius:0, borderSkipped:false, stack:'s' },
+      { label:'Adults & general',        data:adultVals, backgroundColor:iv2sorted.map(iv => iv.color + '40'), borderRadius:4, borderSkipped:false, stack:'s' },
+    ];
+    c2.options.scales.x.stacked = true;
+    c2.options.scales.y.stacked = true;
+    c2.options.plugins.legend.display = true;
+    c2.options.plugins.legend.labels  = { font:{ family:FONT, size:11 }, boxWidth:12, boxHeight:12 };
+    c2.options.plugins.tooltip.callbacks.label = ctx => {
+      const iv = iv2sorted[ctx.dataIndex];
+      if (ctx.datasetIndex === 0) return ` 👶 Pediatric (${Math.round(iv.ped*100)}%): ${fmt(ctx.raw)} lives per $1M`;
+      return ` Adults & general: ${fmt(ctx.raw)} lives per $1M`;
+    };
+  } else {
+    c2.data.datasets = [{
+      data: values,
+      backgroundColor: iv2sorted.map(iv => iv.color + 'cc'),
+      borderRadius: 4, borderSkipped: false,
+    }];
+    c2.options.scales.x.stacked = false;
+    c2.options.scales.y.stacked = false;
+    c2.options.plugins.legend.display = false;
+    c2.options.plugins.tooltip.callbacks.label = ctx => ' ' + fmt(ctx.raw) + ' lives per $1M';
+  }
+  c2.update();
+}
+refreshChart2();
+
+// ── Calculator ─────────────────────────────────────────────────────────────
+const sel = document.getElementById('ci');
+IV.forEach(iv => {
+  const opt = document.createElement('option');
+  opt.value = iv.id;
+  opt.textContent = iv.icon + ' ' + iv.name;
+  sel.appendChild(opt);
+});
+
+function calc() {
+  const amt  = parseFloat(document.getElementById('ca').value) || 0;
+  const iv   = IV.find(i => i.id === sel.value);
+  if (!iv || amt <= 0) return;
+
+  const lvMid = amt / geo(iv.cplLo, iv.cplHi);
+  const lvLo  = amt / iv.cplHi;
+  const lvHi  = amt / iv.cplLo;
+  const dyMid = amt / geo(iv.cpdLo, iv.cpdHi);
+  const dyLo  = amt / iv.cpdHi;
+  const dyHi  = amt / iv.cpdLo;
+
+  const charities = CL[iv.id] || [];
+  let orgsHtml = '';
+  if (charities.length) {
+    const items = charities.map(c => {
+      const nameLink = c.org ? `<a href="${c.org}" target="_blank" class="calc-org-row-name">${c.name} ↗</a>`
+                             : `<span class="calc-org-row-name">${c.name}</span>`;
+      let badges = '';
+      if (c.gw) badges += `<a href="${c.gw}" target="_blank" class="calc-org-badge badge-givewell">GiveWell Top Charity ↗</a>`;
+      if (c.tl) badges += `<a href="${c.tl}" target="_blank" class="calc-org-badge badge-tlycs">TLYCS ↗</a>`;
+      return `<div class="calc-org-row">${nameLink}${badges}</div>`;
+    }).join('');
+    orgsHtml = `<div class="calc-orgs"><hr class="calc-hdiv"><span class="calc-org-label">Where to donate</span><div class="calc-org-list">${items}</div></div>`;
+  }
+
+  document.getElementById('calc-result').style.borderLeftColor = iv.color;
+  document.getElementById('calc-result').innerHTML = `
+    <div class="calc-result-tag">$${amt.toLocaleString()} donated to ${iv.icon} ${iv.name}</div>
+    <div class="calc-lives" style="color:${iv.color}">${livesPhrase(lvMid)}</div>
+    <div class="calc-range">range: ${livesPhrase(lvLo)} – ${livesPhrase(lvHi)}</div>
+    <hr class="calc-hdiv">
+    <div class="calc-result-tag">Healthy life restored</div>
+    <div class="calc-dalys">${dalysPhrase(dyMid)}</div>
+    <div class="calc-dalys-range">range: ${dalysPhrase(dyLo)} – ${dalysPhrase(dyHi)}</div>
+    <p class="calc-note" style="margin-top:14px">
+      Cost per DALY: $${iv.cpdLo}–$${iv.cpdHi.toLocaleString()} · Cost per life: ${fmtUSD(iv.cplLo)}–${fmtUSD(iv.cplHi)}
+      <br><a href="#iv-${iv.id}" onclick="openAndScrollToCard('${iv.id}'); return false;">See ${iv.name} in detail ↓</a>
+    </p>${orgsHtml}`;
+}
+calc();
+
+// ── Scroll to intervention card with nav offset ─────────────────────────────
+function openAndScrollToCard(id) {
+  const card = document.getElementById('iv-' + id);
+  if (!card) return;
+  if (!card.classList.contains('open')) {
+    card.classList.add('open');
+    if (!cardTrends[id]) initCardTrend(id);
+  }
+  const navH = document.querySelector('nav').offsetHeight;
+  const top = card.getBoundingClientRect().top + window.scrollY - navH - 12;
+  window.scrollTo({ top, behavior: 'smooth' });
+}
+
+// ── Trend chart in card (lazy-init) ────────────────────────────────────────
+const cardTrends = {};
+
+function toggleCard(card) {
+  card.classList.toggle('open');
+  if (card.classList.contains('open')) {
+    const id = card.id.replace('iv-', '');
+    if (!cardTrends[id]) initCardTrend(id);
+  }
+}
+
+function initCardTrend(id) {
+  const iv = IV.find(i => i.id === id);
+  if (!iv || !iv.trend) return;
+  const canvas = document.getElementById('ct-' + id);
+  if (!canvas) return;
+  const t = iv.trend;
+  const isUp = t.dir === 'up';
+
+  // Annotate the last point with its value
+  const lastVal = t.values[t.values.length - 1];
+  const firstVal = t.values[0];
+  const pctChange = (((lastVal - firstVal) / Math.abs(firstVal)) * 100).toFixed(0);
+  const changeLabel = (isUp ? '+' : '') + pctChange + '% since ' + t.years[0];
+  const changeColor = isUp ? '#1a6b4a' : '#b85c14';
+
+  document.getElementById('ct-label-' + id).textContent = changeLabel;
+  document.getElementById('ct-label-' + id).style.color = changeColor;
+
+  cardTrends[id] = new Chart(canvas, {
+    type: 'line',
+    data: {
+      labels: t.years,
+      datasets: [{
+        data: t.values,
+        borderColor: iv.color,
+        backgroundColor: iv.color + '14',
+        fill: true,
+        tension: 0.35,
+        pointRadius: t.years.length <= 14 ? 4 : 2.5,
+        pointHoverRadius: 6,
+        pointBackgroundColor: '#fff',
+        pointBorderColor: iv.color,
+        pointBorderWidth: 2,
+        borderWidth: 2.5,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 500 },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: 'rgba(26,23,20,.85)',
+          titleFont: { family: FONT, size: 12 },
+          bodyFont:  { family: FONT, size: 12 },
+          callbacks: {
+            label: ctx => ` ${ctx.raw.toLocaleString()} ${t.unit}`,
+            title: ctx => ctx[0].label
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid: { color: 'rgba(0,0,0,.04)' },
+          ticks: { font: { family: FONT, size: 11 }, maxRotation: 0 }
+        },
+        y: {
+          grid: { color: 'rgba(0,0,0,.05)' },
+          ticks: { font: { family: FONT, size: 11 }, maxTicksLimit: 5 },
+          title: {
+            display: true,
+            text: t.label,
+            font: { size: 11, family: FONT },
+            color: '#6a6560'
+          }
+        }
+      }
+    }
+  });
+}
+
+// ── Intervention cards ─────────────────────────────────────────────────────
+const intPills = document.getElementById('int-pills');
+const intGrid  = document.getElementById('int-grid');
+
+IV.forEach(iv => {
+  // pill
+  const pill = document.createElement('a');
+  pill.href = '#iv-' + iv.id;
+  pill.className = 'int-nav-pill';
+  pill.style.background = iv.color;
+  pill.textContent = iv.icon + ' ' + iv.name;
+  pill.addEventListener('click', e => { e.preventDefault(); openAndScrollToCard(iv.id); });
+  intPills.appendChild(pill);
+
+  // card
+  const card = document.createElement('div');
+  card.className = 'icard';
+  card.id = 'iv-' + iv.id;
+
+  const linksHtml = Object.entries(iv.links).map(([label,url]) =>
+    `<a href="${url}" target="_blank" class="ilink">${label}</a>`).join('');
+
+  const dalysStr = iv.dpy ? fmt(iv.dpy) + ' DALYs/yr' : '—';
+  const totStr   = iv.ltot ? fmt(iv.ltot) + ' total' : '—';
+  const t = iv.trend;
+
+  // Build charity "where to give" block for this card
+  const cardCharities = CL[iv.id] || [];
+  let cardCharitiesHtml = '';
+  if (cardCharities.length) {
+    const citems = cardCharities.map(c => {
+      let cbadges = '';
+      if (c.gw) cbadges += `<a href="${c.gw}" target="_blank" class="calc-org-badge badge-givewell">GiveWell Top Charity ↗</a>`;
+      if (c.tl) cbadges += `<a href="${c.tl}" target="_blank" class="calc-org-badge badge-tlycs">TLYCS ↗</a>`;
+      if (c.org) {
+        const dom = c.org.replace(/https?:\/\/(www\.)?/,'').split('/')[0];
+        cbadges += `<a href="${c.org}" target="_blank" class="calc-org-badge badge-org">${dom} ↗</a>`;
+      }
+      const cnote = c.gwNote ? `<div class="icard-charity-note">ℹ️ <strong>GiveWell:</strong> ${c.gwNote}</div>` : '';
+      return `<div class="icard-charity-item">
+        <div class="icard-charity-name">${c.name}</div>
+        <div style="color:var(--muted);font-size:.72rem;margin-bottom:2px">${c.tag}</div>
+        <div class="icard-charity-badges">${cbadges}</div>
+        ${cnote}
+      </div>`;
+    }).join('');
+    cardCharitiesHtml = `<div class="icard-charities">
+      <span class="icard-charity-label">Where to give</span>
+      <div class="icard-charity-list">${citems}</div>
+    </div>`;
+  }
+
+  card.innerHTML = `
+    <div class="icard-hdr" onclick="toggleCard(this.parentElement)">
+      <div class="icard-icon" style="background:${iv.color}22">${iv.icon}</div>
+      <div>
+        <div class="icard-name" style="color:${iv.color}">${iv.name}</div>
+        <div class="icard-hl">${iv.hl}</div>
+      </div>
+      <div class="icard-right">
+        <div class="ichip">
+          <div class="ichip-num" style="color:${iv.color}">${fmt(iv.lpy)}</div>
+          <div class="ichip-label">lives/year</div>
+        </div>
+        <div class="ichip">
+          <div class="ichip-num">${fmt(iv.add)}</div>
+          <div class="ichip-label">additional/yr</div>
+        </div>
+        <div class="ichip">
+          <div class="ichip-num">$${iv.cpdLo}–${iv.cpdHi}</div>
+          <div class="ichip-label">per DALY</div>
+        </div>
+        <span class="ichevron">▼</span>
+      </div>
+    </div>
+    <div class="icard-body">
+      <p class="icard-desc">${iv.desc}</p>
+      <div class="icard-stats">
+        <div class="istat">
+          <div class="istat-num" style="color:${iv.color}">${fmt(iv.lpy)}</div>
+          <div class="istat-label">Lives saved / year</div>
+        </div>
+        <div class="istat">
+          <div class="istat-num">${totStr}</div>
+          <div class="istat-label">Total lives saved</div>
+        </div>
+        <div class="istat">
+          <div class="istat-num">${fmt(iv.add)}</div>
+          <div class="istat-label">Additional / year reachable</div>
+        </div>
+        <div class="istat">
+          <div class="istat-num">${Math.round(iv.ped*100)}%</div>
+          <div class="istat-label">Pediatric share</div>
+        </div>
+        <div class="istat">
+          <div class="istat-num">$${iv.cpdLo}–$${iv.cpdHi}</div>
+          <div class="istat-label">Cost per DALY (USD)</div>
+        </div>
+        <div class="istat">
+          <div class="istat-num">${fmtUSD(iv.cplLo)}–${fmtUSD(iv.cplHi)}</div>
+          <div class="istat-label">Cost per life (USD)</div>
+        </div>
+        <div class="istat">
+          <div class="istat-num">${dalysStr}</div>
+          <div class="istat-label">DALYs averted / year</div>
+        </div>
+        <div class="istat">
+          <div class="istat-num">${iv.period}</div>
+          <div class="istat-label">Period</div>
+        </div>
+      </div>
+      <div class="itrend-wrap">
+        <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:8px">
+          <div class="itrend-title">📈 Historical trend — ${t.label}</div>
+          <span id="ct-label-${iv.id}" style="font-size:.75rem; font-weight:700"></span>
+        </div>
+        <div style="height:200px; position:relative">
+          <canvas id="ct-${iv.id}"></canvas>
+        </div>
+        <p class="source" style="margin-top:8px">Source: ${t.src}</p>
+      </div>
+      <div class="ilinks">${linksHtml}</div>
+      ${cardCharitiesHtml}
+    </div>`;
+  intGrid.appendChild(card);
+});
+
+// ── Summary table ──────────────────────────────────────────────────────────
+const tbody = document.getElementById('tbl-body');
+let sortCol = 2, sortAsc = false;
+
+function sortTable(col) {
+  if (sortCol === col) sortAsc = !sortAsc; else { sortCol = col; sortAsc = false; }
+  renderTable();
+}
+function sortVal(iv, col) {
+  switch(col) {
+    case 2: return iv.lpy;
+    case 3: return iv.ltot || 0;
+    case 4: return iv.add;
+    case 5: return iv.ped;
+    case 6: return (iv.cpdLo + iv.cpdHi) / 2;
+    case 7: return (iv.cplLo + iv.cplHi) / 2;
+    default: return 0;
+  }
+}
+function renderTable() {
+  const sorted = [...IV].sort((a,b) => {
+    const v = sortVal(a,sortCol) - sortVal(b,sortCol);
+    return sortAsc ? v : -v;
+  });
+  tbody.innerHTML = sorted.map(iv => `
+    <tr>
+      <td>${iv.icon}</td>
+      <td><span class="dot" style="background:${iv.color}"></span><a href="#iv-${iv.id}">${iv.name}</a></td>
+      <td>${fmt(iv.lpy)}</td>
+      <td>${iv.ltot ? fmt(iv.ltot) : '—'}</td>
+      <td>${fmt(iv.add)}</td>
+      <td>${Math.round(iv.ped*100)}%</td>
+      <td>$${iv.cpdLo}–$${iv.cpdHi}</td>
+      <td>${fmtUSD(iv.cplLo)}–${fmtUSD(iv.cplHi)}</td>
+      <td style="color:var(--muted);font-size:.82rem">${iv.period}</td>
+    </tr>`).join('');
+}
+renderTable();
+</script>
+</body>
+</html>

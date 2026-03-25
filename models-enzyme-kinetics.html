@@ -1,0 +1,1277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Michaelis-Menten Enzyme Kinetics - Matt Lubin</title>
+    <meta name="description" content="Interactive simulation of Michaelis-Menten enzyme kinetics">
+    <style>
+        :root {
+            --bg-light: #faf8f5;
+            --bg-dark: #1a1614;
+            --text-light: #2d2a26;
+            --text-dark: #e8e4df;
+            --text-muted-light: #6b6762;
+            --text-muted-dark: #9a9288;
+            --biology: #2d7a5e;
+            --biology-light: #3d9a78;
+        }
+
+        :root {
+            --bg: var(--bg-light);
+            --text: var(--text-light);
+            --text-muted: var(--text-muted-light);
+        }
+
+        :root.dark {
+            --bg: var(--bg-dark);
+            --text: var(--text-dark);
+            --text-muted: var(--text-muted-dark);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Iowan Old Style', 'Palatino Linotype', 'URW Palladio L', P052, serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .site-header { padding: 1.5rem 2rem; text-align: center; }
+        .header-nav { font-size: 0.9rem; color: var(--text-muted); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+        .header-nav a { color: var(--text-muted); text-decoration: none; margin: 0 0.4rem; transition: color 0.2s ease; }
+        .header-nav a:hover { color: var(--text); }
+        .theme-toggle { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 0.9rem; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 0; margin: 0 0.4rem; transition: color 0.2s ease; }
+        .theme-toggle:hover { color: var(--text); }
+
+        .page-hero { text-align: center; padding: 2rem 2rem 1rem; max-width: 800px; margin: 0 auto; }
+        .page-title {
+            font-size: 2.5rem; font-weight: 400; margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--biology) 0%, var(--biology-light) 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+        .page-subtitle { font-size: 1rem; color: var(--text-muted); font-weight: 300; font-style: italic; }
+
+        .intro { max-width: 700px; margin: 0 auto 2rem; padding: 0 2rem; font-size: 1.05rem; line-height: 1.8; }
+        .intro p { margin-bottom: 1rem; }
+        .intro a { color: var(--biology); text-decoration: none; border-bottom: 1px solid var(--biology); transition: color 0.2s ease; }
+        :root.dark .intro a { color: var(--biology-light); border-bottom-color: var(--biology-light); }
+        .intro a:hover { color: var(--biology-light); }
+
+        .container { text-align: center; max-width: 1400px; margin: 0 auto; padding: 0 1rem 3rem; }
+        .main-content { display: flex; flex-direction: column; align-items: center; gap: 20px; }
+
+        .simulation-section { display: flex; flex-direction: column; align-items: center; }
+
+        #simCanvasContainer {
+            display: inline-block; cursor: pointer; border-radius: 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        canvas { display: block; }
+
+        .instructions { color: var(--text-muted); font-size: 0.85rem; margin-top: 8px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+
+        .controls-section { display: flex; flex-direction: column; gap: 15px; width: 100%; max-width: 500px; }
+
+        .control-group {
+            display: flex; flex-direction: column; align-items: center; gap: 10px;
+            padding: 15px 20px; background: var(--bg);
+            border: 1px solid var(--text-muted); border-left: 4px solid var(--biology);
+            border-radius: 0 12px 12px 0; width: 100%; transition: background-color 0.3s ease;
+        }
+
+        .control-header {
+            display: flex; align-items: center; gap: 10px; font-weight: 600;
+            color: var(--biology); font-size: 14px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        :root.dark .control-header { color: var(--biology-light); }
+
+        .icon { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
+        .icon svg { width: 100%; height: 100%; }
+
+        .slider-container { width: 100%; display: flex; flex-direction: column; gap: 5px; }
+        .slider { width: 100%; height: 6px; border-radius: 3px; outline: none; -webkit-appearance: none; background: var(--text-muted); }
+        .slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--biology); cursor: pointer; transition: transform 0.2s ease; }
+        .slider:hover::-webkit-slider-thumb { transform: scale(1.3); }
+        .slider::-moz-range-thumb { width: 18px; height: 18px; border-radius: 50%; background: var(--biology); cursor: pointer; border: none; transition: transform 0.2s ease; }
+        .slider:hover::-moz-range-thumb { transform: scale(1.3); }
+        .slider-labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+        .value-display { font-size: 12px; color: var(--text); text-align: center; font-weight: 500; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+
+        .stats-display { margin-top: 8px; padding: 8px; background: rgba(45, 122, 94, 0.08); border-radius: 6px; font-size: 11px; color: var(--text); text-align: center; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+        .stats-label { font-weight: 600; margin-bottom: 3px; color: var(--biology); }
+        :root.dark .stats-label { color: var(--biology-light); }
+        .stats-value { font-family: 'Courier New', monospace; font-size: 13px; font-weight: 700; }
+
+        .graph-container { background: white; border-radius: 12px; padding: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); width: 100%; }
+        :root.dark .graph-container { background: #2a2520; }
+        .graph-canvas { width: 100%; height: auto; border: 1px solid #e2e8f0; border-radius: 6px; background: #f7fafc; }
+        :root.dark .graph-canvas { border-color: #4a4540; background: #1a1614; }
+        .graph-title { font-size: 12px; font-weight: 600; color: var(--biology); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+        :root.dark .graph-title { color: var(--biology-light); }
+
+        .states-table { width: 100%; margin: 0.5rem 0; border-collapse: collapse; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+        .states-table th { background: rgba(45, 122, 94, 0.1); padding: 10px 8px; text-align: center; font-size: 11px; font-weight: 600; color: var(--biology); border-bottom: 2px solid var(--biology); }
+        :root.dark .states-table th { color: var(--biology-light); border-bottom-color: var(--biology-light); }
+        .states-table td { padding: 10px 8px; text-align: center; border-bottom: 1px solid var(--text-muted); font-size: 12px; }
+        .states-table .weight-value { font-family: 'Courier New', monospace; font-weight: 700; color: var(--biology); }
+        :root.dark .states-table .weight-value { color: var(--biology-light); }
+
+        .math-section { max-width: 700px; margin: 2rem auto; padding: 0 2rem; }
+        .math-section h2 { font-size: 1.4rem; font-weight: 400; color: var(--biology); margin-bottom: 1rem; }
+        :root.dark .math-section h2 { color: var(--biology-light); }
+        .math-section p { font-size: 1rem; line-height: 1.8; margin-bottom: 1rem; }
+
+        .math-box { background: rgba(45, 122, 94, 0.08); border-left: 3px solid var(--biology); padding: 1rem 1.5rem; margin: 1.5rem 0; border-radius: 0 8px 8px 0; font-family: 'Courier New', monospace; overflow-x: auto; }
+        .math-box .equation { font-size: 1.1rem; margin: 0.5rem 0; color: var(--text); }
+        .math-box .label { font-size: 0.85rem; color: var(--text-muted); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin-top: 0.5rem; }
+
+        .highlight-box { background: rgba(45, 122, 94, 0.15); border: 2px solid var(--biology); border-radius: 12px; padding: 1.5rem; margin: 1.5rem 0; text-align: center; }
+        .highlight-box .big-equation { font-family: 'Courier New', monospace; font-size: 1.3rem; color: var(--biology); margin: 0.5rem 0; }
+        :root.dark .highlight-box .big-equation { color: var(--biology-light); }
+
+        .credit { max-width: 700px; margin: 2rem auto 0; padding: 1rem 2rem; font-size: 0.9rem; color: var(--text-muted); font-style: italic; border-top: 1px solid var(--text-muted); }
+        .credit a { color: var(--text-muted); text-decoration: none; border-bottom: 1px solid var(--text-muted); }
+        .credit a:hover { color: var(--text); }
+
+        .inhibition-select {
+            padding: 8px 12px; border-radius: 8px; border: 1px solid var(--text-muted);
+            background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-size: 13px; cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .page-title { font-size: 2rem; }
+            .intro { font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <nav class="header-nav">
+            <a href="/index.html">[home]</a> &middot;
+            <a href="/biology.html">[biology]</a> &middot;
+            <a href="/everything.html">[everything]</a> &middot;
+            <button type="button" class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+                <span id="themeIcon">&#9790;</span>
+            </button>
+        </nav>
+    </header>
+
+    <main>
+        <div class="page-hero">
+            <h1 class="page-title">Michaelis-Menten Enzyme Kinetics</h1>
+            <p class="page-subtitle">How enzymes catalyze reactions and how we measure their efficiency</p>
+        </div>
+
+        <div class="intro">
+            <p>Enzymes are nature's catalysts, accelerating reactions by factors of 10<sup>5</sup> to 10<sup>17</sup>. In 1913, Leonor Michaelis and Maud Menten proposed that an enzyme (E) reversibly binds its substrate (S) to form an ES complex, which then breaks down to yield product (P) and free enzyme. Briggs and Haldane (1925) placed this on a firmer kinetic footing using the steady-state assumption.</p>
+            <p>Below, watch enzyme molecules bind substrates (blue) and release products (orange). Adjust substrate concentration, V<sub>max</sub>, and K<sub>m</sub> to see how initial velocity V<sub>0</sub> follows the hyperbolic Michaelis-Menten curve&mdash;and how inhibitors shift it.</p>
+        </div>
+
+        <div class="container">
+            <div class="main-content">
+                <!-- Simulation Canvas -->
+                <div class="simulation-section">
+                    <div id="simCanvasContainer">
+                        <canvas id="simCanvas"></canvas>
+                    </div>
+                    <div class="instructions">12 enzyme molecules (E, green) &middot; blue dots = substrate S (count &prop; [S]) &middot; orange = product P &middot; fraction bound &asymp; [S]/(K<sub>m</sub>+[S])</div>
+                </div>
+
+                <div class="controls-section">
+                    <!-- Substrate Concentration -->
+                    <div class="control-group">
+                        <div class="control-header">
+                            <div class="icon">
+                                <svg viewBox="0 0 24 24" fill="var(--biology)">
+                                    <circle cx="6" cy="12" r="3"/>
+                                    <circle cx="14" cy="8" r="2"/>
+                                    <circle cx="18" cy="16" r="2.5"/>
+                                    <circle cx="10" cy="17" r="2"/>
+                                </svg>
+                            </div>
+                            <span>Substrate Concentration [S]</span>
+                        </div>
+                        <div class="slider-container">
+                            <input type="range" min="1" max="200" value="30" class="slider" id="substrateSlider">
+                            <div class="slider-labels">
+                                <span>Low (1 mM)</span>
+                                <span>High (200 mM)</span>
+                            </div>
+                            <div class="value-display" id="substrateValue">[S] = 30 mM</div>
+                        </div>
+                    </div>
+
+                    <!-- Vmax (kcat) -->
+                    <div class="control-group">
+                        <div class="control-header">
+                            <div class="icon">
+                                <svg viewBox="0 0 24 24" fill="var(--biology)">
+                                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                                </svg>
+                            </div>
+                            <span>V<sub>max</sub> (Maximum Velocity)</span>
+                        </div>
+                        <div class="slider-container">
+                            <input type="range" min="10" max="200" value="100" class="slider" id="vmaxSlider">
+                            <div class="slider-labels">
+                                <span>Slow</span>
+                                <span>Fast</span>
+                            </div>
+                            <div class="value-display" id="vmaxValue">V<sub>max</sub> = 100 &mu;M/min</div>
+                        </div>
+                    </div>
+
+                    <!-- Km -->
+                    <div class="control-group">
+                        <div class="control-header">
+                            <div class="icon">
+                                <svg viewBox="0 0 24 24" fill="var(--biology)">
+                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                                </svg>
+                            </div>
+                            <span>K<sub>m</sub> (Michaelis Constant)</span>
+                        </div>
+                        <div class="slider-container">
+                            <input type="range" min="1" max="150" value="25" class="slider" id="kmSlider">
+                            <div class="slider-labels">
+                                <span>High affinity (1 mM)</span>
+                                <span>Low affinity (150 mM)</span>
+                            </div>
+                            <div class="value-display" id="kmValue">K<sub>m</sub> = 25 mM</div>
+                        </div>
+                        <div class="stats-display">
+                            <div class="stats-label">At [S] = K<sub>m</sub>, V<sub>0</sub> = &frac12; V<sub>max</sub></div>
+                        </div>
+                    </div>
+
+                    <!-- Inhibition -->
+                    <div class="control-group">
+                        <div class="control-header">
+                            <div class="icon">
+                                <svg viewBox="0 0 24 24" fill="var(--biology)">
+                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11H7v-2h10v2z"/>
+                                </svg>
+                            </div>
+                            <span>Inhibitor Type</span>
+                        </div>
+                        <select class="inhibition-select" id="inhibitionType">
+                            <option value="none">No Inhibitor</option>
+                            <option value="competitive">Competitive (binds active site)</option>
+                            <option value="uncompetitive">Uncompetitive (binds ES only)</option>
+                            <option value="mixed">Mixed (binds E or ES)</option>
+                        </select>
+                        <div class="slider-container" id="inhibitorSliderGroup" style="display:none;">
+                            <input type="range" min="0" max="100" value="30" class="slider" id="inhibitorSlider">
+                            <div class="slider-labels">
+                                <span>0 &mu;M</span>
+                                <span>100 &mu;M</span>
+                            </div>
+                            <div class="value-display" id="inhibitorValue">[I] = 30 &mu;M</div>
+                        </div>
+                    </div>
+
+                    <!-- Michaelis-Menten Curve (V0 vs [S]) -->
+                    <div class="graph-container">
+                        <div class="graph-title">
+                            <span>V<sub>0</sub> vs [S] &mdash; Michaelis-Menten Plot</span>
+                        </div>
+                        <canvas id="mmGraph" class="graph-canvas"></canvas>
+                        <div style="display: flex; justify-content: space-between; margin-top: 10px; font-size: 11px; font-family: -apple-system, sans-serif;">
+                            <span style="color: var(--text-muted);">V<sub>0</sub>: <strong id="currentV0" style="color: var(--biology);">0.00</strong> &mu;M/min</span>
+                            <span style="color: var(--text-muted);">V<sub>0</sub>/V<sub>max</sub>: <strong id="currentRatio" style="color: var(--biology);">0.00</strong></span>
+                        </div>
+                    </div>
+
+                    <!-- Lineweaver-Burk Plot -->
+                    <div class="graph-container">
+                        <div class="graph-title">
+                            <span>1/V<sub>0</sub> vs 1/[S] &mdash; Lineweaver-Burk Plot</span>
+                        </div>
+                        <canvas id="lbGraph" class="graph-canvas"></canvas>
+                    </div>
+
+                    <!-- Reaction State Table -->
+                    <div class="graph-container">
+                        <div class="graph-title"><span>Reaction Parameters</span></div>
+                        <table class="states-table">
+                            <thead>
+                                <tr>
+                                    <th>Parameter</th>
+                                    <th>Value</th>
+                                    <th>Meaning</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>V<sub>0</sub></td>
+                                    <td class="weight-value" id="paramV0">0</td>
+                                    <td>Initial velocity</td>
+                                </tr>
+                                <tr>
+                                    <td>V<sub>max</sub></td>
+                                    <td class="weight-value" id="paramVmax">100</td>
+                                    <td>Maximum velocity (all enzyme saturated)</td>
+                                </tr>
+                                <tr>
+                                    <td>K<sub>m</sub></td>
+                                    <td class="weight-value" id="paramKm">25</td>
+                                    <td>[S] at which V<sub>0</sub> = &frac12;V<sub>max</sub></td>
+                                </tr>
+                                <tr>
+                                    <td>[S]/K<sub>m</sub></td>
+                                    <td class="weight-value" id="paramSKm">1.2</td>
+                                    <td>Saturation ratio</td>
+                                </tr>
+                                <tr>
+                                    <td>Apparent K<sub>m</sub></td>
+                                    <td class="weight-value" id="paramAppKm">25</td>
+                                    <td>Effective K<sub>m</sub> with inhibitor</td>
+                                </tr>
+                                <tr>
+                                    <td>Apparent V<sub>max</sub></td>
+                                    <td class="weight-value" id="paramAppVmax">100</td>
+                                    <td>Effective V<sub>max</sub> with inhibitor</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Explanation Section -->
+        <div class="math-section">
+
+            <h2>What you are looking at</h2>
+            <p>The chamber above shows a <em>schematic</em> of a reaction vessel, not a literal slice of solution. The 12 large green circles are individual enzyme molecules (E). The small blue dots are substrate molecules (S); their count scales with [S]: at 30 mM roughly 18 dots are shown, at 200 mM roughly 120. In reality a 30 mM solution contains around 1.8&times;10<sup>22</sup> molecules per liter&mdash;the cartoon simply makes the proportionality visible.</p>
+
+            <p>What <em>is</em> physically meaningful: the <strong>fraction of enzymes in the ES state</strong> (labeled "ES," darker green) approximates the true steady-state fraction [ES]/[E<sub>t</sub>] = [S]/(K<sub>m</sub> + [S]). Drag [S] far above K<sub>m</sub> and nearly every enzyme is bound; drag it well below K<sub>m</sub> and most enzymes sit idle as free E. Each time an ES complex completes catalysis, an orange product dot appears and the enzyme immediately re-enters the free pool. The rate at which you see orange flashes is proportional to V<sub>0</sub>.</p>
+
+            <h2>The reaction mechanism</h2>
+            <p>The two-step scheme underlying the simulation is:</p>
+
+            <div class="math-box">
+                <div class="equation">E + S &rightleftharpoons; ES &rarr; E + P</div>
+                <div class="label">k<sub>1</sub> (binding rate), k<sub>-1</sub> (dissociation rate), k<sub>cat</sub> (catalytic rate). The irreversible arrow is valid at initial-velocity conditions where [P] &asymp; 0 so back-reaction from P is negligible.</div>
+            </div>
+
+            <p>Michaelis and Menten (1913) derived the rate law assuming rapid equilibrium between E+S and ES. Briggs and Haldane (1925) showed the same equation follows from the more general <strong>steady-state assumption</strong>: [ES] is constant because its rate of formation (k<sub>1</sub>[E][S]) equals its total rate of breakdown (k<sub>-1</sub>[ES] + k<sub>cat</sub>[ES]). Solving for [ES] and substituting V<sub>0</sub> = k<sub>cat</sub>[ES] gives:</p>
+
+            <div class="highlight-box">
+                <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">Michaelis-Menten equation</div>
+                <div class="big-equation">V<sub>0</sub> = V<sub>max</sub> [S] / (K<sub>m</sub> + [S])</div>
+                <div style="font-size: 12px; color: var(--text-muted); margin-top: 8px;">V<sub>max</sub> = k<sub>cat</sub> [E<sub>t</sub>] &nbsp;&nbsp;&middot;&nbsp;&nbsp; K<sub>m</sub> = (k<sub>-1</sub> + k<sub>cat</sub>) / k<sub>1</sub></div>
+            </div>
+
+            <h2>The V<sub>0</sub> vs [S] curve</h2>
+            <p>The upper graph plots V<sub>0</sub> against [S]; the <strong>red dot</strong> is your current slider position. At low [S] (few blue dots, most enzymes labeled E) the dot sits on the nearly-linear rising portion: [S] &lt;&lt; K<sub>m</sub>, so K<sub>m</sub> + [S] &asymp; K<sub>m</sub> and</p>
+
+            <div class="math-box">
+                <div class="equation">V<sub>0</sub> &asymp; (V<sub>max</sub> / K<sub>m</sub>) [S]</div>
+                <div class="label">First-order in [S]: every extra substrate molecule finds an empty enzyme. In the chamber, nearly every enzyme is free (E) and orange flashes are rare.</div>
+            </div>
+
+            <p>Drag [S] far above K<sub>m</sub> (the dashed vertical marker on the curve) and the dot climbs toward the plateau: [S] &gt;&gt; K<sub>m</sub>, so K<sub>m</sub> + [S] &asymp; [S] and V<sub>0</sub> &asymp; V<sub>max</sub>. In the chamber nearly all enzymes are in the ES state; adding more blue dots cannot speed things up because every active site is already occupied. This <strong>saturation</strong> is the hallmark of enzyme kinetics. K<sub>m</sub> is defined as the [S] at which V<sub>0</sub> = &frac12; V<sub>max</sub>:</p>
+
+            <div class="math-box">
+                <div class="equation">At [S] = K<sub>m</sub>: &nbsp; V<sub>0</sub> = V<sub>max</sub> / 2</div>
+                <div class="label">At this point exactly half the enzyme is bound (ES) and half is free (E). Watch the chamber when [S] = K<sub>m</sub>: roughly six of the twelve enzymes should be labeled ES at any moment.</div>
+            </div>
+
+            <p>Note that K<sub>m</sub> equals the true equilibrium dissociation constant K<sub>d</sub> = k<sub>-1</sub>/k<sub>1</sub> only in the rapid-equilibrium limit (k<sub>cat</sub> &lt;&lt; k<sub>-1</sub>); in general K<sub>m</sub> reflects both binding affinity and the catalytic rate.</p>
+
+            <h2>The Lineweaver-Burk plot</h2>
+            <p>The lower graph is a <strong>double-reciprocal (Lineweaver-Burk) plot</strong>: 1/V<sub>0</sub> on the y-axis, 1/[S] on the x-axis. Taking the reciprocal of the Michaelis-Menten equation rearranges it into a linear form:</p>
+
+            <div class="math-box">
+                <div class="equation">1/V<sub>0</sub> = (K<sub>m</sub>/V<sub>max</sub>)(1/[S]) + 1/V<sub>max</sub></div>
+                <div class="label">Slope = K<sub>m</sub>/V<sub>max</sub> &nbsp;&middot;&nbsp; y-intercept = 1/V<sub>max</sub> &nbsp;&middot;&nbsp; x-intercept = &minus;1/K<sub>m</sub></div>
+            </div>
+
+            <p>The <strong>red dot</strong> in the Lineweaver-Burk plot is the same operating point (1/[S], 1/V<sub>0</sub>) as on the MM curve above&mdash;move the [S] slider and watch both dots move simultaneously. The red markers on the axes label the intercepts. This linearization was historically essential for extracting K<sub>m</sub> and V<sub>max</sub> from experimental data before nonlinear curve fitting was routine; today it is mainly useful for visually diagnosing inhibition type (see below).</p>
+
+            <h2>Enzyme inhibition</h2>
+            <p>Select an inhibitor type in the controls and raise [I]. Watch what changes in the chamber, the MM curve, and the Lineweaver-Burk plot. The ghost curve (dashed) shows the uninhibited baseline for comparison.</p>
+
+            <div class="math-box">
+                <div class="equation"><strong>Competitive:</strong> &nbsp; V<sub>0</sub> = V<sub>max</sub>[S] / (&alpha;K<sub>m</sub> + [S])</div>
+                <div class="equation"><strong>Uncompetitive:</strong> &nbsp; V<sub>0</sub> = V<sub>max</sub>[S] / (K<sub>m</sub> + &alpha;&prime;[S])</div>
+                <div class="equation"><strong>Mixed:</strong> &nbsp; V<sub>0</sub> = V<sub>max</sub>[S] / (&alpha;K<sub>m</sub> + &alpha;&prime;[S])</div>
+                <div class="label">&alpha; = 1 + [I]/K<sub>I</sub> (affects free E) &nbsp;&middot;&nbsp; &alpha;&prime; = 1 + [I]/K&prime;<sub>I</sub> (affects ES). Here K<sub>I</sub> = K&prime;<sub>I</sub> = 30 &mu;M.</div>
+            </div>
+
+            <p><strong>Competitive inhibition</strong> (select it and watch the chamber): some free enzymes turn red and are labeled <em>EI</em>&mdash;the inhibitor has entered the active site and physically blocked substrate from binding. Free E can be either EI or available; bound ES enzymes are unaffected. On the MM curve the plateau (V<sub>max</sub>) is unchanged but the curve is shifted right: apparent K<sub>m</sub> = &alpha;K<sub>m</sub>. High [S] can always outcompete the inhibitor, so the dashed K<sub>m</sub> marker moves right while the V<sub>max</sub> dashed line stays put. On the Lineweaver-Burk plot the lines fan out from the same y-intercept (1/V<sub>max</sub> unchanged) with steeper slopes (&alpha;K<sub>m</sub>/V<sub>max</sub>).</p>
+
+            <p><strong>Uncompetitive inhibition</strong>: the inhibitor cannot bind free enzyme at all&mdash;it binds only to the ES complex at a site remote from the active site, forming ESI. In the chamber, free enzymes (E) remain green; it is the bound ES complexes that sometimes turn red (ESI) and stall. Because ESI pulls the E+S &rightleftharpoons; ES equilibrium toward ES, the enzyme actually <em>appears</em> to bind substrate more tightly: apparent K<sub>m</sub> = K<sub>m</sub>/&alpha;&prime; decreases. Apparent V<sub>max</sub> = V<sub>max</sub>/&alpha;&prime; also decreases because a fraction of ES is stuck as ESI. On the Lineweaver-Burk plot both intercepts shift by the same factor &alpha;&prime;, giving <strong>parallel lines</strong>&mdash;the diagnostic signature of uncompetitive inhibition.</p>
+
+            <p><strong>Mixed inhibition</strong>: the inhibitor can bind either free E (forming EI, labeled red in the chamber) or ES (forming ESI, also red). Both &alpha; and &alpha;&prime; are &gt; 1, so both apparent K<sub>m</sub> and apparent V<sub>max</sub> change. When &alpha; = &alpha;&prime; (equal affinity for E and ES) this reduces to <strong>noncompetitive inhibition</strong>: K<sub>m</sub> is unchanged but V<sub>max</sub> decreases; on the Lineweaver-Burk plot the lines intersect on the x-axis.</p>
+        </div>
+
+        <div class="credit">
+            Based on Chapter 6 of <a href="https://www.macmillanlearning.com/college/us/product/Lehninger-Principles-of-Biochemistry/p/1319228003">Lehninger's Principles of Biochemistry</a> by Nelson and Cox.
+        </div>
+    </main>
+
+    <script>
+        // ========== HELPERS ==========
+        const randomBetween = (min, max) => Math.random() * (max - min) + min;
+        const isDark = () => document.documentElement.classList.contains('dark');
+
+        // ========== SIMULATION CANVAS ==========
+        const simContainer = document.getElementById('simCanvasContainer');
+        const simCanvas = document.getElementById('simCanvas');
+        const simCtx = simCanvas.getContext('2d');
+        const simWidth = Math.min(500, window.innerWidth - 40);
+        const simHeight = simWidth;
+        const scale = window.devicePixelRatio;
+
+        simCanvas.style.width = simWidth + 'px';
+        simCanvas.style.height = simHeight + 'px';
+        simCanvas.width = Math.floor(simWidth * scale);
+        simCanvas.height = Math.floor(simHeight * scale);
+        simCtx.scale(scale, scale);
+        simCanvas.style.borderRadius = '24px';
+
+        // ========== STATE ==========
+        let substrate_conc = 30;
+        let vmax = 100;
+        let km = 25;
+        let inhibitionType = 'none';
+        let inhibitorConc = 30;
+        const KI = 30; // inhibition constant
+
+        // Entities
+        const NUM_ENZYMES = 12;
+        let enzymes = [];
+        let substrates = [];
+        let products = [];
+
+        // Product tracking (must be declared before initAll() is called)
+        let productCount = 0;
+        let productHistory = [];
+        const maxHistory = 200;
+        let lastProductCheck = 0;
+
+        // Enzyme states: 'free', 'bound'
+        const initEnzymes = () => {
+            enzymes = [];
+            for (let i = 0; i < NUM_ENZYMES; i++) {
+                enzymes.push({
+                    x: randomBetween(40, simWidth - 40),
+                    y: randomBetween(40, simHeight - 40),
+                    vx: randomBetween(-0.3, 0.3),
+                    vy: randomBetween(-0.3, 0.3),
+                    state: 'free',
+                    boundSubstrate: null,
+                    catalyzeTimer: 0,
+                    radius: 18,
+                    inhibited: false,
+                    inhibitedType: null   // 'EI' (competitive/mixed) or 'ESI' (uncompetitive/mixed)
+                });
+            }
+        };
+
+        const initSubstrates = () => {
+            substrates = [];
+            const numSub = Math.floor(substrate_conc * 0.6);
+            for (let i = 0; i < numSub; i++) {
+                substrates.push({
+                    x: randomBetween(10, simWidth - 10),
+                    y: randomBetween(10, simHeight - 10),
+                    vx: randomBetween(-2, 2),
+                    vy: randomBetween(-2, 2),
+                    radius: 5,
+                    bound: false
+                });
+            }
+        };
+
+        const initAll = () => {
+            initEnzymes();
+            initSubstrates();
+            products = [];
+            productCount = 0;
+            productHistory = [];
+        };
+
+        initAll();
+
+        // ========== KINETICS ==========
+        const getAlpha = () => {
+            if (inhibitionType === 'competitive' || inhibitionType === 'mixed') {
+                return 1 + inhibitorConc / KI;
+            }
+            return 1;
+        };
+
+        const getAlphaPrime = () => {
+            if (inhibitionType === 'uncompetitive' || inhibitionType === 'mixed') {
+                return 1 + inhibitorConc / KI;
+            }
+            return 1;
+        };
+
+        const calcV0 = (s) => {
+            const alpha = getAlpha();
+            const alphaPrime = getAlphaPrime();
+            return vmax * s / (alpha * km + alphaPrime * s);
+        };
+
+        const calcAppKm = () => {
+            const alpha = getAlpha();
+            const alphaPrime = getAlphaPrime();
+            return alpha * km / alphaPrime;
+        };
+
+        const calcAppVmax = () => {
+            const alphaPrime = getAlphaPrime();
+            return vmax / alphaPrime;
+        };
+
+        // ========== SIMULATION PHYSICS ==========
+        const bindingRadius = 22;
+        const catalyzeTime = 60; // frames to convert S -> P
+
+        const updateSimulation = (timestamp) => {
+            // Calculate binding/unbinding probabilities from MM kinetics
+            const v0 = calcV0(substrate_conc);
+            const saturation = v0 / vmax;
+
+            // Move substrates
+            substrates.forEach(s => {
+                if (s.bound) return;
+                s.x += s.vx;
+                s.y += s.vy;
+
+                if (s.x < s.radius || s.x > simWidth - s.radius) { s.vx *= -1; s.x = Math.max(s.radius, Math.min(simWidth - s.radius, s.x)); }
+                if (s.y < s.radius || s.y > simHeight - s.radius) { s.vy *= -1; s.y = Math.max(s.radius, Math.min(simHeight - s.radius, s.y)); }
+
+                s.vx += randomBetween(-0.15, 0.15);
+                s.vy += randomBetween(-0.15, 0.15);
+                s.vx *= 0.98;
+                s.vy *= 0.98;
+            });
+
+            // Move products (drift away)
+            products.forEach(p => {
+                p.x += p.vx;
+                p.y += p.vy;
+                if (p.x < p.radius || p.x > simWidth - p.radius) p.vx *= -1;
+                if (p.y < p.radius || p.y > simHeight - p.radius) p.vy *= -1;
+                p.vx *= 0.99;
+                p.vy *= 0.99;
+                p.life -= 1;
+            });
+            products = products.filter(p => p.life > 0);
+
+            // Move enzymes slowly
+            enzymes.forEach(e => {
+                if (e.state === 'bound') {
+                    e.catalyzeTimer++;
+                    const speed = 1 + (vmax / 50);
+
+                    if (e.inhibited && e.inhibitedType === 'ESI') {
+                        // ESI complex (uncompetitive/mixed): inhibitor at allosteric site blocks catalysis.
+                        // Substrate still occupies active site. Inhibitor dissociates after a delay.
+                        if (e.catalyzeTimer > catalyzeTime * 2 / speed) {
+                            e.inhibited = false;
+                            e.inhibitedType = null;
+                            e.catalyzeTimer = 0;
+                        }
+                        return;
+                    }
+
+                    if (e.catalyzeTimer > catalyzeTime / speed) {
+                        // ES → E + P: release product
+                        if (e.boundSubstrate !== null) {
+                            const s = e.boundSubstrate;
+                            products.push({
+                                x: e.x + randomBetween(-10, 10),
+                                y: e.y + randomBetween(-10, 10),
+                                vx: randomBetween(-1.5, 1.5),
+                                vy: randomBetween(-1.5, 1.5),
+                                radius: 4,
+                                life: 300
+                            });
+                            const idx = substrates.indexOf(s);
+                            if (idx >= 0) substrates.splice(idx, 1);
+                            productCount++;
+                        }
+                        e.state = 'free';
+                        e.boundSubstrate = null;
+                        e.catalyzeTimer = 0;
+
+                        // Replenish substrate to maintain [S]
+                        substrates.push({
+                            x: randomBetween(10, simWidth - 10),
+                            y: randomBetween(10, simHeight - 10),
+                            vx: randomBetween(-2, 2),
+                            vy: randomBetween(-2, 2),
+                            radius: 5,
+                            bound: false
+                        });
+                    }
+                    return;
+                }
+
+                e.x += e.vx;
+                e.y += e.vy;
+                if (e.x < e.radius || e.x > simWidth - e.radius) { e.vx *= -1; }
+                if (e.y < e.radius || e.y > simHeight - e.radius) { e.vy *= -1; }
+                e.x = Math.max(e.radius, Math.min(simWidth - e.radius, e.x));
+                e.y = Math.max(e.radius, Math.min(simHeight - e.radius, e.y));
+                e.vx += randomBetween(-0.05, 0.05);
+                e.vy += randomBetween(-0.05, 0.05);
+                e.vx *= 0.98;
+                e.vy *= 0.98;
+            });
+
+            // Binding: use Glauber-style dynamics
+            // Probability of binding should reflect the equilibrium: fraction bound = [S]/(Km + [S])
+            const alpha = getAlpha();
+            const alphaPrime = getAlphaPrime();
+            const effectiveKm = alpha * km;
+            const pBind = substrate_conc / (effectiveKm + substrate_conc);
+            const flipRate = 0.04;
+
+            enzymes.forEach((e, ei) => {
+                if (Math.random() > flipRate) return;
+
+                if (e.state === 'free' && e.inhibitedType !== 'EI') {
+                    // EI complex (competitive/mixed) prevents substrate from entering active site
+                    if (Math.random() < pBind) {
+                        // Find nearest free substrate
+                        let closest = null;
+                        let closestDist = Infinity;
+                        substrates.forEach(s => {
+                            if (s.bound) return;
+                            const dx = e.x - s.x;
+                            const dy = e.y - s.y;
+                            const d = Math.sqrt(dx*dx + dy*dy);
+                            if (d < closestDist) { closestDist = d; closest = s; }
+                        });
+                        if (closest) {
+                            e.state = 'bound';
+                            e.boundSubstrate = closest;
+                            closest.bound = true;
+                            closest.x = e.x;
+                            closest.y = e.y;
+                            e.catalyzeTimer = 0;
+                        }
+                    }
+                } else if (e.state === 'bound') {
+                    // Chance to unbind (reverse reaction, k-1)
+                    const pUnbind = effectiveKm / (effectiveKm + substrate_conc) * 0.3;
+                    if (Math.random() < pUnbind) {
+                        if (e.boundSubstrate) {
+                            e.boundSubstrate.bound = false;
+                            e.boundSubstrate.vx = randomBetween(-2, 2);
+                            e.boundSubstrate.vy = randomBetween(-2, 2);
+                        }
+                        e.state = 'free';
+                        e.boundSubstrate = null;
+                        e.catalyzeTimer = 0;
+                    }
+                }
+            });
+
+            // Inhibition: type-specific binding to correct enzyme form
+            // Competitive/mixed: inhibitor binds free E → EI (blocks substrate binding)
+            // Uncompetitive/mixed: inhibitor binds ES complex → ESI (blocks catalysis)
+            if (inhibitionType !== 'none') {
+                const pInhibit = inhibitorConc / (KI + inhibitorConc);
+                enzymes.forEach(e => {
+                    if (!e.inhibited) {
+                        if ((inhibitionType === 'competitive' || inhibitionType === 'mixed') && e.state === 'free') {
+                            if (Math.random() < 0.015 && Math.random() < pInhibit) {
+                                e.inhibited = true;
+                                e.inhibitedType = 'EI';
+                            }
+                        }
+                        if ((inhibitionType === 'uncompetitive' || inhibitionType === 'mixed') && e.state === 'bound' && e.inhibitedType !== 'ESI') {
+                            if (Math.random() < 0.015 && Math.random() < pInhibit) {
+                                e.inhibited = true;
+                                e.inhibitedType = 'ESI';
+                            }
+                        }
+                    }
+                    // EI inhibitor dissociates from free enzyme
+                    if (e.inhibited && e.inhibitedType === 'EI' && Math.random() < 0.008) {
+                        e.inhibited = false;
+                        e.inhibitedType = null;
+                    }
+                });
+            } else {
+                enzymes.forEach(e => { e.inhibited = false; e.inhibitedType = null; });
+            }
+
+            // Track product rate
+            if (timestamp - lastProductCheck > 500) {
+                productHistory.push(productCount);
+                if (productHistory.length > maxHistory) productHistory.shift();
+                lastProductCheck = timestamp;
+            }
+        };
+
+        // ========== DRAWING ==========
+        const drawSimulation = () => {
+            const ctx = simCtx;
+
+            // Background
+            const gradient = ctx.createLinearGradient(0, 0, 0, simHeight);
+            if (isDark()) {
+                gradient.addColorStop(0, '#1a2530');
+                gradient.addColorStop(1, '#0f1520');
+            } else {
+                gradient.addColorStop(0, '#e8f4e8');
+                gradient.addColorStop(1, '#d0e8d0');
+            }
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, simWidth, simHeight);
+
+            // Label
+            ctx.fillStyle = isDark() ? '#4a6050' : '#70a080';
+            ctx.font = '12px -apple-system, BlinkMacSystemFont, sans-serif';
+            ctx.textAlign = 'left';
+            ctx.fillText('Enzyme reaction chamber', 15, 25);
+
+            // Draw products (orange)
+            products.forEach(p => {
+                const alpha = Math.min(1, p.life / 100);
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(230, 150, 50, ${alpha})`;
+                ctx.fill();
+                ctx.strokeStyle = `rgba(180, 110, 30, ${alpha})`;
+                ctx.lineWidth = 1;
+                ctx.stroke();
+            });
+
+            // Draw substrates (blue)
+            substrates.forEach(s => {
+                if (s.bound) return;
+                ctx.beginPath();
+                ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
+                ctx.fillStyle = '#4488cc';
+                ctx.fill();
+                ctx.strokeStyle = '#336699';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+
+                // Small highlight
+                ctx.beginPath();
+                ctx.arc(s.x - 1, s.y - 1, s.radius * 0.3, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(150, 200, 255, 0.5)';
+                ctx.fill();
+            });
+
+            // Draw enzymes
+            enzymes.forEach(e => {
+                // Glow for bound enzymes
+                if (e.state === 'bound') {
+                    const glow = ctx.createRadialGradient(e.x, e.y, 0, e.x, e.y, e.radius * 2);
+                    glow.addColorStop(0, 'rgba(45, 122, 94, 0.3)');
+                    glow.addColorStop(1, 'rgba(45, 122, 94, 0)');
+                    ctx.fillStyle = glow;
+                    ctx.beginPath();
+                    ctx.arc(e.x, e.y, e.radius * 2, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                // Enzyme body
+                ctx.beginPath();
+                ctx.arc(e.x, e.y, e.radius, 0, Math.PI * 2);
+
+                if (e.inhibited) {
+                    ctx.fillStyle = '#cc4444'; // Red for inhibited
+                } else if (e.state === 'bound') {
+                    ctx.fillStyle = '#2d7a5e'; // Green, bound
+                } else {
+                    ctx.fillStyle = isDark() ? '#3d7a5e' : '#5aaa80'; // Green, free
+                }
+                ctx.fill();
+                ctx.strokeStyle = isDark() ? '#1a4a30' : '#1a5a3e';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                // Active site notch: shows what occupies the active site
+                ctx.beginPath();
+                ctx.arc(e.x + e.radius * 0.5, e.y, e.radius * 0.35, 0, Math.PI * 2);
+                if (e.inhibitedType === 'EI') {
+                    ctx.fillStyle = '#ff6666';  // inhibitor blocks active site (competitive)
+                } else if (e.state === 'bound') {
+                    ctx.fillStyle = '#4488cc';  // substrate in active site (ES or ESI)
+                } else {
+                    ctx.fillStyle = isDark() ? '#2a4a3a' : '#4a9a6a';  // empty active site
+                }
+                ctx.fill();
+
+                // Label: show the correct enzyme complex state
+                ctx.fillStyle = 'white';
+                ctx.font = 'bold 9px -apple-system, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                if (e.inhibitedType === 'EI') {
+                    ctx.fillText('EI', e.x - 2, e.y);        // competitive: inhibitor at active site
+                } else if (e.inhibitedType === 'ESI') {
+                    ctx.fillText('ESI', e.x - 2, e.y);       // uncompetitive: inhibitor at allosteric site
+                } else if (e.state === 'bound') {
+                    ctx.fillText('ES', e.x - 3, e.y);
+                } else {
+                    ctx.fillText('E', e.x - 3, e.y);
+                }
+            });
+
+            // Stats overlay
+            const boundCount = enzymes.filter(e => e.state === 'bound' || e.inhibitedType === 'ESI').length;
+            const freeSubstrates = substrates.filter(s => !s.bound).length;
+            const fracBound = (boundCount / NUM_ENZYMES).toFixed(2);
+            const fracTheory = (substrate_conc / (calcAppKm() + substrate_conc)).toFixed(2);
+            ctx.fillStyle = isDark() ? 'rgba(0,0,0,0.55)' : 'rgba(255,255,255,0.85)';
+            ctx.fillRect(10, simHeight - 48, simWidth - 20, 38);
+            ctx.strokeStyle = 'rgba(45, 122, 94, 0.4)';
+            ctx.strokeRect(10, simHeight - 48, simWidth - 20, 38);
+            ctx.fillStyle = isDark() ? '#e8e4df' : '#2d2a26';
+            ctx.font = '11px -apple-system, BlinkMacSystemFont, sans-serif';
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'alphabetic';
+            ctx.fillText(`ES: ${boundCount}  Free E: ${NUM_ENZYMES - boundCount}  |  frac. bound: ${fracBound} (theory [S]/(Km+[S]): ${fracTheory})`, 18, simHeight - 30);
+            ctx.fillText(`[S] = ${substrate_conc} mM  →  ${freeSubstrates + boundCount} substrate dots shown  |  Products released: ${productCount}`, 18, simHeight - 14);
+        };
+
+        // ========== GRAPH: Michaelis-Menten Curve ==========
+        const mmCanvas = document.getElementById('mmGraph');
+        const mmCtx = mmCanvas.getContext('2d');
+        const mmWidth = Math.min(470, window.innerWidth - 70);
+        const mmHeight = 180;
+
+        mmCanvas.style.width = mmWidth + 'px';
+        mmCanvas.style.height = mmHeight + 'px';
+        mmCanvas.width = Math.floor(mmWidth * scale);
+        mmCanvas.height = Math.floor(mmHeight * scale);
+        mmCtx.scale(scale, scale);
+
+        const drawMMGraph = () => {
+            const padding = { left: 45, right: 20, top: 20, bottom: 35 };
+            const gw = mmWidth - padding.left - padding.right;
+            const gh = mmHeight - padding.top - padding.bottom;
+
+            mmCtx.fillStyle = isDark() ? '#1a1614' : '#f7fafc';
+            mmCtx.fillRect(0, 0, mmWidth, mmHeight);
+
+            // Axes
+            mmCtx.strokeStyle = isDark() ? '#6a6560' : '#4a5568';
+            mmCtx.lineWidth = 2;
+            mmCtx.beginPath();
+            mmCtx.moveTo(padding.left, padding.top);
+            mmCtx.lineTo(padding.left, mmHeight - padding.bottom);
+            mmCtx.lineTo(mmWidth - padding.right, mmHeight - padding.bottom);
+            mmCtx.stroke();
+
+            // Grid
+            mmCtx.strokeStyle = isDark() ? '#3a3530' : '#e2e8f0';
+            mmCtx.lineWidth = 1;
+            for (let i = 0; i <= 4; i++) {
+                const y = padding.top + (gh / 4) * i;
+                mmCtx.beginPath();
+                mmCtx.moveTo(padding.left, y);
+                mmCtx.lineTo(mmWidth - padding.right, y);
+                mmCtx.stroke();
+
+                const val = ((4 - i) / 4 * calcAppVmax() * 1.2).toFixed(0);
+                mmCtx.fillStyle = isDark() ? '#9a9288' : '#718096';
+                mmCtx.font = '9px sans-serif';
+                mmCtx.textAlign = 'right';
+                mmCtx.fillText(val, padding.left - 5, y + 3);
+            }
+
+            // X axis labels
+            const maxS = 200;
+            for (let i = 0; i <= 4; i++) {
+                const x = padding.left + (gw / 4) * i;
+                const val = (maxS / 4 * i).toFixed(0);
+                mmCtx.fillStyle = isDark() ? '#9a9288' : '#718096';
+                mmCtx.font = '9px sans-serif';
+                mmCtx.textAlign = 'center';
+                mmCtx.fillText(val, x, mmHeight - padding.bottom + 15);
+            }
+            mmCtx.fillText('[S] (mM)', padding.left + gw / 2, mmHeight - 5);
+
+            // Y axis label
+            mmCtx.save();
+            mmCtx.translate(12, padding.top + gh / 2);
+            mmCtx.rotate(-Math.PI / 2);
+            mmCtx.fillStyle = isDark() ? '#9a9288' : '#718096';
+            mmCtx.font = '9px sans-serif';
+            mmCtx.textAlign = 'center';
+            mmCtx.fillText('V₀ (μM/min)', 0, 0);
+            mmCtx.restore();
+
+            const yMax = calcAppVmax() * 1.2 || vmax * 1.2;
+
+            // Vmax line (dashed)
+            const appVmax = calcAppVmax();
+            const vmaxY = padding.top + gh * (1 - appVmax / yMax);
+            mmCtx.strokeStyle = 'rgba(45, 122, 94, 0.3)';
+            mmCtx.setLineDash([5, 5]);
+            mmCtx.beginPath();
+            mmCtx.moveTo(padding.left, vmaxY);
+            mmCtx.lineTo(mmWidth - padding.right, vmaxY);
+            mmCtx.stroke();
+            mmCtx.setLineDash([]);
+
+            // Km marker
+            const appKm = calcAppKm();
+            if (appKm <= maxS) {
+                const kmX = padding.left + (appKm / maxS) * gw;
+                const halfVmaxY = padding.top + gh * (1 - (appVmax / 2) / yMax);
+                mmCtx.strokeStyle = 'rgba(45, 122, 94, 0.3)';
+                mmCtx.setLineDash([3, 3]);
+                mmCtx.beginPath();
+                mmCtx.moveTo(kmX, mmHeight - padding.bottom);
+                mmCtx.lineTo(kmX, halfVmaxY);
+                mmCtx.lineTo(padding.left, halfVmaxY);
+                mmCtx.stroke();
+                mmCtx.setLineDash([]);
+
+                // Km label
+                mmCtx.fillStyle = isDark() ? '#9a9288' : '#718096';
+                mmCtx.font = '9px sans-serif';
+                mmCtx.textAlign = 'center';
+                mmCtx.fillText('Km', kmX, mmHeight - padding.bottom + 25);
+            }
+
+            // No-inhibitor curve (ghost if inhibited)
+            if (inhibitionType !== 'none') {
+                mmCtx.strokeStyle = 'rgba(45, 122, 94, 0.2)';
+                mmCtx.lineWidth = 1.5;
+                mmCtx.setLineDash([4, 4]);
+                mmCtx.beginPath();
+                for (let i = 0; i <= 200; i++) {
+                    const s = (i / 200) * maxS;
+                    const v = vmax * s / (km + s);
+                    const x = padding.left + (s / maxS) * gw;
+                    const y = padding.top + gh * (1 - v / yMax);
+                    if (i === 0) mmCtx.moveTo(x, y); else mmCtx.lineTo(x, y);
+                }
+                mmCtx.stroke();
+                mmCtx.setLineDash([]);
+            }
+
+            // Main MM curve
+            mmCtx.strokeStyle = '#2d7a5e';
+            mmCtx.lineWidth = 2.5;
+            mmCtx.beginPath();
+            for (let i = 0; i <= 200; i++) {
+                const s = (i / 200) * maxS;
+                const v = calcV0(s);
+                const x = padding.left + (s / maxS) * gw;
+                const y = padding.top + gh * (1 - v / yMax);
+                if (i === 0) mmCtx.moveTo(x, y); else mmCtx.lineTo(x, y);
+            }
+            mmCtx.stroke();
+
+            // Current point
+            const currentV = calcV0(substrate_conc);
+            const dotX = padding.left + (substrate_conc / maxS) * gw;
+            const dotY = padding.top + gh * (1 - currentV / yMax);
+            mmCtx.beginPath();
+            mmCtx.arc(dotX, dotY, 5, 0, Math.PI * 2);
+            mmCtx.fillStyle = '#cc4444';
+            mmCtx.fill();
+            mmCtx.strokeStyle = 'white';
+            mmCtx.lineWidth = 2;
+            mmCtx.stroke();
+        };
+
+        // ========== GRAPH: Lineweaver-Burk ==========
+        const lbCanvas = document.getElementById('lbGraph');
+        const lbCtx = lbCanvas.getContext('2d');
+        const lbWidth = mmWidth;
+        const lbHeight = 180;
+
+        lbCanvas.style.width = lbWidth + 'px';
+        lbCanvas.style.height = lbHeight + 'px';
+        lbCanvas.width = Math.floor(lbWidth * scale);
+        lbCanvas.height = Math.floor(lbHeight * scale);
+        lbCtx.scale(scale, scale);
+
+        const drawLBGraph = () => {
+            const padding = { left: 45, right: 20, top: 20, bottom: 35 };
+            const gw = lbWidth - padding.left - padding.right;
+            const gh = lbHeight - padding.top - padding.bottom;
+
+            lbCtx.fillStyle = isDark() ? '#1a1614' : '#f7fafc';
+            lbCtx.fillRect(0, 0, lbWidth, lbHeight);
+
+            // Calculate ranges for 1/[S] and 1/V0
+            // 1/[S] from -1/Km (x-intercept) to some positive range
+            const appKm = calcAppKm();
+            const appVmax = calcAppVmax();
+
+            const maxInvS = 1 / 2; // 1/[S] up to 0.5
+            const minInvS = -1 / Math.max(appKm, 5) * 1.2;
+            const maxInvV = (appKm / appVmax) * maxInvS + 1 / appVmax;
+            const yRange = maxInvV * 1.3;
+
+            // Map functions
+            const mapX = (invS) => padding.left + ((invS - minInvS) / (maxInvS - minInvS)) * gw;
+            const mapY = (invV) => padding.top + gh * (1 - invV / yRange);
+
+            // Grid lines
+            lbCtx.strokeStyle = isDark() ? '#3a3530' : '#e2e8f0';
+            lbCtx.lineWidth = 1;
+            for (let i = 0; i <= 4; i++) {
+                const y = padding.top + (gh / 4) * i;
+                lbCtx.beginPath();
+                lbCtx.moveTo(padding.left, y);
+                lbCtx.lineTo(lbWidth - padding.right, y);
+                lbCtx.stroke();
+                const val = ((4 - i) / 4 * yRange).toFixed(3);
+                lbCtx.fillStyle = isDark() ? '#9a9288' : '#718096';
+                lbCtx.font = '8px sans-serif';
+                lbCtx.textAlign = 'right';
+                lbCtx.fillText(val, padding.left - 4, y + 3);
+            }
+
+            // Axes through origin area
+            lbCtx.strokeStyle = isDark() ? '#6a6560' : '#4a5568';
+            lbCtx.lineWidth = 2;
+
+            // Y axis at 1/[S] = 0
+            const zeroX = mapX(0);
+            lbCtx.beginPath();
+            lbCtx.moveTo(zeroX, padding.top);
+            lbCtx.lineTo(zeroX, lbHeight - padding.bottom);
+            lbCtx.stroke();
+
+            // X axis at 1/V0 = 0
+            const zeroY = mapY(0);
+            lbCtx.beginPath();
+            lbCtx.moveTo(padding.left, zeroY);
+            lbCtx.lineTo(lbWidth - padding.right, zeroY);
+            lbCtx.stroke();
+
+            // No-inhibitor line (ghost)
+            if (inhibitionType !== 'none') {
+                lbCtx.strokeStyle = 'rgba(45, 122, 94, 0.2)';
+                lbCtx.lineWidth = 1.5;
+                lbCtx.setLineDash([4, 4]);
+                lbCtx.beginPath();
+                for (let i = 0; i <= 100; i++) {
+                    const invS = minInvS + (i / 100) * (maxInvS - minInvS);
+                    const invV = (km / vmax) * invS + 1 / vmax;
+                    const x = mapX(invS);
+                    const y = mapY(invV);
+                    if (i === 0) lbCtx.moveTo(x, y); else lbCtx.lineTo(x, y);
+                }
+                lbCtx.stroke();
+                lbCtx.setLineDash([]);
+            }
+
+            // Main LB line
+            const alpha = getAlpha();
+            const alphaPrime = getAlphaPrime();
+            lbCtx.strokeStyle = '#2d7a5e';
+            lbCtx.lineWidth = 2.5;
+            lbCtx.beginPath();
+            for (let i = 0; i <= 100; i++) {
+                const invS = minInvS + (i / 100) * (maxInvS - minInvS);
+                // 1/V0 = (alpha*Km / Vmax)(1/[S]) + alpha'/Vmax
+                const invV = (alpha * km / vmax) * invS + alphaPrime / vmax;
+                const x = mapX(invS);
+                const y = mapY(invV);
+                if (i === 0) lbCtx.moveTo(x, y); else lbCtx.lineTo(x, y);
+            }
+            lbCtx.stroke();
+
+            // Labels
+            lbCtx.fillStyle = isDark() ? '#9a9288' : '#718096';
+            lbCtx.font = '9px sans-serif';
+            lbCtx.textAlign = 'center';
+            lbCtx.fillText('1/[S] (1/mM)', padding.left + gw / 2, lbHeight - 5);
+
+            lbCtx.save();
+            lbCtx.translate(12, padding.top + gh / 2);
+            lbCtx.rotate(-Math.PI / 2);
+            lbCtx.fillText('1/V₀', 0, 0);
+            lbCtx.restore();
+
+            // Mark intercepts
+            // Y-intercept: α'/V_max (at 1/[S] = 0)
+            const yInt = alphaPrime / vmax;
+            const yIntY = mapY(yInt);
+            if (yIntY > padding.top && yIntY < lbHeight - padding.bottom) {
+                lbCtx.beginPath();
+                lbCtx.arc(zeroX, yIntY, 4, 0, Math.PI * 2);
+                lbCtx.fillStyle = '#cc4444';
+                lbCtx.fill();
+                lbCtx.fillStyle = isDark() ? '#9a9288' : '#718096';
+                lbCtx.font = '8px sans-serif';
+                lbCtx.textAlign = 'left';
+                const yIntLabel = inhibitionType === 'none' ? '1/V\u2098\u2090\u02e3' : '\u03b1\u2032/V\u2098\u2090\u02e3';
+                lbCtx.fillText(yIntLabel, zeroX + 5, yIntY - 4);
+            }
+
+            // X-intercept: -α'/(α·K_m) = -1/K_m,app  (at 1/V_0 = 0)
+            const xInt = -alphaPrime / (alpha * km);
+            const xIntX = mapX(xInt);
+            if (xIntX > padding.left && xIntX < lbWidth - padding.right) {
+                lbCtx.beginPath();
+                lbCtx.arc(xIntX, zeroY, 4, 0, Math.PI * 2);
+                lbCtx.fillStyle = '#cc4444';
+                lbCtx.fill();
+                lbCtx.fillStyle = isDark() ? '#9a9288' : '#718096';
+                lbCtx.font = '8px sans-serif';
+                lbCtx.textAlign = 'center';
+                const xIntLabel = inhibitionType === 'none' ? '-1/K\u2098' : '-1/K\u2098,app';
+                lbCtx.fillText(xIntLabel, xIntX, zeroY + 12);
+            }
+
+            // Current point
+            if (substrate_conc > 0) {
+                const curInvS = 1 / substrate_conc;
+                const curInvV = 1 / calcV0(substrate_conc);
+                if (curInvS <= maxInvS) {
+                    const cx = mapX(curInvS);
+                    const cy = mapY(curInvV);
+                    lbCtx.beginPath();
+                    lbCtx.arc(cx, cy, 5, 0, Math.PI * 2);
+                    lbCtx.fillStyle = '#cc4444';
+                    lbCtx.fill();
+                    lbCtx.strokeStyle = 'white';
+                    lbCtx.lineWidth = 2;
+                    lbCtx.stroke();
+                }
+            }
+        };
+
+        // ========== UI UPDATES ==========
+        const updateUI = () => {
+            const v0 = calcV0(substrate_conc);
+            const appKm = calcAppKm();
+            const appVmax = calcAppVmax();
+
+            document.getElementById('substrateValue').innerHTML = `[S] = ${substrate_conc} mM`;
+            document.getElementById('vmaxValue').innerHTML = `V<sub>max</sub> = ${vmax} &mu;M/min`;
+            document.getElementById('kmValue').innerHTML = `K<sub>m</sub> = ${km} mM`;
+
+            document.getElementById('currentV0').textContent = v0.toFixed(1);
+            document.getElementById('currentRatio').textContent = (v0 / vmax).toFixed(3);
+
+            document.getElementById('paramV0').textContent = v0.toFixed(1) + ' μM/min';
+            document.getElementById('paramVmax').textContent = vmax + ' μM/min';
+            document.getElementById('paramKm').textContent = km + ' mM';
+            document.getElementById('paramSKm').textContent = (substrate_conc / km).toFixed(2);
+            document.getElementById('paramAppKm').textContent = appKm.toFixed(1) + ' mM';
+            document.getElementById('paramAppVmax').textContent = appVmax.toFixed(1) + ' μM/min';
+
+            if (inhibitionType !== 'none') {
+                document.getElementById('inhibitorValue').textContent = `[I] = ${inhibitorConc} \u03bcM`;
+            }
+        };
+
+        // ========== EVENT LISTENERS ==========
+        document.getElementById('substrateSlider').addEventListener('input', e => {
+            substrate_conc = parseInt(e.target.value);
+            // Re-init substrates to match
+            const currentFree = substrates.filter(s => !s.bound).length;
+            const target = Math.floor(substrate_conc * 0.6);
+            const boundSubs = substrates.filter(s => s.bound);
+            const freeSubs = substrates.filter(s => !s.bound);
+
+            if (target > freeSubs.length) {
+                for (let i = 0; i < target - freeSubs.length; i++) {
+                    substrates.push({
+                        x: randomBetween(10, simWidth - 10),
+                        y: randomBetween(10, simHeight - 10),
+                        vx: randomBetween(-2, 2),
+                        vy: randomBetween(-2, 2),
+                        radius: 5,
+                        bound: false
+                    });
+                }
+            } else if (target < freeSubs.length) {
+                let toRemove = freeSubs.length - target;
+                substrates = substrates.filter(s => {
+                    if (s.bound) return true;
+                    if (toRemove > 0) { toRemove--; return false; }
+                    return true;
+                });
+            }
+            updateUI();
+        });
+
+        document.getElementById('vmaxSlider').addEventListener('input', e => {
+            vmax = parseInt(e.target.value);
+            updateUI();
+        });
+
+        document.getElementById('kmSlider').addEventListener('input', e => {
+            km = parseInt(e.target.value);
+            updateUI();
+        });
+
+        document.getElementById('inhibitionType').addEventListener('change', e => {
+            inhibitionType = e.target.value;
+            const group = document.getElementById('inhibitorSliderGroup');
+            group.style.display = inhibitionType === 'none' ? 'none' : 'flex';
+            updateUI();
+        });
+
+        document.getElementById('inhibitorSlider').addEventListener('input', e => {
+            inhibitorConc = parseInt(e.target.value);
+            updateUI();
+        });
+
+        simCanvas.addEventListener('click', () => {
+            productCount = 0;
+            productHistory = [];
+            products = [];
+        });
+
+        // ========== ANIMATION LOOP ==========
+        let lastTime = 0;
+        const animate = (timestamp) => {
+            updateSimulation(timestamp);
+            drawSimulation();
+            drawMMGraph();
+            drawLBGraph();
+            updateUI();
+            requestAnimationFrame(animate);
+        };
+
+        updateUI();
+        requestAnimationFrame(animate);
+
+        // ========== THEME TOGGLE ==========
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = document.getElementById('themeIcon');
+        const html = document.documentElement;
+        const savedTheme = localStorage.getItem('theme');
+
+        if (savedTheme === 'dark') { html.classList.add('dark'); themeIcon.textContent = '\u2600'; }
+        else if (savedTheme === 'light') { html.classList.add('light'); themeIcon.textContent = '\u263E'; }
+
+        themeToggle.addEventListener('click', () => {
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark'); html.classList.add('light');
+                localStorage.setItem('theme', 'light'); themeIcon.textContent = '\u263E';
+            } else {
+                html.classList.remove('light'); html.classList.add('dark');
+                localStorage.setItem('theme', 'dark'); themeIcon.textContent = '\u2600';
+            }
+        });
+    </script>
+</body>
+</html>
