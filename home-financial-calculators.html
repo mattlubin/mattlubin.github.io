@@ -1,0 +1,929 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Home Calculators</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #f5f2eb;
+    --paper: #fbf9f4;
+    --ink: #16140f;
+    --ink-2: #3a3630;
+    --muted: #87807687;
+    --muted-strong: #6d655a;
+    --line: #d9d2c1;
+    --line-soft: #e7e1d2;
+    --accent: oklch(0.52 0.11 145);
+    --accent-soft: oklch(0.93 0.045 145);
+    --accent-ink: oklch(0.32 0.09 145);
+    --warn: oklch(0.55 0.13 55);
+    --grid: #d9d2c14d;
+    --sans: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    --mono: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 15px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    font-variant-numeric: tabular-nums;
+  }
+  .page { max-width: 1180px; margin: 0 auto; padding: 56px 32px 96px; }
+
+  /* ---- Masthead ---- */
+  .mast { display: flex; align-items: end; justify-content: space-between; gap: 32px; border-bottom: 1px solid var(--line); padding-bottom: 20px; margin-bottom: 28px; }
+  .mast h1 { font-size: 26px; font-weight: 600; letter-spacing: -0.01em; margin: 0; }
+  .mast p { margin: 6px 0 0; color: var(--muted-strong); font-size: 14px; max-width: 56ch; }
+  .mast .meta { font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted-strong); white-space: nowrap; padding-bottom: 4px; }
+
+  /* ---- Tabs ---- */
+  .tabs { display: flex; gap: 0; border-bottom: 1px solid var(--line); margin-bottom: 36px; }
+  .tab { appearance: none; background: none; border: 0; font: inherit; cursor: pointer;
+         padding: 14px 22px 16px; font-size: 14px; color: var(--muted-strong);
+         border-bottom: 2px solid transparent; margin-bottom: -1px; letter-spacing: -0.005em; }
+  .tab .num { font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; color: var(--muted-strong); margin-right: 10px; opacity: 0.7; }
+  .tab:hover { color: var(--ink); }
+  .tab.active { color: var(--ink); border-bottom-color: var(--ink); font-weight: 500; }
+  .tab.active .num { color: var(--ink); opacity: 1; }
+
+  /* ---- Panels ---- */
+  .panel { display: none; }
+  .panel.active { display: block; }
+  .panel-head { margin-bottom: 28px; max-width: 70ch; }
+  .panel-head h2 { font-size: 22px; font-weight: 600; margin: 0 0 6px; letter-spacing: -0.01em; }
+  .panel-head p { margin: 0; color: var(--muted-strong); font-size: 14px; }
+
+  /* ---- Two-col layout: inputs left, graph right ---- */
+  .grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: 36px; }
+  @media (max-width: 980px) { .grid { grid-template-columns: 1fr; } }
+
+  /* ---- Calculator card ---- */
+  .calc {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 22px 24px 18px;
+  }
+  .calc .hint { font-size: 12px; color: var(--muted-strong); margin: 0 0 18px; padding-bottom: 16px; border-bottom: 1px dashed var(--line-soft); display: flex; align-items: center; gap: 10px; }
+  .hint .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+
+  .fields { display: flex; flex-direction: column; gap: 2px; }
+  .field {
+    display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 12px;
+    padding: 10px 0; border-bottom: 1px solid var(--line-soft);
+  }
+  .field:last-child { border-bottom: 0; }
+  .field-label { font-size: 13px; color: var(--ink-2); display: flex; flex-direction: column; gap: 2px; }
+  .field-label .sub { font-size: 11px; color: var(--muted-strong); font-family: var(--mono); letter-spacing: 0.02em; }
+  .field-input { display: flex; align-items: center; gap: 8px; }
+  .field-input .unit { font-family: var(--mono); font-size: 12px; color: var(--muted-strong); width: 24px; text-align: left; flex-shrink: 0; }
+  .field-input input {
+    font-family: var(--mono); font-size: 15px; font-weight: 500;
+    background: transparent; border: 0; border-bottom: 1px solid var(--line);
+    padding: 4px 4px 5px; width: 160px; text-align: right; color: var(--ink);
+    outline: none; transition: border-color 0.12s, background 0.12s;
+  }
+  .field-input input:focus { border-bottom-color: var(--ink); }
+  .field-input input::placeholder { color: var(--muted); font-weight: 400; }
+
+  .solve-btn {
+    appearance: none; background: transparent; border: 1px solid var(--line);
+    border-radius: 999px; padding: 3px 9px; font-family: var(--mono); font-size: 10px; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--muted-strong); cursor: pointer; transition: all 0.12s;
+    flex-shrink: 0;
+  }
+  .solve-btn:hover { color: var(--ink); border-color: var(--ink-2); }
+  .field.solving .solve-btn { background: var(--accent); border-color: var(--accent); color: white; }
+  .field.solving .field-input input {
+    color: var(--accent-ink); font-weight: 600;
+    background: var(--accent-soft); border-bottom-color: var(--accent);
+    padding: 4px 8px 5px;
+  }
+  .field.solving .field-label { color: var(--accent-ink); }
+
+  .calc-actions { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--line-soft); }
+  .btn {
+    appearance: none; font: inherit; cursor: pointer;
+    background: var(--ink); color: var(--paper); border: 1px solid var(--ink);
+    padding: 9px 18px; border-radius: 3px; font-size: 13px; letter-spacing: -0.005em;
+  }
+  .btn:hover { background: #000; }
+  .btn.ghost { background: transparent; color: var(--ink); border-color: var(--line); }
+  .btn.ghost:hover { border-color: var(--ink); }
+  .status { font-family: var(--mono); font-size: 11px; color: var(--muted-strong); letter-spacing: 0.02em; }
+  .status.err { color: var(--warn); }
+
+  /* ---- Summary stripe ---- */
+  .summary {
+    margin-top: 22px; padding: 16px 20px; background: var(--accent-soft);
+    border: 1px solid color-mix(in oklab, var(--accent) 30%, transparent);
+    border-radius: 4px; display: flex; flex-wrap: wrap; gap: 28px; align-items: baseline;
+  }
+  .summary .label { font-family: var(--mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent-ink); display: block; margin-bottom: 3px; }
+  .summary .value { font-family: var(--mono); font-size: 18px; font-weight: 600; color: var(--accent-ink); }
+  .summary .value.sm { font-size: 14px; }
+
+  /* ---- Graph panel ---- */
+  .graph {
+    background: var(--paper); border: 1px solid var(--line); border-radius: 4px;
+    padding: 22px 24px;
+  }
+  .graph-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 14px; gap: 12px; flex-wrap: wrap; }
+  .graph-head h3 { font-size: 14px; font-weight: 600; margin: 0; letter-spacing: -0.005em; }
+  .graph-head .subtitle { font-size: 12px; color: var(--muted-strong); font-family: var(--mono); }
+
+  .graph-controls { display: grid; grid-template-columns: auto 1fr auto 1fr; gap: 8px 14px; align-items: center; margin-bottom: 14px; padding-bottom: 16px; border-bottom: 1px dashed var(--line-soft); }
+  .graph-controls label { font-family: var(--mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted-strong); }
+  .graph-controls select {
+    font-family: var(--sans); font-size: 13px; padding: 5px 8px; background: var(--bg);
+    border: 1px solid var(--line); border-radius: 3px; color: var(--ink); width: 100%;
+  }
+  .range-row { display: grid; grid-template-columns: auto 1fr auto 1fr; gap: 8px 14px; align-items: center; margin-bottom: 16px; }
+  .range-row input {
+    font-family: var(--mono); font-size: 12px; padding: 5px 8px; background: var(--bg);
+    border: 1px solid var(--line); border-radius: 3px; color: var(--ink); width: 100%;
+    text-align: right;
+  }
+  .chart-wrap { position: relative; }
+  .chart { width: 100%; height: 320px; display: block; }
+  .chart .axis text { font-family: var(--mono); font-size: 10px; fill: var(--muted-strong); }
+  .chart .axis line { stroke: var(--line); }
+  .chart .grid line { stroke: var(--grid); stroke-dasharray: 2 3; }
+  .chart .curve { fill: none; stroke: var(--ink); stroke-width: 1.5; }
+  .chart .marker { fill: var(--accent); stroke: var(--paper); stroke-width: 2; }
+  .chart .axis-title { font-family: var(--mono); font-size: 10px; fill: var(--ink-2); letter-spacing: 0.06em; text-transform: uppercase; }
+  .readout {
+    margin-top: 12px; display: flex; gap: 24px; font-family: var(--mono); font-size: 11px;
+    color: var(--muted-strong); padding-top: 12px; border-top: 1px dashed var(--line-soft);
+  }
+  .readout b { color: var(--ink); font-weight: 600; }
+
+  .footer { margin-top: 64px; padding-top: 20px; border-top: 1px solid var(--line); font-size: 11px; color: var(--muted-strong); font-family: var(--mono); letter-spacing: 0.02em; }
+  .footer .row { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+  <div class="page">
+
+    <div class="mast">
+      <div>
+        <h1>Home Buying &amp; Selling Calculators</h1>
+        <p>Three calculators. Each one lets you fill in what you know, leave one field unknown, and solve. Then sweep any variable to see how the answer changes.</p>
+      </div>
+      <div class="meta">v0.1 — U.S. conventional loans</div>
+    </div>
+
+    <div class="tabs" role="tablist">
+      <button class="tab active" data-tab="afford"><span class="num">01</span>Affordability</button>
+      <button class="tab" data-tab="mortgage"><span class="num">02</span>Mortgage Payment</button>
+      <button class="tab" data-tab="sale"><span class="num">03</span>Sale Net Proceeds</button>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- PANEL 01: AFFORDABILITY                                     -->
+    <!-- ============================================================ -->
+    <section class="panel active" data-panel="afford">
+      <div class="panel-head">
+        <h2>How much house can you afford?</h2>
+        <p>Maps the connection between your income, debts, down payment, mortgage rate, and local property tax to a feasible home price. Tap <span style="font-family:var(--mono);font-size:11px;border:1px solid var(--line);padding:1px 6px;border-radius:99px;">SOLVE</span> on any row to make that the unknown.</p>
+      </div>
+
+      <div class="grid">
+        <div>
+          <div class="calc" data-calc="afford">
+            <p class="hint"><span class="dot"></span> Front-end DTI = housing payment ÷ gross monthly income. Lenders typically cap this at 28–36%.</p>
+            <div class="fields"></div>
+            <div class="calc-actions">
+              <span class="status">Ready</span>
+              <button class="btn" data-action="calc">Calculate</button>
+            </div>
+            <div class="summary" data-summary></div>
+          </div>
+        </div>
+        <div>
+          <div class="graph" data-graph="afford"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- PANEL 02: MORTGAGE PAYMENT                                  -->
+    <!-- ============================================================ -->
+    <section class="panel" data-panel="mortgage">
+      <div class="panel-head">
+        <h2>Mortgage payment, four ways.</h2>
+        <p>The classic amortization formula. Leave any one of price, down payment, APR, term, or monthly P&amp;I empty and solve for it.</p>
+      </div>
+
+      <div class="grid">
+        <div>
+          <div class="calc" data-calc="mortgage">
+            <p class="hint"><span class="dot"></span> Calculates principal &amp; interest only. Taxes and insurance live in the Affordability calculator above.</p>
+            <div class="fields"></div>
+            <div class="calc-actions">
+              <span class="status">Ready</span>
+              <button class="btn" data-action="calc">Calculate</button>
+            </div>
+            <div class="summary" data-summary></div>
+          </div>
+        </div>
+        <div>
+          <div class="graph" data-graph="mortgage"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- PANEL 03: SALE NET PROCEEDS                                 -->
+    <!-- ============================================================ -->
+    <section class="panel" data-panel="sale">
+      <div class="panel-head">
+        <h2>What do you walk away with?</h2>
+        <p>Selling before the mortgage is paid off. Models remaining principal from the original loan, subtracts agent and closing costs from the sale price, and returns net cash to seller.</p>
+      </div>
+
+      <div class="grid">
+        <div>
+          <div class="calc" data-calc="sale">
+            <p class="hint"><span class="dot"></span> Net = current value − remaining mortgage − agent commission − closing costs. Doesn't include capital-gains tax (talk to your CPA).</p>
+            <div class="fields"></div>
+            <div class="calc-actions">
+              <span class="status">Ready</span>
+              <button class="btn" data-action="calc">Calculate</button>
+            </div>
+            <div class="summary" data-summary></div>
+          </div>
+        </div>
+        <div>
+          <div class="graph" data-graph="sale"></div>
+        </div>
+      </div>
+    </section>
+
+    <div class="footer">
+      <div class="row">
+        <div>Estimates only — not financial advice. Conventional U.S. mortgages, monthly compounding.</div>
+        <div>house-calculators</div>
+      </div>
+    </div>
+
+  </div>
+
+<script>
+/* =================================================================
+   MATH
+   ================================================================= */
+
+// Monthly payment from principal P, annual rate apr (%), term years yrs.
+function pmt(P, apr, yrs) {
+  const n = yrs * 12;
+  const r = (apr / 100) / 12;
+  if (n <= 0) return Infinity;
+  if (r === 0) return P / n;
+  return P * r / (1 - Math.pow(1 + r, -n));
+}
+
+// Remaining balance after `monthsPaid` payments on a loan of `P` at `apr` over `yrs`.
+function remainingBalance(P, apr, yrs, monthsPaid) {
+  const n = yrs * 12;
+  const r = (apr / 100) / 12;
+  if (monthsPaid >= n) return 0;
+  if (monthsPaid <= 0) return P;
+  if (r === 0) return P * (1 - monthsPaid / n);
+  const M = pmt(P, apr, yrs);
+  return P * Math.pow(1 + r, monthsPaid) - M * (Math.pow(1 + r, monthsPaid) - 1) / r;
+}
+
+/* =================================================================
+   GENERIC SOLVER — bisection over a residual function
+   ================================================================= */
+
+function solveFor(residual, lo, hi, opts = {}) {
+  const tol = opts.tol || 1e-4;
+  const maxIter = opts.maxIter || 80;
+  let fLo = residual(lo);
+  let fHi = residual(hi);
+
+  // If same sign at both ends, try to expand or scan
+  if (fLo * fHi > 0) {
+    // Scan for sign change
+    const steps = 200;
+    let prevX = lo, prevF = fLo;
+    for (let i = 1; i <= steps; i++) {
+      const x = lo + (hi - lo) * (i / steps);
+      const f = residual(x);
+      if (prevF * f <= 0) { lo = prevX; hi = x; fLo = prevF; fHi = f; break; }
+      prevX = x; prevF = f;
+      if (i === steps) return null;
+    }
+  }
+  if (fLo * fHi > 0) return null;
+
+  for (let i = 0; i < maxIter; i++) {
+    const mid = (lo + hi) / 2;
+    const fMid = residual(mid);
+    if (!isFinite(fMid)) return null;
+    if (Math.abs(fMid) < tol || Math.abs(hi - lo) < tol) return mid;
+    if (fLo * fMid < 0) { hi = mid; fHi = fMid; }
+    else { lo = mid; fLo = fMid; }
+  }
+  return (lo + hi) / 2;
+}
+
+/* =================================================================
+   CALCULATOR SCHEMAS
+   ================================================================= */
+
+// Field types: money | percent | rate | years | months | number
+// Each field can be solved-for; one is the default unknown.
+// `compute(state)` is the constraint: returns residual (should be 0 when valid).
+// We solve for whichever field is `unknown` by bisection.
+
+const FMT = {
+  money: v => v == null || !isFinite(v) ? '—' : '$' + Math.round(v).toLocaleString('en-US'),
+  money2: v => v == null || !isFinite(v) ? '—' : '$' + (Math.round(v * 100) / 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+  percent: v => v == null || !isFinite(v) ? '—' : (Math.round(v * 100) / 100).toFixed(2) + '%',
+  rate: v => v == null || !isFinite(v) ? '—' : (Math.round(v * 1000) / 1000).toFixed(3) + '%',
+  years: v => v == null || !isFinite(v) ? '—' : (Math.round(v * 10) / 10) + ' yr',
+  number: v => v == null || !isFinite(v) ? '—' : (Math.round(v * 100) / 100).toLocaleString('en-US'),
+};
+
+const TYPES = {
+  money:   { unit: '$',   placeholder: '0',     parse: s => Number(String(s).replace(/[$,\s]/g, '')), bounds: [0, 50_000_000], fmtInput: v => Math.round(v).toLocaleString('en-US') },
+  percent: { unit: '%',   placeholder: '0.0',   parse: s => Number(String(s).replace(/[%\s]/g, '')),  bounds: [0, 100],         fmtInput: v => (Math.round(v*100)/100).toString() },
+  rate:    { unit: '%',   placeholder: '6.500', parse: s => Number(String(s).replace(/[%\s]/g, '')),  bounds: [0.01, 25],       fmtInput: v => (Math.round(v*1000)/1000).toString() },
+  years:   { unit: 'yr',  placeholder: '30',    parse: s => Number(s),                                bounds: [1, 50],          fmtInput: v => (Math.round(v*10)/10).toString() },
+  yearsHeld:{unit: 'yr',  placeholder: '5',     parse: s => Number(s),                                bounds: [0, 50],          fmtInput: v => (Math.round(v*10)/10).toString() },
+  number:  { unit: '',    placeholder: '0',     parse: s => Number(s),                                bounds: [0, 1e9],         fmtInput: v => v.toString() },
+};
+
+const CALCS = {
+
+  /* ---------- AFFORDABILITY ---------- */
+  afford: {
+    fields: [
+      { id: 'income',      label: 'Gross annual income',     sub: 'household, pre-tax',         type: 'money',  default: 120000,  bounds: [0, 5_000_000] },
+      { id: 'debts',       label: 'Other monthly debts',     sub: 'student loans, cars, cc',    type: 'money',  default: 400,     bounds: [0, 50_000] },
+      { id: 'down',        label: 'Down payment',            sub: 'cash on hand',               type: 'money',  default: 60000,   bounds: [0, 5_000_000] },
+      { id: 'apr',         label: 'Mortgage APR',            sub: '30-yr fixed, today',         type: 'rate',   default: 6.875 },
+      { id: 'term',        label: 'Loan term',               sub: 'years',                       type: 'years',  default: 30 },
+      { id: 'taxRate',     label: 'Property tax rate',       sub: 'annual, % of home value',    type: 'percent',default: 1.10,    bounds: [0, 5] },
+      { id: 'insurance',   label: 'Home insurance',          sub: 'annual, $',                   type: 'money',  default: 1800,    bounds: [0, 50_000] },
+      { id: 'dti',         label: 'Front-end DTI cap',       sub: '% of income for housing',    type: 'percent',default: 28,      bounds: [10, 50] },
+      { id: 'price',       label: 'Home price',              sub: 'feasible purchase price',    type: 'money',  default: 480000,  bounds: [0, 50_000_000], output: true },
+    ],
+    unknownDefault: 'price',
+    // residual = (computed monthly housing + debts) − (income/12 * DTI/100)
+    residual(s) {
+      const loan = Math.max(0, s.price - s.down);
+      const pi = pmt(loan, s.apr, s.term);
+      const tax = s.price * (s.taxRate / 100) / 12;
+      const ins = s.insurance / 12;
+      const allowed = (s.income / 12) * (s.dti / 100);
+      return (pi + tax + ins + s.debts) - allowed;
+    },
+    summary(s) {
+      const loan = Math.max(0, s.price - s.down);
+      const pi = pmt(loan, s.apr, s.term);
+      const tax = s.price * (s.taxRate / 100) / 12;
+      const ins = s.insurance / 12;
+      const total = pi + tax + ins;
+      return [
+        { label: 'Home price', value: FMT.money(s.price) },
+        { label: 'Loan amount', value: FMT.money(loan), sm: true },
+        { label: 'Monthly P&I', value: FMT.money(pi), sm: true },
+        { label: 'Total monthly (PITI)', value: FMT.money(total), sm: true },
+        { label: 'Down payment %', value: FMT.percent(100 * s.down / Math.max(1, s.price)), sm: true },
+      ];
+    },
+  },
+
+  /* ---------- MORTGAGE PAYMENT ---------- */
+  mortgage: {
+    fields: [
+      { id: 'price',     label: 'Home price',         sub: 'purchase price',              type: 'money',  default: 480000, bounds: [1000, 50_000_000] },
+      { id: 'down',      label: 'Down payment',       sub: 'cash at closing',             type: 'money',  default: 96000,  bounds: [0, 50_000_000] },
+      { id: 'apr',       label: 'Mortgage APR',       sub: 'annual rate',                 type: 'rate',   default: 6.875 },
+      { id: 'term',      label: 'Loan term',          sub: 'years',                        type: 'years',  default: 30 },
+      { id: 'payment',   label: 'Monthly P&I',        sub: 'principal + interest',         type: 'money',  default: 2525,   bounds: [1, 200_000], output: true },
+    ],
+    unknownDefault: 'payment',
+    residual(s) {
+      const loan = Math.max(0, s.price - s.down);
+      const calc = pmt(loan, s.apr, s.term);
+      return calc - s.payment;
+    },
+    summary(s) {
+      const loan = Math.max(0, s.price - s.down);
+      const totalPaid = s.payment * s.term * 12;
+      const totalInterest = totalPaid - loan;
+      return [
+        { label: 'Monthly P&I', value: FMT.money(s.payment) },
+        { label: 'Loan amount', value: FMT.money(loan), sm: true },
+        { label: 'Total interest over life', value: FMT.money(totalInterest), sm: true },
+        { label: 'Total paid over life', value: FMT.money(totalPaid), sm: true },
+      ];
+    },
+  },
+
+  /* ---------- SALE NET PROCEEDS ---------- */
+  sale: {
+    fields: [
+      { id: 'origPrice',   label: 'Original purchase price', sub: 'when you bought',          type: 'money',  default: 380000, bounds: [1000, 50_000_000] },
+      { id: 'downPct',     label: 'Down payment %',           sub: 'at purchase',              type: 'percent',default: 15,     bounds: [0, 100] },
+      { id: 'origApr',     label: 'Original mortgage APR',    sub: 'rate you locked',          type: 'rate',   default: 4.25 },
+      { id: 'origTerm',    label: 'Original loan term',       sub: 'years',                    type: 'years',  default: 30 },
+      { id: 'yearsHeld',   label: 'Years owned',              sub: 'time mortgage paid',       type: 'yearsHeld', default: 5 },
+      { id: 'currentValue',label: 'Current home value',       sub: 'estimated sale price',     type: 'money',  default: 520000, bounds: [1000, 50_000_000] },
+      { id: 'agentPct',    label: 'Agent commission',          sub: 'typically 5–6%',          type: 'percent',default: 5.5,    bounds: [0, 15] },
+      { id: 'closingPct',  label: 'Other closing costs',       sub: 'title, transfer, etc.',   type: 'percent',default: 1.5,    bounds: [0, 10] },
+      { id: 'netCash',     label: 'Net cash to seller',        sub: 'walkaway amount',         type: 'money',  default: 130000, bounds: [-5_000_000, 50_000_000], output: true },
+    ],
+    unknownDefault: 'netCash',
+    residual(s) {
+      const loanOrig = s.origPrice * (1 - s.downPct / 100);
+      const balance = remainingBalance(loanOrig, s.origApr, s.origTerm, s.yearsHeld * 12);
+      const costs = s.currentValue * (s.agentPct + s.closingPct) / 100;
+      const net = s.currentValue - balance - costs;
+      return net - s.netCash;
+    },
+    summary(s) {
+      const loanOrig = s.origPrice * (1 - s.downPct / 100);
+      const balance = remainingBalance(loanOrig, s.origApr, s.origTerm, s.yearsHeld * 12);
+      const costs = s.currentValue * (s.agentPct + s.closingPct) / 100;
+      const equity = s.currentValue - balance;
+      const appreciation = s.currentValue - s.origPrice;
+      return [
+        { label: 'Net cash to seller', value: FMT.money(s.netCash) },
+        { label: 'Remaining mortgage', value: FMT.money(balance), sm: true },
+        { label: 'Selling costs', value: FMT.money(costs), sm: true },
+        { label: 'Total equity', value: FMT.money(equity), sm: true },
+        { label: 'Appreciation', value: FMT.money(appreciation), sm: true },
+      ];
+    },
+  },
+};
+
+/* =================================================================
+   STATE + UI
+   ================================================================= */
+
+const state = {};
+for (const id in CALCS) {
+  const calc = CALCS[id];
+  const s = { unknown: calc.unknownDefault, values: {}, lastError: null };
+  for (const f of calc.fields) {
+    s.values[f.id] = f.default;
+  }
+  state[id] = s;
+}
+
+function getBounds(field) {
+  return field.bounds || TYPES[field.type].bounds;
+}
+
+function bracketFor(field) {
+  const [lo, hi] = getBounds(field);
+  return [lo + 1e-6, hi];
+}
+
+function solveCalc(calcId) {
+  const calc = CALCS[calcId];
+  const s = state[calcId];
+  const unknownField = calc.fields.find(f => f.id === s.unknown);
+  const [lo, hi] = bracketFor(unknownField);
+  const baseValues = { ...s.values };
+  const resid = (x) => {
+    const trial = { ...baseValues, [s.unknown]: x };
+    return calc.residual(trial);
+  };
+  const result = solveFor(resid, lo, hi);
+  if (result == null || !isFinite(result)) {
+    s.lastError = 'No solution in feasible range';
+    return false;
+  }
+  s.values[s.unknown] = result;
+  s.lastError = null;
+  return true;
+}
+
+/* ---- Field rendering ---- */
+
+function renderCalc(calcId) {
+  const calc = CALCS[calcId];
+  const s = state[calcId];
+  const root = document.querySelector(`[data-calc="${calcId}"]`);
+  const fieldsRoot = root.querySelector('.fields');
+  fieldsRoot.innerHTML = '';
+
+  for (const f of calc.fields) {
+    const type = TYPES[f.type];
+    const isUnknown = s.unknown === f.id;
+    const row = document.createElement('div');
+    row.className = 'field' + (isUnknown ? ' solving' : '');
+    row.dataset.field = f.id;
+
+    const label = document.createElement('div');
+    label.className = 'field-label';
+    label.innerHTML = `<span>${f.label}</span><span class="sub">${f.sub || ''}</span>`;
+    row.appendChild(label);
+
+    const inputWrap = document.createElement('div');
+    inputWrap.className = 'field-input';
+
+    const solveBtn = document.createElement('button');
+    solveBtn.className = 'solve-btn';
+    solveBtn.textContent = isUnknown ? '◉ solve' : 'solve';
+    solveBtn.title = isUnknown ? 'Currently solving for this field' : 'Solve for this field';
+    solveBtn.addEventListener('click', () => {
+      s.unknown = f.id;
+      renderCalc(calcId);
+      renderGraph(calcId); // refresh axis options
+    });
+    inputWrap.appendChild(solveBtn);
+
+    const unit = document.createElement('span');
+    unit.className = 'unit';
+    unit.textContent = type.unit;
+    inputWrap.appendChild(unit);
+
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.inputMode = 'decimal';
+    input.value = type.fmtInput(s.values[f.id]);
+    input.placeholder = type.placeholder;
+    input.disabled = isUnknown;
+    input.addEventListener('change', () => {
+      const v = type.parse(input.value);
+      if (isFinite(v)) {
+        s.values[f.id] = v;
+        input.value = type.fmtInput(v);
+        renderSummary(calcId);
+        renderGraph(calcId);
+      } else {
+        input.value = type.fmtInput(s.values[f.id]);
+      }
+    });
+    input.addEventListener('focus', () => input.select());
+    inputWrap.appendChild(input);
+
+    row.appendChild(inputWrap);
+    fieldsRoot.appendChild(row);
+  }
+
+  renderSummary(calcId);
+}
+
+function renderSummary(calcId) {
+  const calc = CALCS[calcId];
+  const s = state[calcId];
+  const root = document.querySelector(`[data-calc="${calcId}"]`);
+  const sumRoot = root.querySelector('[data-summary]');
+  const status = root.querySelector('.status');
+
+  if (s.lastError) {
+    status.textContent = '✕  ' + s.lastError;
+    status.classList.add('err');
+  } else {
+    const unknownField = calc.fields.find(f => f.id === s.unknown);
+    status.textContent = `Solving for ${unknownField.label.toLowerCase()}`;
+    status.classList.remove('err');
+  }
+
+  const items = calc.summary(s.values);
+  sumRoot.innerHTML = '';
+  for (const it of items) {
+    const el = document.createElement('div');
+    el.innerHTML = `<span class="label">${it.label}</span><span class="value${it.sm ? ' sm' : ''}">${it.value}</span>`;
+    sumRoot.appendChild(el);
+  }
+}
+
+/* =================================================================
+   GRAPH PANEL
+   ================================================================= */
+
+function renderGraph(calcId) {
+  const calc = CALCS[calcId];
+  const s = state[calcId];
+  const root = document.querySelector(`[data-graph="${calcId}"]`);
+
+  // Preserve previously selected axes if possible
+  const existingX = root.querySelector('select[data-axis="x"]');
+  const existingY = root.querySelector('select[data-axis="y"]');
+  let xId = existingX ? existingX.value : null;
+  let yId = existingY ? existingY.value : null;
+
+  // y default = the current unknown
+  if (!yId || !calc.fields.find(f => f.id === yId)) {
+    yId = s.unknown;
+  }
+  // x default = the first field that isn't y
+  if (!xId || xId === yId || !calc.fields.find(f => f.id === xId)) {
+    xId = calc.fields.find(f => f.id !== yId).id;
+  }
+
+  const xField = calc.fields.find(f => f.id === xId);
+  const yField = calc.fields.find(f => f.id === yId);
+
+  // Range defaults — around current value
+  const cur = s.values[xId];
+  const rangeKey = `${calcId}.range.${xId}`;
+  let saved = null;
+  try { saved = JSON.parse(sessionStorage.getItem(rangeKey)); } catch(e) {}
+  let xMin = saved ? saved.min : suggestMin(xField, cur);
+  let xMax = saved ? saved.max : suggestMax(xField, cur);
+
+  root.innerHTML = `
+    <div class="graph-head">
+      <h3>Relationship</h3>
+      <span class="subtitle">${calcId === 'afford' ? 'sensitivity sweep' : calcId === 'mortgage' ? 'parameter scan' : 'walkaway scan'}</span>
+    </div>
+    <div class="graph-controls">
+      <label>Y axis</label>
+      <select data-axis="y">
+        ${calc.fields.map(f => `<option value="${f.id}" ${f.id === yId ? 'selected' : ''}>${f.label}</option>`).join('')}
+      </select>
+      <label>vs X</label>
+      <select data-axis="x">
+        ${calc.fields.filter(f => f.id !== yId).map(f => `<option value="${f.id}" ${f.id === xId ? 'selected' : ''}>${f.label}</option>`).join('')}
+      </select>
+    </div>
+    <div class="range-row">
+      <label>X min</label>
+      <input type="text" data-range="min" value="${TYPES[xField.type].fmtInput(xMin)}" />
+      <label>X max</label>
+      <input type="text" data-range="max" value="${TYPES[xField.type].fmtInput(xMax)}" />
+    </div>
+    <div class="chart-wrap">
+      <svg class="chart" viewBox="0 0 560 320" preserveAspectRatio="none" data-svg></svg>
+    </div>
+    <div class="readout" data-readout></div>
+  `;
+
+  // Wire up controls
+  root.querySelector('select[data-axis="x"]').addEventListener('change', () => renderGraph(calcId));
+  root.querySelector('select[data-axis="y"]').addEventListener('change', () => renderGraph(calcId));
+  const minIn = root.querySelector('input[data-range="min"]');
+  const maxIn = root.querySelector('input[data-range="max"]');
+  const onRange = () => {
+    const min = TYPES[xField.type].parse(minIn.value);
+    const max = TYPES[xField.type].parse(maxIn.value);
+    if (isFinite(min) && isFinite(max) && max > min) {
+      sessionStorage.setItem(rangeKey, JSON.stringify({ min, max }));
+      drawChart();
+    }
+  };
+  minIn.addEventListener('change', onRange);
+  maxIn.addEventListener('change', onRange);
+
+  function drawChart() {
+    const min = TYPES[xField.type].parse(minIn.value);
+    const max = TYPES[xField.type].parse(maxIn.value);
+    if (!isFinite(min) || !isFinite(max) || max <= min) return;
+    drawSweep(root, calc, s, xField, yField, min, max);
+  }
+
+  drawChart();
+}
+
+function suggestMin(field, cur) {
+  if (field.type === 'rate') return Math.max(0.5, cur - 3);
+  if (field.type === 'percent') return Math.max(0, cur - 10);
+  if (field.type === 'years' || field.type === 'yearsHeld') return Math.max(0, Math.floor(cur - 10));
+  return Math.max(0, cur * 0.5);
+}
+function suggestMax(field, cur) {
+  if (field.type === 'rate') return cur + 3;
+  if (field.type === 'percent') return Math.min(100, cur + 10);
+  if (field.type === 'years' || field.type === 'yearsHeld') return cur + 15;
+  return cur * 1.6 + 1;
+}
+
+function drawSweep(root, calc, s, xField, yField, xMin, xMax) {
+  const svg = root.querySelector('[data-svg]');
+  const W = 560, H = 320;
+  const PAD = { l: 64, r: 18, t: 16, b: 44 };
+  const innerW = W - PAD.l - PAD.r;
+  const innerH = H - PAD.t - PAD.b;
+
+  // Sample N points; for each x, solve for yField holding others fixed
+  const N = 60;
+  const xs = [];
+  const ys = [];
+  const baseValues = { ...s.values };
+
+  for (let i = 0; i <= N; i++) {
+    const x = xMin + (xMax - xMin) * (i / N);
+    let y;
+    if (xField.id === yField.id) {
+      y = x;
+    } else {
+      // Hold every field at baseValues, set xField=x, solve for yField
+      const trial = { ...baseValues, [xField.id]: x };
+      const [lo, hi] = bracketFor(yField);
+      const resid = (v) => calc.residual({ ...trial, [yField.id]: v });
+      y = solveFor(resid, lo, hi);
+    }
+    xs.push(x);
+    ys.push(y);
+  }
+
+  const validYs = ys.filter(v => v != null && isFinite(v));
+  if (validYs.length < 2) {
+    svg.innerHTML = `<text x="${W/2}" y="${H/2}" text-anchor="middle" fill="#6d655a" font-family="JetBrains Mono" font-size="11">no solution in range</text>`;
+    root.querySelector('[data-readout]').innerHTML = '';
+    return;
+  }
+  let yMin = Math.min(...validYs);
+  let yMax = Math.max(...validYs);
+  if (yMin === yMax) { yMin -= 1; yMax += 1; }
+  // Pad y range slightly
+  const yPad = (yMax - yMin) * 0.08;
+  yMin -= yPad; yMax += yPad;
+
+  const sx = x => PAD.l + ((x - xMin) / (xMax - xMin)) * innerW;
+  const sy = y => PAD.t + innerH - ((y - yMin) / (yMax - yMin)) * innerH;
+
+  // Build path
+  let d = '';
+  let started = false;
+  for (let i = 0; i <= N; i++) {
+    const y = ys[i];
+    if (y == null || !isFinite(y)) { started = false; continue; }
+    const cmd = started ? 'L' : 'M';
+    d += `${cmd}${sx(xs[i]).toFixed(2)},${sy(y).toFixed(2)}`;
+    started = true;
+  }
+
+  // Ticks
+  const xTicks = niceTicks(xMin, xMax, 6);
+  const yTicks = niceTicks(yMin, yMax, 5);
+
+  let svgInner = '';
+
+  // Grid
+  svgInner += `<g class="grid">`;
+  for (const t of yTicks) {
+    const y = sy(t);
+    svgInner += `<line x1="${PAD.l}" x2="${W - PAD.r}" y1="${y}" y2="${y}" />`;
+  }
+  for (const t of xTicks) {
+    const x = sx(t);
+    svgInner += `<line y1="${PAD.t}" y2="${H - PAD.b}" x1="${x}" x2="${x}" />`;
+  }
+  svgInner += `</g>`;
+
+  // Axes
+  svgInner += `<g class="axis">`;
+  svgInner += `<line x1="${PAD.l}" x2="${W - PAD.r}" y1="${H - PAD.b}" y2="${H - PAD.b}" />`;
+  svgInner += `<line x1="${PAD.l}" x2="${PAD.l}" y1="${PAD.t}" y2="${H - PAD.b}" />`;
+  for (const t of xTicks) {
+    const x = sx(t);
+    svgInner += `<text x="${x}" y="${H - PAD.b + 14}" text-anchor="middle">${tickLabel(xField, t)}</text>`;
+  }
+  for (const t of yTicks) {
+    const y = sy(t);
+    svgInner += `<text x="${PAD.l - 8}" y="${y + 3}" text-anchor="end">${tickLabel(yField, t)}</text>`;
+  }
+  // Axis titles
+  svgInner += `<text class="axis-title" x="${PAD.l + innerW / 2}" y="${H - 8}" text-anchor="middle">${xField.label}</text>`;
+  svgInner += `<text class="axis-title" x="${-(PAD.t + innerH / 2)}" y="14" text-anchor="middle" transform="rotate(-90)">${yField.label}</text>`;
+  svgInner += `</g>`;
+
+  // Curve
+  svgInner += `<path class="curve" d="${d}" />`;
+
+  // Current-state marker
+  const cx = s.values[xField.id];
+  const trialNow = { ...s.values, [xField.id]: cx };
+  let cy;
+  if (xField.id === yField.id) cy = cx;
+  else if (yField.id === s.unknown) cy = s.values[yField.id];
+  else {
+    const [lo, hi] = bracketFor(yField);
+    cy = solveFor(v => calc.residual({ ...trialNow, [yField.id]: v }), lo, hi);
+  }
+  if (cy != null && isFinite(cy) && cx >= xMin && cx <= xMax) {
+    svgInner += `<circle class="marker" cx="${sx(cx).toFixed(2)}" cy="${sy(cy).toFixed(2)}" r="5" />`;
+  }
+
+  svg.innerHTML = svgInner;
+
+  // Readout: slope of curve at current x (Δy per unit Δx)
+  let slopeStr = '—';
+  if (cy != null && isFinite(cy)) {
+    const dx = (xMax - xMin) / 200;
+    const trialP = { ...s.values, [xField.id]: cx + dx };
+    const trialM = { ...s.values, [xField.id]: Math.max(xMin, cx - dx) };
+    const [lo, hi] = bracketFor(yField);
+    const yp = solveFor(v => calc.residual({ ...trialP, [yField.id]: v }), lo, hi);
+    const ym = solveFor(v => calc.residual({ ...trialM, [yField.id]: v }), lo, hi);
+    if (yp != null && ym != null && isFinite(yp) && isFinite(ym)) {
+      const slope = (yp - ym) / (2 * dx);
+      slopeStr = formatSlope(slope, xField, yField);
+    }
+  }
+
+  const readout = root.querySelector('[data-readout]');
+  readout.innerHTML = `
+    <span>At current: <b>${tickLabel(xField, cx)} → ${cy == null ? '—' : tickLabel(yField, cy)}</b></span>
+    <span>Local sensitivity: <b>${slopeStr}</b></span>
+  `;
+}
+
+function tickLabel(field, v) {
+  if (field.type === 'money')   return v >= 1_000_000 ? '$' + (v/1_000_000).toFixed(2) + 'M'
+                                : v >= 1_000        ? '$' + Math.round(v/1000) + 'k'
+                                : '$' + Math.round(v);
+  if (field.type === 'rate')    return v.toFixed(2) + '%';
+  if (field.type === 'percent') return v.toFixed(1) + '%';
+  if (field.type === 'years' || field.type === 'yearsHeld') return v.toFixed(0) + 'y';
+  return v.toFixed(1);
+}
+
+function formatSlope(slope, xField, yField) {
+  // Choose nice "per unit" framing
+  const xUnit = unitWord(xField, true);
+  const yUnit = unitWord(yField, false);
+  // Scale x step for readability on money inputs
+  let step = 1;
+  let stepLabel = '1';
+  if (xField.type === 'money') { step = 1000; stepLabel = '$1k'; }
+  else if (xField.type === 'rate') { step = 0.25; stepLabel = '0.25%'; }
+  else if (xField.type === 'percent') { step = 1; stepLabel = '1%'; }
+  else if (xField.type === 'years' || xField.type === 'yearsHeld') { step = 1; stepLabel = '1 yr'; }
+
+  const dy = slope * step;
+  let dyLabel;
+  if (yField.type === 'money') dyLabel = (dy >= 0 ? '+' : '−') + '$' + Math.abs(Math.round(dy)).toLocaleString('en-US');
+  else if (yField.type === 'rate') dyLabel = (dy >= 0 ? '+' : '−') + Math.abs(dy).toFixed(3) + '%';
+  else if (yField.type === 'percent') dyLabel = (dy >= 0 ? '+' : '−') + Math.abs(dy).toFixed(2) + '%';
+  else dyLabel = (dy >= 0 ? '+' : '−') + Math.abs(dy).toFixed(2);
+
+  return `${dyLabel} per ${stepLabel}`;
+}
+function unitWord(f, isX) {
+  if (f.type === 'money') return '$';
+  if (f.type === 'rate' || f.type === 'percent') return '%';
+  if (f.type === 'years' || f.type === 'yearsHeld') return 'yr';
+  return '';
+}
+
+function niceTicks(min, max, count) {
+  const range = max - min;
+  const rough = range / count;
+  const pow = Math.pow(10, Math.floor(Math.log10(rough)));
+  const norm = rough / pow;
+  let step;
+  if (norm < 1.5) step = 1 * pow;
+  else if (norm < 3) step = 2 * pow;
+  else if (norm < 7) step = 5 * pow;
+  else step = 10 * pow;
+  const first = Math.ceil(min / step) * step;
+  const out = [];
+  for (let v = first; v <= max + step * 0.001; v += step) out.push(v);
+  return out;
+}
+
+/* =================================================================
+   WIRING
+   ================================================================= */
+
+document.querySelectorAll('.tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelector(`[data-panel="${btn.dataset.tab}"]`).classList.add('active');
+  });
+});
+
+document.querySelectorAll('[data-action="calc"]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const calcRoot = btn.closest('[data-calc]');
+    const calcId = calcRoot.dataset.calc;
+    solveCalc(calcId);
+    renderCalc(calcId);
+    renderGraph(calcId);
+  });
+});
+
+// Initial render
+for (const id in CALCS) {
+  // Solve once at startup so defaults are self-consistent
+  solveCalc(id);
+  renderCalc(id);
+  renderGraph(id);
+}
+</script>
+</body>
+</html>

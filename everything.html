@@ -30,8 +30,6 @@
       --text-muted: var(--text-muted-dark);
     }
 
-    /* Light mode is the default - dark mode only activates via toggle */
-
     * {
       margin: 0;
       padding: 0;
@@ -171,32 +169,29 @@
     }
 
     /* Color accents for different categories */
-    .sitemap-item.biology a { border-left: 3px solid #2d7a5e; }
-    .sitemap-item.judaism a { border-left: 3px solid #4a5f8d; }
-    .sitemap-item.ai-safety a { border-left: 3px solid #8b5a3c; }
-    .sitemap-item.crossover a { border-left: 3px solid #6b6762; }
-    .sitemap-item.model a { border-left: 3px solid #2d7a5e; }
-    .sitemap-item.substack a { border-left: 3px solid #ff6719; }
+    .sitemap-item.biology a    { border-left: 3px solid #2d7a5e; }
+    .sitemap-item.judaism a    { border-left: 3px solid #4a5f8d; }
+    .sitemap-item.ai-safety a  { border-left: 3px solid #8b5a3c; }
+    .sitemap-item.crossover a  { border-left: 3px solid #6b6762; }
+    .sitemap-item.model a      { border-left: 3px solid #2d7a5e; }
+    .sitemap-item.substack a   { border-left: 3px solid #ff6719; }
     .sitemap-item.publication a { border-left: 3px solid #8b5a3c; }
-    .sitemap-item.external a { border-left: 3px solid #6b6762; }
-    .sitemap-item.tool a { border-left: 3px solid #6b6762; }
+    .sitemap-item.external a   { border-left: 3px solid #6b6762; }
+    .sitemap-item.tool a       { border-left: 3px solid #6b6762; }
+
+    /* Aleph item — subtle spectral shimmer via gradient border effect */
+    .sitemap-item.aleph a {
+      border-left: 3px solid oklch(0.65 0.18 290);
+    }
+    .sitemap-item.aleph a:hover {
+      background: rgba(107, 90, 150, 0.07);
+    }
 
     @media (max-width: 768px) {
-      .page-title {
-        font-size: 2.2rem;
-      }
-
-      .page-subtitle {
-        font-size: 1rem;
-      }
-
-      .content p {
-        font-size: 1rem;
-      }
-
-      .sitemap-list {
-        grid-template-columns: 1fr;
-      }
+      .page-title      { font-size: 2.2rem; }
+      .page-subtitle   { font-size: 1rem; }
+      .content p       { font-size: 1rem; }
+      .sitemap-list    { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -280,7 +275,7 @@
           </li>
         </ul>
       </div>
-      
+
       <!-- Other Websites -->
       <div class="sitemap-section">
         <h2 class="sitemap-section-title">Other Websites</h2>
@@ -351,6 +346,12 @@
             <a href="/contact.html">
               <div class="sitemap-item-title">Contact</div>
               <div class="sitemap-item-desc">Get in touch</div>
+            </a>
+          </li>
+          <li class="sitemap-item aleph">
+            <a href="/aleph.html">
+              <div class="sitemap-item-title">Aleph Lava Lamp</div>
+              <div class="sitemap-item-desc">Thing I made just to look at</div>
             </a>
           </li>
         </ul>

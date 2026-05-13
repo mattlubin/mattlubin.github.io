@@ -30,8 +30,6 @@
       --text-muted: var(--text-muted-dark);
     }
 
-    /* Light mode is the default - dark mode only activates via toggle */
-
     * {
       margin: 0;
       padding: 0;
@@ -224,7 +222,7 @@
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
 
-    /* Recommendation list - more casual styling */
+    /* Recommendation list */
     .rec-list {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -257,7 +255,6 @@
       letter-spacing: 0.05em;
     }
 
-    /* Author styling - warm amber tones, italic name */
     .rec-item.rec-author {
       background: linear-gradient(135deg, rgba(139, 90, 60, 0.08) 0%, rgba(168, 111, 77, 0.04) 100%);
       border-left: 3px solid #8b5a3c;
@@ -268,23 +265,12 @@
       background: linear-gradient(135deg, rgba(139, 90, 60, 0.15) 0%, rgba(168, 111, 77, 0.08) 100%);
     }
 
-    .rec-item.rec-author .rec-item-title {
-      font-style: italic;
-    }
+    .rec-item.rec-author .rec-item-title { font-style: italic; }
+    .rec-item.rec-author .rec-item-type  { color: #8b5a3c; }
 
-    .rec-item.rec-author .rec-item-type {
-      color: #8b5a3c;
-    }
+    :root.dark .rec-item.rec-author { border-left-color: #c4926e; }
+    :root.dark .rec-item.rec-author .rec-item-type { color: #c4926e; }
 
-    :root.dark .rec-item.rec-author {
-      border-left-color: #c4926e;
-    }
-
-    :root.dark .rec-item.rec-author .rec-item-type {
-      color: #c4926e;
-    }
-
-    /* Book styling - bold spine-like appearance */
     .rec-item.rec-book {
       background: var(--bg);
       border: 1px solid var(--text-muted);
@@ -297,19 +283,11 @@
       box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
     }
 
-    .rec-item.rec-book .rec-item-title {
-      font-weight: 600;
-    }
+    .rec-item.rec-book .rec-item-title { font-weight: 600; }
+    .rec-item.rec-book .rec-item-type  { color: var(--personal); }
 
-    .rec-item.rec-book .rec-item-type {
-      color: var(--personal);
-    }
+    :root.dark .rec-item.rec-book .rec-item-type { color: var(--personal-light); }
 
-    :root.dark .rec-item.rec-book .rec-item-type {
-      color: var(--personal-light);
-    }
-
-    /* Magazine styling - centered with badge label */
     .rec-item.rec-magazine {
       background: linear-gradient(135deg, rgba(74, 95, 141, 0.08) 0%, rgba(93, 118, 171, 0.04) 100%);
       border-radius: 12px;
@@ -341,7 +319,6 @@
       background: rgba(93, 118, 171, 0.2);
     }
 
-    /* YouTube styling - red accent, play button feel */
     .rec-item.rec-youtube {
       background: linear-gradient(135deg, rgba(255, 0, 0, 0.06) 0%, rgba(200, 50, 50, 0.03) 100%);
       border-radius: 8px;
@@ -363,26 +340,13 @@
       background: linear-gradient(135deg, rgba(255, 0, 0, 0.12) 0%, rgba(200, 50, 50, 0.06) 100%);
     }
 
-    .rec-item.rec-youtube .rec-item-type {
-      color: #cc0000;
-    }
+    .rec-item.rec-youtube .rec-item-type { color: #cc0000; }
 
-    :root.dark .rec-item.rec-youtube::before {
-      color: #ff4444;
-    }
+    :root.dark .rec-item.rec-youtube::before { color: #ff4444; }
+    :root.dark .rec-item.rec-youtube .rec-item-type { color: #ff4444; }
 
-    :root.dark .rec-item.rec-youtube .rec-item-type {
-      color: #ff4444;
-    }
-
-    /* Category groups for recommendations */
-    .rec-category {
-      margin-bottom: 1.5rem;
-    }
-
-    .rec-category:last-child {
-      margin-bottom: 0;
-    }
+    .rec-category { margin-bottom: 1.5rem; }
+    .rec-category:last-child { margin-bottom: 0; }
 
     .rec-category-label {
       font-size: 0.8rem;
@@ -395,18 +359,92 @@
       border-bottom: 1px solid rgba(107, 103, 98, 0.2);
     }
 
+    /* ── Aleph lava lamp section ─────────────────────────────── */
+    .aleph-section {
+      margin-top: 2rem;
+      padding-top: 3rem;
+      border-top: 1px solid var(--text-muted);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.25rem;
+      padding-bottom: 1rem;
+    }
+
+    .aleph-section-heading {
+      font-size: 1.6rem;
+      font-weight: 400;
+      color: var(--personal);
+      text-align: center;
+    }
+
+    :root.dark .aleph-section-heading {
+      color: var(--personal-light);
+    }
+
+    .aleph-section-caption {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      text-align: center;
+      max-width: 360px;
+      line-height: 1.8;
+      font-style: italic;
+    }
+
+    .aleph-section-caption a {
+      color: var(--text-muted);
+      text-underline-offset: 3px;
+    }
+
+    .aleph-section-caption a:hover {
+      color: var(--text);
+    }
+
+    /* Aleph lava lamp (embedded, 320px) */
+    .aleph-mxc-stage-p {
+      width: 320px;
+      height: 320px;
+      position: relative;
+      max-width: 85vw;
+      max-height: 85vw;
+    }
+
+    .aleph-mxc-stage-p svg { width: 100%; height: 100%; display: block; }
+
+    .aleph-mxc-ch-p {
+      transform-box: fill-box;
+      transform-origin: center;
+      mix-blend-mode: multiply;
+    }
+
+    :root.dark .aleph-mxc-ch-p {
+      mix-blend-mode: screen;
+    }
+
+    .aleph-mxc-r-p { animation: aleph-mxc-r 9s ease-in-out infinite; }
+    .aleph-mxc-g-p { animation: aleph-mxc-g 9s ease-in-out infinite; }
+    .aleph-mxc-b-p { animation: aleph-mxc-b 9s ease-in-out infinite; }
+
+    @keyframes aleph-mxc-r {
+      0%, 11.11% { transform: translate(0, 0) scale(1); }
+      55.55%     { transform: translate(6px, -3px) scale(1.03); }
+      100%       { transform: translate(0, 0) scale(1); }
+    }
+    @keyframes aleph-mxc-g {
+      0%, 11.11% { transform: translate(0, 0) scale(1); }
+      55.55%     { transform: translate(-5px, 5px) scale(0.98); }
+      100%       { transform: translate(0, 0) scale(1); }
+    }
+    @keyframes aleph-mxc-b {
+      0%, 11.11% { transform: translate(0, 0) scale(1); }
+      55.55%     { transform: translate(-2px, -7px) scale(1.02); }
+      100%       { transform: translate(0, 0) scale(1); }
+    }
+
     @media (max-width: 768px) {
-      .page-title {
-        font-size: 2.2rem;
-      }
-
-      .page-subtitle {
-        font-size: 1rem;
-      }
-
-      .content p {
-        font-size: 1rem;
-      }
+      .page-title    { font-size: 2.2rem; }
+      .page-subtitle { font-size: 1rem; }
+      .content p     { font-size: 1rem; }
 
       .section-header {
         flex-direction: column;
@@ -414,19 +452,9 @@
         gap: 0.75rem;
       }
 
-      .section-icon {
-        width: 40px;
-        height: 40px;
-        font-size: 1.2rem;
-      }
-
-      .section-title {
-        font-size: 1.4rem;
-      }
-
-      .rec-list {
-        grid-template-columns: 1fr;
-      }
+      .section-icon  { width: 40px; height: 40px; font-size: 1.2rem; }
+      .section-title { font-size: 1.4rem; }
+      .rec-list      { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -449,57 +477,99 @@
     </div>
 
     <div class="content">
-      <p>There are only so many things you can do in life. In fact, my real ambitions are to do things that cannot be linked on the internet. 
-        From the perspective of the great horde of humanity, I'm just a random guy in the sea of billions. So, ideally, I intend to focus my efforts on doing things for the people to whom I'm not just a random guy, besides for trying to make a the world a better place for whoever else I can.</p>
+      <p>There are only so many things you can do in life. In fact, my real ambitions are to do things that cannot be linked on the internet.
+        Although, I did at least <a href="https://accomattating.substack.com/p/arthur-aging-and-ambition">write about that very thing on the internet</a>. And a very <a href="https://substack.com/home/post/p-182607821">Jewish/religious essay</a> about publishing stuff online.
+        From the perspective of the internet, I'm just a random guy in the sea of billions. So, ideally, I intend to focus my efforts on doing things for the people to whom I'm not just a random guy.</p>
       <p>On this page is also going to be whatever else I <em>am</em> interested in posting online, but doesn't fit into any of the other things I work on. </p>
-
-      <!-- Personal Essays -->
-      <section class="section">
-      <div class="section-header">
-        <div class="section-icon">🧑‍💻</div>
-        <h2 class="section-title">Personal Essays</h2>
-      </div>
-      <p class="section-intro">Occasional reflections on my own work and thought processes.
-      </p>
-      <div class="link-list">
-        <a href="https://mattsbiodefense.substack.com/p/top-10-public-health-interventions" class="link-card">
-          <div class="link-card-title">My Vibe Coding Experience</div>
-          <div class="link-card-description">
-            Reflections on building things with AI-assisted coding tools.
-          </div>
-        </a>
-        <a href="https://accomattating.substack.com/p/arthur-aging-and-ambition" class="link-card">
-          <div class="link-card-title">Arthur, Aging, and Ambition</div>
-          <div class="link-card-description">
-            Processing the experience of turning thirty years old.
-          </div>
-        </a>
-      </div>
-      </section>
 
       <!-- Web Apps -->
       <section class="section">
-      <div class="section-header">
-        <div class="section-icon">🔧</div>
-        <h2 class="section-title">Tools</h2>
-      </div>
-      <p class="section-intro">Random things I built for myself, with some help from Claude Code.
-      </p>
-      <div class="link-list">
-        <a href="/task-calendar.html" class="link-card">
-          <div class="link-card-title">Task Breakdown Calendar</div>
-          <div class="link-card-description">
-            This is a mostly-functional calendar, with the main feature being that when you add a "task" due on some particular day, you can give the task a dozen subtasks, and the calendar will automatically distribute those subtasks to be due on days between today and the final due date. No other fancy plugins.
-          </div>
-        </a>
-        <a href="https://github.com/mattlubin/tools" class="link-card">
-          <div class="link-card-title">PDF Highlight Extractor</div>
-          <div class="link-card-description">
-            Extracts highlighted text from PDFs using OCR. Useful when the text layer is corrupted or the document is scanned. Supports multiple languages including Hebrew, Arabic, Chinese, and more.
-          </div>
-        </a>
-      </div>
+        <div class="section-header">
+          <div class="section-icon">🧑‍💻</div>
+          <h2 class="section-title">Tools</h2>
+        </div>
+        <p class="section-intro">Random things I built for myself, with some help from Claude Code.</p>
+        <div class="link-list">
+          <a href="/task-calendar.html" class="link-card">
+            <div class="link-card-title">Task Breakdown Calendar</div>
+            <div class="link-card-description">
+              This is a mostly-functional calendar, with the main feature being that when you add a "task" due on some particular day, you can give the task a dozen subtasks, and the calendar will automatically distribute those subtasks to be due on days between today and the final due date. No other fancy plugins.
+            </div>
+          </a>
+          <a href="https://github.com/mattlubin/tools" class="link-card">
+            <div class="link-card-title">PDF Highlight Extractor</div>
+            <div class="link-card-description">
+              Extracts highlighted text from PDFs using OCR. Useful when the text layer is corrupted or the document is scanned. Supports multiple languages including Hebrew, Arabic, Chinese, and more.
+            </div>
+          </a>
+          <a href="/home-financial-calculators.html" class="link-card">
+            <div class="link-card-title">Home Buying/selling Calculator</div>
+            <div class="link-card-description">
+              I didn't love the versions of this that I found online, so Claude helped me build me own. Calculates estimates for US home buying costs and selling gains, with more number flexibility and charts.
+            </div>
+          </a>
+        </div>
       </section>
+
+      <!-- Aleph lava lamp -->
+      <div class="aleph-section">
+        <h2 class="aleph-section-heading">Aleph Lava Lamp</h2>
+
+        <div class="aleph-mxc-stage-p">
+          <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" aria-label="Animated aleph glyph" role="img">
+            <defs>
+              <symbol id="aleph-glyph-p" viewBox="50 1000 1080 1400" preserveAspectRatio="xMidYMid meet">
+                <path fill="currentColor" d="M87 1192.5q11 63.5 16.5 108.5t5.5 87q0 47-7 89l154 95-154 682h306q7 4 17.5 8t18 9 12.5 13q12 20 19.5 40t14.5 45 14 43q25-38 30-46t26.5-45 28.5-57 15.5-52 8.5-61q0-44-17-85-13-30-33.5-54t-41-38-53.5-26.5-55.5-18.5-63-15.5T288 1898l66-254q61 57 136 140t133 146.5 126 129.5 144 115.5 159 78.5q61 0 75-32-14-67-14-142 0-143 16-240-8 7-25.5 26.5t-30.5 30-26 10.5q-6 0-13-3-47-13-83.5-36t-56.5-44.5-57.5-63.5-68.5-72q10-4 41.5-18t42.5-19.5 38.5-18.5 39-20 34-21 33-24 26-25 23-29 14.5-31 10-36q6-16 6-31 0-33-30-71t-71-71.5-97.5-91T782 1064q7 28 7 55 0 42-21.5 81t-46.5 62.5-67 59-62 56.5q5 4 37 16.5t66.5 28 72.5 46 56 67.5q4 12 4 16 0 48-130 80-88-107-190.5-194.5t-239.5-186T72 1105q4 24 15 87.5z"/>
+              </symbol>
+
+              <filter id="mxRp" x="-25%" y="-25%" width="150%" height="150%">
+                <feTurbulence type="fractalNoise" baseFrequency="0.012 0.022" numOctaves="2" seed="3">
+                  <animate attributeName="baseFrequency" dur="8s" values="0.008 0.018; 0.03 0.04; 0.008 0.018" repeatCount="indefinite"/>
+                </feTurbulence>
+                <feDisplacementMap in="SourceGraphic" scale="12"/>
+                <feColorMatrix type="hueRotate" values="0">
+                  <animate attributeName="values" dur="15s" values="0;360" repeatCount="indefinite"/>
+                </feColorMatrix>
+              </filter>
+
+              <filter id="mxGp" x="-25%" y="-25%" width="150%" height="150%">
+                <feTurbulence type="fractalNoise" baseFrequency="0.014 0.020" numOctaves="2" seed="11">
+                  <animate attributeName="baseFrequency" dur="8s" values="0.03 0.04; 0.008 0.018; 0.03 0.04" repeatCount="indefinite"/>
+                </feTurbulence>
+                <feDisplacementMap in="SourceGraphic" scale="12"/>
+                <feColorMatrix type="hueRotate" values="0">
+                  <animate attributeName="values" dur="15s" values="0;360" repeatCount="indefinite"/>
+                </feColorMatrix>
+              </filter>
+
+              <filter id="mxBp" x="-25%" y="-25%" width="150%" height="150%">
+                <feTurbulence type="fractalNoise" baseFrequency="0.010 0.024" numOctaves="2" seed="19">
+                  <animate attributeName="baseFrequency" dur="8s" values="0.018 0.03; 0.012 0.022; 0.018 0.03" repeatCount="indefinite"/>
+                </feTurbulence>
+                <feDisplacementMap in="SourceGraphic" scale="12"/>
+                <feColorMatrix type="hueRotate" values="0">
+                  <animate attributeName="values" dur="15s" values="0;360" repeatCount="indefinite"/>
+                </feColorMatrix>
+              </filter>
+            </defs>
+
+            <g class="aleph-mxc-ch-p aleph-mxc-r-p" filter="url(#mxRp)" style="color: oklch(0.65 0.22 25);">
+              <use href="#aleph-glyph-p" x="35" y="35" width="130" height="130"/>
+            </g>
+            <g class="aleph-mxc-ch-p aleph-mxc-g-p" filter="url(#mxGp)" style="color: oklch(0.7 0.22 145);">
+              <use href="#aleph-glyph-p" x="35" y="35" width="130" height="130"/>
+            </g>
+            <g class="aleph-mxc-ch-p aleph-mxc-b-p" filter="url(#mxBp)" style="color: oklch(0.55 0.22 260);">
+              <use href="#aleph-glyph-p" x="35" y="35" width="130" height="130"/>
+            </g>
+          </svg>
+        </div>
+
+        <p class="aleph-section-caption">
+          I really enjoy looking at this thing I made. Maybe a little too much.
+          <a href="/aleph.html">Check out its full page.</a>
+        </p>
+      </div>
     </div>
   </main>
 
