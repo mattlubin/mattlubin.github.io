@@ -1,2 +1,2 @@
 # mattlubin.github.io
-Personal webiste. Mostly vibe coded.
+Personal webiste. Written with assistance from various Claudes.
